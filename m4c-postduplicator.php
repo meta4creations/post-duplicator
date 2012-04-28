@@ -2,7 +2,7 @@
 /*
 Plugin Name: Post Duplicator
 Description: Creates functionality to duplicate any and all post types, including taxonomies & custom fields
-Version: 1.0
+Version: 1.1
 Author: Metaphor Creations
 Author URI: http://www.metaphorcreations.com
 License: GPL2
@@ -36,7 +36,7 @@ add_action( 'admin_enqueue_scripts', 'm4c_duplicate_post_scripts' );
  */
 function m4c_duplicate_post_scripts( $hook_suffix ) {
 	if( $hook_suffix == 'edit.php' ) {
-		wp_enqueue_script( 'm4c-duplicate-post', plugins_url().'/m4c-postduplicator/m4c-postduplicator.js', array('jquery'), '1.0' );
+		wp_enqueue_script( 'm4c-duplicate-post', plugins_url().'/post-duplicator/m4c-postduplicator.js', array('jquery'), '1.0' );
 	}
 }
 

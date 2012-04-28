@@ -38,3 +38,11 @@ Check out the 'Installation' tab.
 1. Sample view of the duplicate post link
 
 == Changelog ==
+
+= 1.1 =
+* Updated filenames and paths so the plugin works.
+
+== Upgrade Notice ==
+
+= 1.1 =
+Must upgrade in order for the plugin to work. The file paths where initially wrong as the plugin upload created a different directory name.
