@@ -2,7 +2,7 @@
 Contributors: metaphorcreations
 Tags: posts, post, duplicate, duplication
 Requires at least: 3.0
-Tested up to: 3.4
+Tested up to: 3.4.
 Stable tag: /trunk/
 License: GPL2
 
@@ -14,7 +14,7 @@ This plugin was created to make an exact duplicate of a selected post. Custom po
 
 *Note: Comments are not passed to the new post.
 
-There are no settings to mess with as this plugin is simply meant to quickly and easily duplicate a post. Just hover over a post in the edit screen and select 'Duplicate {post_type}' to create a duplicate post.
+This plugin is simply meant to quickly and easily duplicate a post. Just hover over a post in the edit screen and select 'Duplicate {post_type}' to create a duplicate post.
 
 I created this plugin mainly for myself when I'm develping WordPress sites. I always need dummy content to fill out the look of a website and wanted a very quick and easy way to create multiple posts.
 
@@ -27,7 +27,8 @@ I created this plugin mainly for myself when I'm develping WordPress sites. I al
 
 = Are there any settings I need to configure? =
 
-No.
+No, but there are a couple settings you can adjust if you choose to do so.
+View the settings by going to 'Tools > Post Duplicator'.
 
 = How do I install the plugin? =
 
@@ -36,13 +37,20 @@ Check out the 'Installation' tab.
 == Screenshots ==
 
 1. Sample view of the duplicate post link
+2. View of the settings page
 
 == Changelog ==
+
+= 2.0 =
+* Added a settings page to set 'post status' and 'date' of duplicated posts.
 
 = 1.1 =
 * Updated filenames and paths so the plugin works.
 
 == Upgrade Notice ==
+
+= 2.0 =
+Upgrade Post Duplicator to add 'post status' and 'date' options to your duplicated posts.
 
 = 1.1 =
 Must upgrade in order for the plugin to work. The file paths where initially wrong as the plugin upload created a different directory name.
