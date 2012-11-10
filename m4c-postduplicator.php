@@ -2,7 +2,7 @@
 /*
 Plugin Name: Post Duplicator
 Description: Creates functionality to duplicate any and all post types, including taxonomies & custom fields
-Version: 2.0
+Version: 2.1
 Author: Metaphor Creations
 Author URI: http://www.metaphorcreations.com
 License: GPL2
