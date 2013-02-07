@@ -2,7 +2,7 @@
 /**
  * This is where the metabox magic happens.
  *
- * @package  Metaboxer
+ * @package Ditty News Ticker
  * @author   Metaphor Creations
  * @license  http://www.opensource.org/licenses/gpl-license.php GPL v2.0 (or later)
  * @link     http://www.metaphorcreations.com/plugins/metatools
@@ -16,11 +16,11 @@
 /**
  * Create the metabox class
  *
- * @since 1.0
+ * @since 1.0.0
  */
-if( !class_exists('MetaBoxer') ) {
+if( !class_exists('MTPHR_POST_DUPLICATOR_MetaBoxer') ) {
 
-	class MetaBoxer {
+	class MTPHR_POST_DUPLICATOR_MetaBoxer {
 	
 	  public function __construct( $meta_box ) {
 	
@@ -30,8 +30,8 @@ if( !class_exists('MetaBoxer') ) {
 	  	$this->mb = $meta_box;
 	  	$this->mb_fields = &$this->mb['fields'];
 		
-	    add_action( 'add_meta_boxes', array(&$this, 'metaboxer_add') );
-	    add_action( 'save_post', array(&$this, 'metaboxer_save') );
+	    add_action( 'add_meta_boxes', array(&$this, 'mtphr_post_duplicator_metaboxer_add') );
+	    add_action( 'save_post', array(&$this, 'mtphr_post_duplicator_metaboxer_save') );
 	  }
 	
 	
@@ -40,12 +40,12 @@ if( !class_exists('MetaBoxer') ) {
 		/**
 		 * Create the metaboxes
 		 *
-		 * @since 1.0
+		 * @since 1.0.0
 		 */
-		public function metaboxer_add() {
+		public function mtphr_post_duplicator_metaboxer_add() {
 		
 			foreach ( $this->mb['page'] as $page ) {
-		    add_meta_box( $this->mb['id'], $this->mb['title'], array(&$this, 'metaboxer_render_content'), $page, $this->mb['context'], $this->mb['priority'] );
+		    add_meta_box( $this->mb['id'], $this->mb['title'], array(&$this, 'mtphr_post_duplicator_metaboxer_render_content'), $page, $this->mb['context'], $this->mb['priority'] );
 	  	}
 		}
 	
@@ -55,11 +55,11 @@ if( !class_exists('MetaBoxer') ) {
 		/**
 		 * Render the metabox content
 		 *
-		 * @since 1.0
+		 * @since 1.0.0
 		 */
-	  public function metaboxer_render_content() {
+	  public function mtphr_post_duplicator_metaboxer_render_content() {
 	  	?>
-	  	<div style="width:100%;" class="metaboxer-admin-fields wrap">
+	  	<table style="width:100%;" class="mtphr-post-duplicator-metaboxer-admin-fields wrap">
 	      <?php 
 	      foreach( $this->mb_fields as $field ) {
 	
@@ -69,10 +69,10 @@ if( !class_exists('MetaBoxer') ) {
 					}
 					
 					// Output the field
-					metaboxer_container( $field );
+					mtphr_post_duplicator_metaboxer_container( $field, $this->mb['context'] );
 				}
 				?>
-			</div>
+			</table>
 			<?php
 	  }
 	
@@ -82,9 +82,9 @@ if( !class_exists('MetaBoxer') ) {
 		/**
 		 * Save the field values
 		 *
-		 * @since 1.0
+		 * @since 1.0.0
 		 */
-	  public function metaboxer_save( $post_id ) {
+	  public function mtphr_post_duplicator_metaboxer_save( $post_id ) {
 			
 			global $post;
 			
@@ -113,34 +113,74 @@ if( !class_exists('MetaBoxer') ) {
 						// Store the user data or set as empty string
 						$data = ( isset($_POST[$field['id']]) ) ? $_POST[$field['id']] : '';
 						
-						// Add, update or delete the post meta
-						if( get_post_meta($post_id, $field['id']) == '' ) {
-							add_post_meta( $post_id, $field['id'], $data, true );				
-						} elseif ( $data != get_post_meta($post_id, $field['id'], true) ) {
-							update_post_meta( $post_id, $field['id'], $data );
-						} elseif ( $data == '' ) {
-							delete_post_meta( $post_id, $field['id'], get_post_meta($post_id, $field['id'], true) );
-						}
+						// Update the meta
+						mtphr_post_duplicator_metaboxer_update_meta( $post_id, $field['id'], $field['type'], $data );
 						
-						if( isset($field['append']) ) {
-							foreach( $field['append'] as $id => $append ) {
-								
-								// Store the user data or set as empty string
-								$data = ( isset($_POST[$id]) ) ? $_POST[$id] : '';
-								
-								// Add, update or delete the post meta
-								if( get_post_meta($post_id, $id) == '' ) {
-									add_post_meta( $post_id, $id, $data, true );				
-								} elseif ( $data != get_post_meta($post_id, $id, true) ) {
-									update_post_meta( $post_id, $id, $data );
-								} elseif ( $data == '' ) {
-									delete_post_meta( $post_id, $id, get_post_meta($post_id, $id, true) );
-								}
-							}
-						}
+						// Save appended fields
+						mtphr_post_duplicator_metaboxer_save_appended( $post_id, $field );
+						
+						// Save row fields
+						mtphr_post_duplicator_metaboxer_save_rows( $post_id, $field );
 					}
 				}
 			}
 		}
 	}
+	
+	/**
+	 * Save the row field values
+	 *
+	 * @since 1.0.0
+	 */
+  function mtphr_post_duplicator_metaboxer_save_rows( $post_id, $field ) {
+  
+  	if( isset($field['rows']) ) {
+  	
+			foreach( $field['rows'] as $id => $row ) {
+				
+				$row_id = $row['id'];
+				
+				// Store the user data or set as empty string
+				$data = ( isset($_POST[$row_id]) ) ? $_POST[$row_id] : '';
+				
+				// Update the meta
+				mtphr_post_duplicator_metaboxer_update_meta( $post_id, $row_id, $row['type'], $data );
+				
+				// Save appended fields
+				mtphr_post_duplicator_metaboxer_save_appended( $post_id, $row );
+			}
+		}
+  }
+		
+	/**
+	 * Save the appended field values
+	 *
+	 * @since 1.0.0
+	 */
+  function mtphr_post_duplicator_metaboxer_save_appended( $post_id, $field ) {
+
+		if( isset($field['append']) ) {
+		
+			foreach( $field['append'] as $id => $append ) {
+				
+				// Store the user data or set as empty string
+				$data = ( isset($_POST[$id]) ) ? $_POST[$id] : '';
+				
+				// Update the meta
+				mtphr_post_duplicator_metaboxer_update_meta( $post_id, $id, $append['type'], $data );
+			}
+		}
+	}
+	
+	/**
+	 * Update the meta
+	 *
+	 * @since 1.0.0
+	 */
+  function mtphr_post_duplicator_metaboxer_update_meta( $post_id, $id, $type, $data ) {
+  	
+  	// Update the post meta
+  	update_post_meta( $post_id, $id, $data );
+  }
+	
 }

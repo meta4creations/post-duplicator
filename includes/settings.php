@@ -24,70 +24,70 @@ add_action( 'admin_init', 'mtphr_post_duplicator_initialize_settings' );
 /**
  * Initializes the options page.
  *
- * @since 2.0
+ * @since 2.2
  */ 
 function mtphr_post_duplicator_initialize_settings() {
 
 	$settings['status'] = array(
-		'title' => __( 'Post Status', 'mtphr' ),
+		'title' => __( 'Post Status', 'post-duplicator' ),
 		'type' => 'select',
 		'options' => array(
-			'same' => __('Same as original', 'mtphr'),
-			'draft' => __('Draft', 'mtphr'),
-			'publish' => __('Published', 'mtphr'),
-			'pending' => __('Pending', 'mtphr')	
+			'same' => __('Same as original', 'post-duplicator'),
+			'draft' => __('Draft', 'post-duplicator'),
+			'publish' => __('Published', 'post-duplicator'),
+			'pending' => __('Pending', 'post-duplicator')	
 		),
 		'default' => 'same'
 	);
 	
 	$settings['timestamp'] = array(
-		'title' => __( 'Post Date', 'mtphr' ),
+		'title' => __( 'Post Date', 'post-duplicator' ),
 		'type' => 'radio',
 		'options' => array(
-			'duplicate' => __('Duplicate Timestamp', 'mtphr'),
-			'current' => __('Current Time', 'mtphr')
+			'duplicate' => __('Duplicate Timestamp', 'post-duplicator'),
+			'current' => __('Current Time', 'post-duplicator')
 		),
 		'display' => 'inline',
 		'default' => 'duplicate'
 	);
 	
 	$settings['time_offset'] = array(
-		'title' => __( 'Offset Date', 'mtphr' ),
+		'title' => __( 'Offset Date', 'post-duplicator' ),
 		'type' => 'checkbox',
 		'append' => array(
 			'time_offset_days' => array(
 				'type' => 'text',
 				'size' => 2,
-				'after' => __(' days', 'mtphr'),
+				'after' => __(' days', 'post-duplicator'),
 				'text_align' => 'right',
 				'default' => 0
 			),
 			'time_offset_hours' => array(
 				'type' => 'text',
 				'size' => 2,
-				'after' => __(' hours', 'mtphr'),
+				'after' => __(' hours', 'post-duplicator'),
 				'text_align' => 'right',
 				'default' => 0
 			),
 			'time_offset_minutes' => array(
 				'type' => 'text',
 				'size' => 2,
-				'after' => __(' minutes', 'mtphr'),
+				'after' => __(' minutes', 'post-duplicator'),
 				'text_align' => 'right',
 				'default' => 0
 			),
 			'time_offset_seconds' => array(
 				'type' => 'text',
 				'size' => 2,
-				'after' => __(' seconds', 'mtphr'),
+				'after' => __(' seconds', 'post-duplicator'),
 				'text_align' => 'right',
 				'default' => 0
 			),
 			'time_offset_direction' => array(
 				'type' => 'select',
 				'options' => array(
-					'newer' => __('newer', 'mtphr'),
-					'older' => __('older', 'mtphr')
+					'newer' => __('newer', 'post-duplicator'),
+					'older' => __('older', 'post-duplicator')
 				),
 				'default' => 'newer'
 			)
@@ -133,7 +133,7 @@ function mtphr_post_duplicator_settings_display() {
 	?>
 	<div class="wrap">
 	
-		<h2><?php _e( 'Post Duplicator Settings', 'mtphr' ); ?></h2>
+		<h2><?php _e( 'Post Duplicator Settings', 'post-duplicator' ); ?></h2>
 		<?php settings_errors(); ?>
 
 		<form method="post" action="options.php">
@@ -182,11 +182,11 @@ function mtphr_post_duplicator_field_display( $args ) {
 	}
 	if( isset($args['type']) ) {
 	
-		echo '<div class="metaboxer-field metaboxer-'.$args['type'].'">';
+		echo '<div class="mtphr-post-duplicator-metaboxer-field mtphr-post-duplicator-metaboxer-'.$args['type'].'">';
 		
 		// Call the function to display the field
-		if ( function_exists('metaboxer_'.$args['type']) ) {
-			call_user_func( 'metaboxer_'.$args['type'], $args, $value );
+		if ( function_exists('mtphr_post_duplicator_metaboxer_'.$args['type']) ) {
+			call_user_func( 'mtphr_post_duplicator_metaboxer_'.$args['type'], $args, $value );
 		}
 		
 		echo '<div>';

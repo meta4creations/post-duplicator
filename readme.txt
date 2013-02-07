@@ -2,7 +2,7 @@
 Contributors: metaphorcreations
 Tags: posts, post, duplicate, duplication
 Requires at least: 3.0
-Tested up to: 3.4.
+Tested up to: 3.5.1
 Stable tag: /trunk/
 License: GPL2
 
@@ -41,6 +41,9 @@ Check out the 'Installation' tab.
 
 == Changelog ==
 
+= 2.2 =
+* Updated metaboxer code.
+
 = 2.0 =
 * Added a settings page to set 'post status' and 'date' of duplicated posts.
 
@@ -48,6 +51,9 @@ Check out the 'Installation' tab.
 * Updated filenames and paths so the plugin works.
 
 == Upgrade Notice ==
+
+= 2.2 =
+Code updates.
 
 = 2.0 =
 Upgrade Post Duplicator to add 'post status' and 'date' options to your duplicated posts.
