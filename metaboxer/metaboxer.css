@@ -1,30 +1,4 @@
-/* Table of Contents
-
-* Media Uploader
-* General
-* Fields
-* Labels
-* Content
-
-* File
-* Lists
-* Sorts
-* Code
-* Radio
-* Checkbox
-* WYSIWYG
-* Farbtastic
-* jQuery Slider
-* Pattern Select
-* Image Select
-* Attachments
-* Single Image
-* Clearfix
-* Custom
-
-*/
-
-/* General
+/* General - 1.0.2
 ------------------------------------------------------------ */
 
 .mtphr-post-duplicator-metaboxer-admin-fields {
@@ -35,13 +9,15 @@
 }
 .mtphr-post-duplicator-metaboxer-appended {
 	display: inline;
-	margin-left: 10px;
+	margin-left: 20px;
+}
+.mtphr-post-duplicator-metaboxer-widget-field {
+	display: block;
+	margin: 0 0 1em;
+	padding: 0;
 }
 
-
-/* Fields
------------------------------------------------------------- */
-
+/* Fields */
 .mtphr-post-duplicator-metaboxer-field {
 	margin-bottom: 20px;
 }
@@ -51,10 +27,14 @@
 .mtphr-post-duplicator-metaboxer-field:last-child {
 	margin-bottom: 20px;
 }
+.mtphr-post-duplicator-metaboxer-field input[type="checkbox"] {
+	margin-top: 0;
+}
+.mtphr-post-duplicator-metaboxer-field input[type="radio"] {
+	margin-top:-1px;
+}
 
-/* Labels
------------------------------------------------------------- */
-
+/* Labels */
 .mtphr-post-duplicator-metaboxer-label {
 	vertical-align: top;
 	width: 20%;
@@ -77,8 +57,7 @@
 	padding: 0;
 }
 
-/* Content
------------------------------------------------------------- */
+/* Content */
 .mtphr-post-duplicator-metaboxer-field-content {
 	width: 80%;
 	vertical-align: top;
@@ -93,417 +72,7 @@
 	width: auto;
 }
 
-/* File
------------------------------------------------------------- */
-
-.wp-core-ui .mtphr-post-duplicator-metaboxer-file-upload {
-	display: none;
-}
-.mtphr-post-duplicator-metaboxer-file-table {
-	width: 100%;
-}
-.mtphr-post-duplicator-metaboxer-file-display a {
-	display: block;
-	margin: 0;
-	padding: 10px;
-	background: #FEFEFE;
-	border: 1px solid #EEE;
-	white-space: normal;
-	text-decoration: none;
-	
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
-	border-radius: 5px;
-}
-.mtphr-post-duplicator-metaboxer-file-display img {
-	display: block;
-	float: left;
-	margin-right: 10px;
-}
-.mtphr-post-duplicator-metaboxer-file-display span {
-	text-decoration: none;
-}
-.mtphr-post-duplicator-metaboxer-file-delete {
-	width: 16px;
-	padding-top: 4px !important;
-}
-.mtphr-post-duplicator-metaboxer-file-delete a {
-	display: block;
-	text-indent: -9999px;
-	width: 16px;
-	height: 16px;
-	background: url(images/minus-circle.png) no-repeat top;
-}
-.mtphr-post-duplicator-metaboxer-file-delete a:hover {
-	background-position: 0 -16px;
-}
-
-/* List Item
------------------------------------------------------------- */
-
-.mtphr-post-duplicator-metaboxer-list > table {
-	width: 100%;
-}
-.mtphr-post-duplicator-metaboxer-list th,
-.mtphr-post-duplicator-metaboxer-list td {
-	text-align: left;
-	vertical-align: top;
-	padding: 0 3px;
-}
-.mtphr-post-duplicator-metaboxer-list input[type="text"],
-.mtphr-post-duplicator-metaboxer-list input[type="number"],
-.mtphr-post-duplicator-metaboxer-list input[type="email"],
-.mtphr-post-duplicator-metaboxer-list input[type="password"],
-.mtphr-post-duplicator-metaboxer-list textarea {
-	width: 100%;
-}
-.mtphr-post-duplicator-metaboxer-list-item-handle,
-.mtphr-post-duplicator-metaboxer-list-item-add,
-.mtphr-post-duplicator-metaboxer-list-item-delete {
-	width: 16px;
-	padding-top: 4px !important;
-}
-.mtphr-post-duplicator-metaboxer-list-item-handle span,
-.mtphr-post-duplicator-metaboxer-list-item-add a,
-.mtphr-post-duplicator-metaboxer-list-item-delete a {
-	display: block;
-	text-indent: -9999px;
-	width: 16px;
-	height: 16px;
-}
-.mtphr-post-duplicator-metaboxer-list-item-handle span {
-	background: url(images/arrow-resize-090.png) no-repeat top;
-}
-.mtphr-post-duplicator-metaboxer-list-item-add a {
-	background: url(images/plus-circle.png) no-repeat top;
-}
-.mtphr-post-duplicator-metaboxer-list-item-delete a {
-	background: url(images/minus-circle.png) no-repeat top;
-}
-.mtphr-post-duplicator-metaboxer-list-item-handle span:hover,
-.mtphr-post-duplicator-metaboxer-list-item-add a:hover,
-.mtphr-post-duplicator-metaboxer-list-item-delete a:hover {
-	background-position: 0 -16px;
-}
-
-/* Sorts
------------------------------------------------------------- */
-
-.mtphr-post-duplicator-metaboxer-sort td {
-	padding: 6px 3px;
-	border-bottom: 1px dashed #CCC;
-}
-.mtphr-post-duplicator-metaboxer-sort td.mtphr-post-duplicator-metaboxer-sort-name {
-	font-weight: bold;
-	padding-right: 10px;
-}
-.mtphr-post-duplicator-metaboxer-sort td.mtphr-post-duplicator-metaboxer-sort-item-handle {
-	width: 16px;
-	padding-top: 2px !important;
-	border: none;
-}
-.mtphr-post-duplicator-metaboxer-sort-item-handle span {
-	display: block;
-	text-indent: -9999px;
-	width: 16px;
-	height: 16px;
-	background: url(images/arrow-resize-090.png) no-repeat top;
-}
-.mtphr-post-duplicator-metaboxer-sort-item-handle span:hover {
-	background-position: 0 -16px;
-}
-
-/* Code
------------------------------------------------------------- */
-
-.mtphr-post-duplicator-metaboxer-code pre {
-	margin: 0 0 5px 0;
-	padding: 10px;
-	background: #FFF;
-	border: 1px solid #EEE;
-	white-space: normal;
-	
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
-	border-radius: 5px;
-}
-.mtphr-post-duplicator-metaboxer-code pre p {
-	margin: 0;
-}
-
-/* Radio
------------------------------------------------------------- */
-
-.mtphr-post-duplicator-metaboxer-radio input {
-	margin-top: 0;
-	margin-right: 1px;
-}
-
-/* Checkbox
------------------------------------------------------------- */
-
-.mtphr-post-duplicator-metaboxer-checkbox input {
-	margin-top: 0;
-	margin-right: 1px;
-}
-
-/* Textarea
------------------------------------------------------------- */
-
-.mtphr-post-duplicator-metaboxer-textarea textarea {
-	width: 96%;
-}
-
-/* WYSIWYG
------------------------------------------------------------- */
-
-.mtphr-post-duplicator-metaboxer-wysiwyg {
-	max-width: 800px;
-}
-.mtphr-post-duplicator-metaboxer-wysiwyg .mceIframeContainer {
-	background: #FFF;
-}
-
-/* Farbtastic
------------------------------------------------------------- */
-
-.farbtastic_cp {
-	float: left;
-	display: none;
-}
-
-/* jQuery Slider
------------------------------------------------------------- */
-
-.slider-value {
-	display: inline;
-	font-weight: bold;
-	line-height: 12px;
-	color: #3D759B;
-	border: none !important;
-	margin: 0 0 0 5px;
-	padding: 0;
-}
-
-/* Pattern Select
------------------------------------------------------------- */
-
-.mtphr-post-duplicator-metaboxer-pattern_select select {
-	margin-bottom: 5px;
-}
-.mtphr-post-duplicator-metaboxer-pattern-selection {
-	width: 200px;
-	height: 100px;
-	background-repeat: repeat;
-}
-
-/* Image Select
------------------------------------------------------------- */
-
-.mtphr-post-duplicator-metaboxer-image-select {
-	margin-bottom: 10px;
-}
-a.mtphr-post-duplicator-metaboxer-image-select-link {
-	display: block;
-	float: left;
-	margin: 0 10px 10px 0;
-	text-decoration: none;
-}
-a.mtphr-post-duplicator-metaboxer-image-select-link small {
-	display: block;
-	text-align: center;
-	font-weight: bold;
-	color: #333;
-}
-a.mtphr-post-duplicator-metaboxer-image-select-link img {
-	opacity: .5;
-	-webkit-transition: opacity .2s linear;
-	-moz-transition: opacity .2s linear;
-	-o-transition: opacity .2s linear;
-	-ms-transition: opacity .2s linear;
-	transition: opacity .2s linear;
-}
-	a.mtphr-post-duplicator-metaboxer-image-select-link.selected img {
-		opacity: 1;
-	}
-
-
-/* Attachments
------------------------------------------------------------- */
-
-.mtphr-post-duplicator-metaboxer-attachment-container {
-	margin: 0;
-	padding: 0;
-}
-.mtphr-post-duplicator-metaboxer-attachment-buttons {
-	margin-bottom: 10px;
-}
-.mtphr-post-duplicator-metaboxer-attachment-links {
-	opacity: 0;
-	-webkit-transition: opacity .2s linear;
-	-moz-transition: opacity .2s linear;
-	-o-transition: opacity .2s linear;
-	-ms-transition: opacity .2s linear;
-	transition: opacity .2s linear;
-}
-.mtphr-post-duplicator-metaboxer-gallery-attachment:hover .mtphr-post-duplicator-metaboxer-attachment-links,
-.mtphr-post-duplicator-metaboxer-single-attachment:hover .mtphr-post-duplicator-metaboxer-attachment-links {
-	opacity: 1;
-}
-.mtphr-post-duplicator-metaboxer-attachment-preview,
-.mtphr-post-duplicator-metaboxer-attachment-settings,
-.mtphr-post-duplicator-metaboxer-attachment-delete {
-	display: inline-block;
-	opacity: .5;
-	-webkit-transition: opacity .2s linear;
-	-moz-transition: opacity .2s linear;
-	-o-transition: opacity .2s linear;
-	-ms-transition: opacity .2s linear;
-	transition: opacity .2s linear;
-}
-.mtphr-post-duplicator-metaboxer-attachment-preview:hover,
-.mtphr-post-duplicator-metaboxer-attachment-settings:hover,
-.mtphr-post-duplicator-metaboxer-attachment-delete:hover {
-	opacity: 1;
-}
-.mtphr-post-duplicator-metaboxer-attachment-preview {
-	position: absolute;
-	top: 10px;
-	left: 10px;
-	width: 17px;
-	height: 17px;
-	background: url(images/attachment-preview.png);
-}
-.mtphr-post-duplicator-metaboxer-attachment-settings {
-	position: absolute;
-	top: 10px;
-	right: 10px;
-	width: 17px;
-	height: 17px;
-	background: url(images/attachment-settings.png);
-}
-.mtphr-post-duplicator-metaboxer-attachment-delete {
-	position: absolute;
-	bottom: 10px;
-	right: 10px;
-	width: 14px;
-	height: 14px;
-	background: url(images/attachment-delete.png);
-}
-.mtphr-post-duplicator-metaboxer-attachment-mime-type {
-	position: absolute;
-	bottom: 10px;
-	left: 10px;
-}
-.mtphr-post-duplicator-metaboxer-attachment-mime-type-vimeo {
-	width: 20px;
-	height: 20px;
-	background: url(images/attachment-vimeo.png);
-}
-.mtphr-post-duplicator-metaboxer-attachment-mime-type-youtube {
-	width: 20px;
-	height: 23px;
-	background: url(images/attachment-youtube.png);
-}
-.mtphr-post-duplicator-metaboxer-attachment-mime-type-audio {
-	width: 20px;
-	height: 20px;
-	background: url(images/attachment-audio.png);
-}
-.mtphr-post-duplicator-metaboxer-attachment-mime-type-video {
-	width: 20px;
-	height: 20px;
-	background: url(images/attachment-video.png);
-}
-.mtphr-post-duplicator-metaboxer-attachment-mime-type-image {
-	width: 20px;
-	height: 20px;
-	background: url(images/attachment-image.png);
-}
-.mtphr-post-duplicator-metaboxer-gallery-attachment-container {
-	width:100%;
-	margin: 0;
-}
-.mtphr-post-duplicator-metaboxer-gallery-attachment {
-	position: relative;
-	float: left;
-	width: 120px;
-	height: 120px;
-	
-	margin: 0 10px 10px 0;
-	
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
-	border-radius: 5px;
-	
-	-moz-box-shadow: 2px 0 0px #000, inset 0 0 3px #DDD;
-	-webkit-box-shadow: 2px 0 0px #000, inset 0 0 3px #DDD;
-	box-shadow: 0 0 1px #000;
-	
-	opacity: 1;
-	-webkit-transition: opacity .2s linear;
-	-moz-transition: opacity .2s linear;
-	-o-transition: opacity .2s linear;
-	-ms-transition: opacity .2s linear;
-	transition: opacity .2s linear;
-}
-.mtphr-post-duplicator-metaboxer-gallery-attachment:active {
-	opacity: .5;
-}
-.mtphr-post-duplicator-metaboxer-gallery-attachment-bg {
-	width: 120px;
-	height: 120px;
-	background-position: center center;
-	background-size: auto 120px;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
-	border-radius: 5px;
-}
-.mtphr-post-duplicator-metaboxer-gallery-attachment-bg-youtube {
-	background-size: auto 160px;
-}
-.mtphr-post-duplicator-metaboxer-gallery-attachment img {
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
-	border-radius: 5px;
-}
-.mtphr-post-duplicator-metaboxer-gallery-attachment:active .mtphr-post-duplicator-metaboxer-attachment-links {
-	opacity: 0;
-}
-.attachment-mtphr-post-duplicator-metaboxer-gallery-thumb {
-	cursor: move;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
-	border-radius: 5px;
-}
-
-/* Single Image
------------------------------------------------------------- */
-
-.mtphr-post-duplicator-metaboxer-single-attachment {
-	float: left;
-	position: relative;
-	margin: 0;
-	padding: 0;
-}
-.mtphr-post-duplicator-metaboxer-single-attachment img {
-	max-width: 90%;
-	height: auto;
-	padding: 20px;
-	margin: 0;
-	
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
-	border-radius: 5px;
-	
-	-moz-box-shadow: 2px 0 0px #000, inset 0 0 3px #DDD;
-	-webkit-box-shadow: 2px 0 0px #000, inset 0 0 3px #DDD;
-	box-shadow: 0 0 1px #000;
-}
-
-/* Clearfix
------------------------------------------------------------- */
-
+/* Clearfix */
 .clearfix {
   *zoom: 1;
 }
@@ -516,9 +85,26 @@ a.mtphr-post-duplicator-metaboxer-image-select-link img {
   clear: both;
 }
 
-/* Custom
+/* Checkbox
 ------------------------------------------------------------ */
 
-#mtphr_post_duplicator_global_settings .mtphr-post-duplicator-metaboxer-field-content {
-	padding-bottom: 0;
+.mtphr-post-duplicator-metaboxer-checkbox input {
+	margin-top: 0;
+	margin-right: 1px;
 }
+
+/* Radio
+------------------------------------------------------------ */
+
+.mtphr-team-members-metaboxer-radio input {
+	margin-top: 0;
+	margin-right: 1px;
+}
+
+/* Textarea - 1.0.1
+------------------------------------------------------------ */
+
+.mtphr-post-duplicator-metaboxer-textarea textarea {
+	width: 96%;
+}
+
