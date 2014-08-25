@@ -2,7 +2,7 @@
 /*
 Plugin Name: Post Duplicator
 Description: Creates functionality to duplicate any and all post types, including taxonomies & custom fields
-Version: 2.3
+Version: 2.4
 Author: Metaphor Creations
 Author URI: http://www.metaphorcreations.com
 License: GPL2
@@ -29,11 +29,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 /**Define Widget Constants */
-if ( WP_DEBUG ) {
-	define ( 'MTPHR_POST_DUPLICATOR_VERSION', '2.3-'.time() );
-} else {
-	define ( 'MTPHR_POST_DUPLICATOR_VERSION', '2.3' );
-}
+define ( 'MTPHR_POST_DUPLICATOR_VERSION', '2.4' );
 define ( 'MTPHR_POST_DUPLICATOR_DIR', plugin_dir_path(__FILE__) );
 define ( 'MTPHR_POST_DUPLICATOR_URL', plugins_url().'/post-duplicator' );
 
@@ -44,10 +40,10 @@ add_action( 'plugins_loaded', 'mtphr_post_duplicator_localization' );
 /**
  * Setup localization
  *
- * @since 2.1.2
+ * @since 2.4
  */
 function mtphr_post_duplicator_localization() {
-  load_plugin_textdomain( 'post-duplicator', false, MTPHR_POST_DUPLICATOR_DIR.'/languages/' );
+	load_plugin_textdomain( 'post-duplicator', false, 'post-duplicator/languages/' );
 }
 
 

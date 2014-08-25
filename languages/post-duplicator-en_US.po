@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Post Duplicator v2.2\n"
+"Project-Id-Version: Post Duplicator v2.4\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2013-02-07 20:29:35+0000\n"
+"PO-Revision-Date: 2014-08-25 19:02:54+0000\n"
 "Last-Translator: admin <joe@metaphorcreations.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -98,10 +98,5 @@ msgstr ""
 #: includes/settings.php:136
 #@ post-duplicator
 msgid "Post Duplicator Settings"
-msgstr ""
-
-#: metaboxer/metaboxer.php:943
-#@ post-duplicator
-msgid "Select Code"
 msgstr ""
 
