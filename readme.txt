@@ -21,7 +21,7 @@ I created this plugin mainly for myself when I'm develping WordPress sites. I al
 == Installation ==
 
 1. Upload `m4c-postduplicator` directory to the `/wp-content/plugins/` directory
-2. Activate the plugin through the 'Plugins' menu in WordPress
+2. Activate the plugin through the 'Plugins' menu in WordPress 
 
 == Frequently Asked Questions ==
 
