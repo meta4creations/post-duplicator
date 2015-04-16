@@ -24,7 +24,7 @@ add_action( 'admin_init', 'mtphr_post_duplicator_initialize_settings' );
 /**
  * Initializes the options page.
  *
- * @since 2.2
+ * @since 2.5
  */ 
 function mtphr_post_duplicator_initialize_settings() {
 
@@ -48,7 +48,7 @@ function mtphr_post_duplicator_initialize_settings() {
 			'current' => __('Current Time', 'post-duplicator')
 		),
 		'display' => 'inline',
-		'default' => 'duplicate'
+		'default' => 'current'
 	);
 	
 	$settings['time_offset'] = array(
