@@ -10,8 +10,7 @@ Creates functionality to duplicate any and all post types, including taxonomies 
 
 == Description ==
 
-This plugin was created to make an exact duplicate of a selected post.
-Custom post types are supported, along with custom taxonomies and custom fields.
+This plugin was created to make an exact duplicate of a selected post. Custom post types are supported, along with custom taxonomies and custom fields.
 
 *Note: Comments are not passed to the new post.
 
