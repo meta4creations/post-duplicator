@@ -157,7 +157,7 @@ function mtphr_post_duplicator_settings_display() {
  * @since 2.0
  */ 
 function mtphr_post_duplicator_settings_callback() {
-	echo '<h4>Customize the settings for duplicated posts.</h4>';
+	echo '<h4>' . __( 'Customize the settings for duplicated posts.', 'post-duplicator' ) . '</h4>';
 }
 
 
