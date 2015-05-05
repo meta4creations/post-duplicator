@@ -64,7 +64,7 @@ function m4c_duplicate_post() {
 		add_post_meta( $duplicate_id, $key, maybe_unserialize($value[0]) );
   }
 
-	echo 'Duplicate Post Created!';
+	_e('Duplicate Post Created!', 'post-duplicator' );
 
 	die(); // this is required to return a proper result
 }
