@@ -2,7 +2,7 @@
 Contributors: metaphorcreations
 Tags: posts, post, duplicate, duplication
 Requires at least: 3.0
-Tested up to: 4.2
+Tested up to: 4.3
 Stable tag: /trunk/
 License: GPL2
 
@@ -41,6 +41,9 @@ Check out the 'Installation' tab.
 
 == Changelog ==
 
+= 2.6 =
+* Changed the default published status to Draft
+
 = 2.5 =
 * Changed the default post date of duplicated posts to be the current time.
 
@@ -70,4 +73,4 @@ Must upgrade in order for the plugin to work. The file paths where initially wro
 
 == Upgrade Notice ==
 
-Changed the default post date of duplicated posts to be the current time.
+Changed the default published status to Draft.
