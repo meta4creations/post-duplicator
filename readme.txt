@@ -41,6 +41,9 @@ Check out the 'Installation' tab.
 
 == Changelog ==
 
+= 2.7 =
+* Modified duplicated posts data: post_date_gmt, post_modified, post_modified_gmt
+
 = 2.6 =
 * Changed the default published status to Draft
 
@@ -73,4 +76,4 @@ Must upgrade in order for the plugin to work. The file paths where initially wro
 
 == Upgrade Notice ==
 
-Changed the default published status to Draft.
+Modified duplicated posts data: post_date_gmt, post_modified, post_modified_gmt.
