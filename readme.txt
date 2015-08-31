@@ -41,6 +41,11 @@ Check out the 'Installation' tab.
 
 == Changelog ==
 
+= 2.8 =
+* Added German language files
+* Added Japanese language files
+* Updated settings file for localization
+
 = 2.7 =
 * Modified duplicated posts data: post_date_gmt, post_modified, post_modified_gmt
 
@@ -76,4 +81,4 @@ Must upgrade in order for the plugin to work. The file paths where initially wro
 
 == Upgrade Notice ==
 
-Modified duplicated posts data: post_date_gmt, post_modified, post_modified_gmt.
+Localization updates.
