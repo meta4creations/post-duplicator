@@ -4,7 +4,7 @@
  * Thehe jQuery ajax call to create a new post.
  * Duplicates all the data including custom meta.
  *
- * @since 2.7
+ * @since 2.9
  */
 function m4c_duplicate_post() {
 	

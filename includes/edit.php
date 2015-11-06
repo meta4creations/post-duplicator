@@ -1,11 +1,9 @@
 <?php
 
-add_filter( 'post_row_actions', 'mtphr_post_duplicator_action_row', 10, 2 );
-add_filter( 'page_row_actions', 'mtphr_post_duplicator_action_row', 10, 2 );
 /**
  * Add a duplicate post link.
  *
- * @since 1.0.0
+ * @since 2.10
  */
 function mtphr_post_duplicator_action_row( $actions, $post ){
 
@@ -18,4 +16,7 @@ function mtphr_post_duplicator_action_row( $actions, $post ){
 
 	return $actions;
 }
+add_filter( 'post_row_actions', 'mtphr_post_duplicator_action_row', 10, 2 );
+add_filter( 'page_row_actions', 'mtphr_post_duplicator_action_row', 10, 2 );
+add_filter( 'cuar/core/admin/content-list-table/row-actions', 'mtphr_post_duplicator_action_row', 10, 2 );
 
