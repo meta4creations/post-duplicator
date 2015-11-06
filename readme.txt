@@ -41,6 +41,9 @@ Check out the 'Installation' tab.
 
 == Changelog ==
 
+= 2.10 =
+* Added page duplication support for the WP Customer Area plugin
+
 = 2.9 =
 * Now supports multiple values of a single custom field during duplication
 
@@ -84,4 +87,4 @@ Must upgrade in order for the plugin to work. The file paths where initially wro
 
 == Upgrade Notice ==
 
-Now supports multiple values of a single custom field during duplication.
+Added page duplication support for the WP Customer Area plugin.
