@@ -67,7 +67,11 @@ function m4c_duplicate_post() {
 	// Duplicate all the custom fields
 	$custom_fields = get_post_custom( $original_id );
   foreach ( $custom_fields as $key => $value ) {
-		add_post_meta( $duplicate_id, $key, maybe_unserialize($value[0]) );
+	  if( is_array($value) && count($value) > 0 ) {
+			foreach( $value as $i=>$v ) {
+				add_post_meta( $duplicate_id, $key, maybe_unserialize($v) );
+			}
+		}
   }
 
 	echo 'Duplicate Post Created!';

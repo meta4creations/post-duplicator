@@ -2,7 +2,7 @@
 Contributors: metaphorcreations
 Tags: posts, post, duplicate, duplication
 Requires at least: 3.0
-Tested up to: 4.3
+Tested up to: 4.3.1
 Stable tag: /trunk/
 License: GPL2
 
@@ -40,6 +40,9 @@ Check out the 'Installation' tab.
 2. View of the settings page
 
 == Changelog ==
+
+= 2.9 =
+* Now supports multiple values of a single custom field during duplication
 
 = 2.8 =
 * Added German language files
@@ -81,4 +84,4 @@ Must upgrade in order for the plugin to work. The file paths where initially wro
 
 == Upgrade Notice ==
 
-Localization updates.
+Now supports multiple values of a single custom field during duplication.
