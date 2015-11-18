@@ -6,7 +6,7 @@ jQuery( document ).ready( function() {
 	 * Creates an ajax request that creates a new post, 
 	 * duplicating all the data and custom meta.
 	 *
-	 * @since 1.0.0
+	 * @since 2.11
 	 */
 	jQuery( '.m4c-duplicate-post' ).click( function( e ) {
 		
@@ -23,7 +23,7 @@ jQuery( document ).ready( function() {
 		jQuery.post( ajaxurl, data, function( response ) {
 
 			// Reload the page
-			location.reload();
+			window.location.href = window.location.pathname+"?"+jQuery.param({'post-duplicated':response});
 		});
 	});
 });

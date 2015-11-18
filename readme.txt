@@ -41,6 +41,9 @@ Check out the 'Installation' tab.
 
 == Changelog ==
 
+= 2.11 =
+* Added ability to duplicate posts to other post types
+
 = 2.10 =
 * Added page duplication support for the WP Customer Area plugin
 
@@ -87,4 +90,4 @@ Must upgrade in order for the plugin to work. The file paths where initially wro
 
 == Upgrade Notice ==
 
-Added page duplication support for the WP Customer Area plugin.
+Added ability to duplicate posts to other post types.

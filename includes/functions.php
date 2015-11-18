@@ -4,7 +4,7 @@
  * Return a value from the options table if it exists,
  * or return a default value
  *
- * @since 2.5
+ * @since 2.11
  */
 function get_mtphr_post_duplicator_settings() {
 	
@@ -13,6 +13,7 @@ function get_mtphr_post_duplicator_settings() {
 	
 	$defaults = array(
 		'status' => 'same',
+		'type' => 'same',
 		'timestamp' => 'current',
 		'time_offset' => false,
 		'time_offset_days' => 0,

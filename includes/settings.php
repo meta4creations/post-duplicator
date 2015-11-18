@@ -24,7 +24,7 @@ add_action( 'admin_init', 'mtphr_post_duplicator_initialize_settings' );
 /**
  * Initializes the options page.
  *
- * @since 2.6
+ * @since 2.11
  */ 
 function mtphr_post_duplicator_initialize_settings() {
 
@@ -38,6 +38,13 @@ function mtphr_post_duplicator_initialize_settings() {
 			'pending' => __('Pending', 'post-duplicator')	
 		),
 		'default' => 'draft'
+	);
+	
+	$settings['type'] = array(
+		'title' => __( 'Post Type', 'post-duplicator' ),
+		'type' => 'select',
+		'options' => mtphr_post_duplicator_post_types(),
+		'default' => 'same'
 	);
 	
 	$settings['timestamp'] = array(
