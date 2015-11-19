@@ -2,7 +2,7 @@
 Contributors: metaphorcreations
 Tags: posts, post, duplicate, duplication
 Requires at least: 3.0
-Tested up to: 4.3.1
+Tested up to: 4.4
 Stable tag: /trunk/
 License: GPL2
 
@@ -40,6 +40,9 @@ Check out the 'Installation' tab.
 2. View of the settings page
 
 == Changelog ==
+
+= 2.12 =
+* Fixed page reload bug after duplication
 
 = 2.11 =
 * Added ability to duplicate posts to other post types
@@ -90,4 +93,4 @@ Must upgrade in order for the plugin to work. The file paths where initially wro
 
 == Upgrade Notice ==
 
-Added ability to duplicate posts to other post types.
+Fixed page reload bug after duplication.
