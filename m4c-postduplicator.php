@@ -5,6 +5,7 @@ Description: Creates functionality to duplicate any and all post types, includin
 Version: 2.12
 Author: Metaphor Creations
 Author URI: http://www.metaphorcreations.com
+Text Domain: post-duplicator
 License: GPL2
 */
 
