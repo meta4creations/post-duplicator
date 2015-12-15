@@ -41,6 +41,9 @@ Check out the 'Installation' tab.
 
 == Changelog ==
 
+= 2.13 =
+* Fixed bug due to "wp_old_slug_redirect" function in core
+
 = 2.12 =
 * Fixed page reload bug after duplication
 
@@ -93,4 +96,4 @@ Must upgrade in order for the plugin to work. The file paths where initially wro
 
 == Upgrade Notice ==
 
-Fixed page reload bug after duplication.
+Fixed bug due to "wp_old_slug_redirect" function in core.
