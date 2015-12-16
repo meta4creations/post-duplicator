@@ -41,6 +41,9 @@ Check out the 'Installation' tab.
 
 == Changelog ==
 
+= 2.14 =
+* New setting to append a custom string to the duplicate post slug
+
 = 2.13 =
 * Fixed bug due to "wp_old_slug_redirect" function in core
 
@@ -96,4 +99,4 @@ Must upgrade in order for the plugin to work. The file paths where initially wro
 
 == Upgrade Notice ==
 
-Fixed bug due to "wp_old_slug_redirect" function in core.
+New setting to append a custom string to the duplicate post slug.
