@@ -4,7 +4,7 @@
  * Return a value from the options table if it exists,
  * or return a default value
  *
- * @since 2.11
+ * @since 2.15
  */
 function get_mtphr_post_duplicator_settings() {
 	
@@ -15,6 +15,8 @@ function get_mtphr_post_duplicator_settings() {
 		'status' => 'same',
 		'type' => 'same',
 		'timestamp' => 'current',
+		'title' => __('Copy', 'post-duplicator'),
+		'slug' => 'copy',
 		'time_offset' => false,
 		'time_offset_days' => 0,
 		'time_offset_hours' => 0,

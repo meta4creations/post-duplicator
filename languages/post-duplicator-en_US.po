@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Post Duplicator v2.12\n"
+"Project-Id-Version: Post Duplicator v2.14\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2015-11-19 20:22:17+0000\n"
+"PO-Revision-Date: 2015-12-16 19:05:26+0000\n"
 "Last-Translator: admin <joe@metaphorcreations.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -61,42 +61,42 @@ msgstr ""
 msgid "Current Time"
 msgstr ""
 
-#: includes/settings.php:62
+#: includes/settings.php:70
 #@ post-duplicator
 msgid "Offset Date"
 msgstr ""
 
-#: includes/settings.php:68
+#: includes/settings.php:76
 #@ post-duplicator
 msgid " days"
 msgstr ""
 
-#: includes/settings.php:75
+#: includes/settings.php:83
 #@ post-duplicator
 msgid " hours"
 msgstr ""
 
-#: includes/settings.php:82
+#: includes/settings.php:90
 #@ post-duplicator
 msgid " minutes"
 msgstr ""
 
-#: includes/settings.php:89
+#: includes/settings.php:97
 #@ post-duplicator
 msgid " seconds"
 msgstr ""
 
-#: includes/settings.php:96
+#: includes/settings.php:104
 #@ post-duplicator
 msgid "newer"
 msgstr ""
 
-#: includes/settings.php:97
+#: includes/settings.php:105
 #@ post-duplicator
 msgid "older"
 msgstr ""
 
-#: includes/settings.php:143
+#: includes/settings.php:151
 #@ post-duplicator
 msgid "Post Duplicator Settings"
 msgstr ""
@@ -129,8 +129,18 @@ msgstr ""
 msgid "Post Type"
 msgstr ""
 
-#: includes/settings.php:167
+#: includes/settings.php:175
 #@ post-duplicator
 msgid "Customize the settings for duplicated posts."
+msgstr ""
+
+#: includes/settings.php:62
+#@ post-duplicator
+msgid "Duplicate Slug"
+msgstr ""
+
+#: includes/settings.php:63
+#@ post-duplicator
+msgid "String that should be appended to the duplicate post's slug"
 msgstr ""
 

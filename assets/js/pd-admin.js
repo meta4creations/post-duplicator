@@ -16,7 +16,7 @@ jQuery( document ).ready( function() {
 		// Create the data to pass
 		var data = {
 			action: 'm4c_duplicate_post',
-			original_id: jQuery(this).attr('href'),
+			original_id: jQuery(this).data('postid'),
 			security: jQuery(this).attr('rel')
 		};
 	
