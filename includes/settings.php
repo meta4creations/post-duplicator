@@ -24,7 +24,7 @@ add_action( 'admin_init', 'mtphr_post_duplicator_initialize_settings' );
 /**
  * Initializes the options page.
  *
- * @since 2.14
+ * @since 2.16
  */ 
 function mtphr_post_duplicator_initialize_settings() {
 
@@ -58,12 +58,20 @@ function mtphr_post_duplicator_initialize_settings() {
 		'default' => 'current'
 	);
 	
+	$settings['title'] = array(
+		'title' => __( 'Duplicate Title', 'post-duplicator' ),
+		'description' => __('String that should be appended to the duplicate post\'s title', 'post-duplicator'),
+		'type' => 'text',
+		'display' => 'inline',
+		'default' => __('Copy', 'post-duplicator')
+	);
+	
 	$settings['slug'] = array(
 		'title' => __( 'Duplicate Slug', 'post-duplicator' ),
 		'description' => __('String that should be appended to the duplicate post\'s slug', 'post-duplicator'),
 		'type' => 'text',
 		'display' => 'inline',
-		'default' => '-copy'
+		'default' => 'copy'
 	);
 	
 	$settings['time_offset'] = array(
