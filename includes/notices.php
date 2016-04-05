@@ -5,8 +5,8 @@
 /* --------------------------------------------------------- */
 
 function mtphr_post_duplicator_notice() {
-	
-	$duplicated_id = isset($_GET['post-duplicated']) ? $_GET['post-duplicated'] : '';
+
+    $duplicated_id = isset($_GET['post-duplicated']) ? htmlspecialchars($_GET['post-duplicated'], ENT_QUOTES, 'UTF-8') : '';
 	if( $duplicated_id != '' ) {
 		
 		$settings = get_mtphr_post_duplicator_settings();
