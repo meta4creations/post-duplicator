@@ -41,6 +41,10 @@ Check out the 'Installation' tab.
 
 == Changelog ==
 
+= 2.17 =
+* XSS vulnerability fix
+* Language file updates
+
 = 2.16 =
 * Modified how post meta is saved to database
 * Modified duplicate slug implementation
@@ -108,4 +112,4 @@ Must upgrade in order for the plugin to work. The file paths where initially wro
 
 == Upgrade Notice ==
 
-Multiple updates
+XSS vulnerability fix
