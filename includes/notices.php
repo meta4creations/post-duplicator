@@ -13,6 +13,7 @@ function mtphr_post_duplicator_notice() {
 	
 		// Get the post type object
 		$duplicated_post = get_post($duplicated_id);
+		echo '<pre>';print_r($duplicated_post);echo '</pre>';
 		$post_type = get_post_type_object( $duplicated_post->post_type );
 		
 		// Set the button label
