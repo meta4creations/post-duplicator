@@ -2,7 +2,7 @@
 Contributors: metaphorcreations
 Tags: posts, post, duplicate, duplication
 Requires at least: 4.0
-Tested up to: 4.5
+Tested up to: 4.6.1
 Stable tag: /trunk/
 License: GPL2
 
@@ -40,6 +40,9 @@ Check out the 'Installation' tab.
 2. View of the settings page
 
 == Changelog ==
+
+= 2.18 =
+* Modified javascript for allow duplication of duplicated page before page reload
 
 = 2.17 =
 * XSS vulnerability fix
@@ -112,4 +115,4 @@ Must upgrade in order for the plugin to work. The file paths where initially wro
 
 == Upgrade Notice ==
 
-XSS vulnerability fix
+Modified javascript for allow duplication of duplicated page before page reload
