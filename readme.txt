@@ -2,7 +2,7 @@
 Contributors: metaphorcreations
 Tags: posts, post, duplicate, duplication
 Requires at least: 4.0
-Tested up to: 4.6.1
+Tested up to: 4.7
 Stable tag: /trunk/
 License: GPL2
 
