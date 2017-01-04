@@ -41,6 +41,9 @@ Check out the 'Installation' tab.
 
 == Changelog ==
 
+= 2.19 =
+* Added Duplicate button to published post edit pages
+
 = 2.18 =
 * Modified javascript for allow duplication of duplicated page before page reload
 
@@ -115,4 +118,4 @@ Must upgrade in order for the plugin to work. The file paths where initially wro
 
 == Upgrade Notice ==
 
-Modified javascript for allow duplication of duplicated page before page reload
+Added Duplicate button to published post edit pages

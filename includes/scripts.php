@@ -28,6 +28,7 @@ add_action( 'admin_enqueue_scripts', 'm4c_duplicate_post_scripts' );
 function m4c_duplicate_post_scripts( $hook_suffix ) {
 	if(
 		$hook_suffix == 'edit.php' ||
+		$hook_suffix == 'post.php' ||
 		$hook_suffix == 'customer-area_page_wpca-list,content,cuar_private_page' ||
 		$hook_suffix == 'customer-area_page_wpca-list,content,cuar_private_file'
 	) {
