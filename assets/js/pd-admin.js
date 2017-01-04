@@ -12,6 +12,8 @@ jQuery( document ).ready( function() {
 	jQuery( '.m4c-duplicate-post' ).live( 'click', function( e ) {
 		
 		e.preventDefault();
+		var $spinner = jQuery(this).next('.spinner');
+		$spinner.css('visibility', 'visible');
 	
 		// Create the data to pass
 		var data = {
