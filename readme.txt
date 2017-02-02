@@ -2,7 +2,7 @@
 Contributors: metaphorcreations
 Tags: posts, post, duplicate, duplication
 Requires at least: 4.0
-Tested up to: 4.7
+Tested up to: 4.7.2
 Stable tag: /trunk/
 License: GPL2
 
@@ -40,6 +40,12 @@ Check out the 'Installation' tab.
 2. View of the settings page
 
 == Changelog ==
+
+= 2.20 =
+* Added "do_action( 'mtphr_post_duplicator_created', $original_id, $duplicate_id, $settings )" action for custom actions on duplicated post
+* Added "mtphr_post_duplicator_action_row_link( $post )" function for custom post action rows
+* Separated post duplicated function outsite of ajax call for custom uses
+* Removed limitations of backend script to load only on specific pages
 
 = 2.19 =
 * Added Duplicate button to published post edit pages
@@ -118,4 +124,4 @@ Must upgrade in order for the plugin to work. The file paths where initially wro
 
 == Upgrade Notice ==
 
-Added Duplicate button to published post edit pages
+New "mtphr_post_duplicator_created" action, function updates and additions, other updates

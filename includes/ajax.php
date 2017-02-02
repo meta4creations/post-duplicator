@@ -1,29 +1,23 @@
 <?php
 
-/**
- * Thehe jQuery ajax call to create a new post.
- * Duplicates all the data including custom meta.
- *
- * @since 2.16
- */
-function m4c_duplicate_post() {
+/* --------------------------------------------------------- */
+/* !Duplicate the post - 2.20 */
+/* --------------------------------------------------------- */
+
+function mtphr_duplicate_post( $original_id, $args=array(), $do_action=true ) {
 	
 	// Get access to the database
 	global $wpdb;
 	
-	// Check the nonce
-	check_ajax_referer( 'm4c_ajax_file_nonce', 'security' );
-	
-	// Get variables
-	$original_id  = $_POST['original_id'];
-	
 	// Get the post as an array
 	$duplicate = get_post( $original_id, 'ARRAY_A' );
 		
-	$settings = get_mtphr_post_duplicator_settings();
+	$global_settings = get_mtphr_post_duplicator_settings();
+	$settings = wp_parse_args( $args, $global_settings );
 	
 	// Modify some of the elements
-	$duplicate['post_title'] = $duplicate['post_title'].' '.$settings['title'];
+	$appended = ( $settings['title'] != '' ) ? ' '.$settings['title'] : '';
+	$duplicate['post_title'] = $duplicate['post_title'].' '.$appended;
 	$duplicate['post_name'] = sanitize_title($duplicate['post_name'].'-'.$settings['slug']);
 	
 	// Set the status
@@ -83,6 +77,30 @@ function m4c_duplicate_post() {
 			}
 		}
   }
+  
+  // Add an action for others to do custom stuff
+  if( $do_action ) {
+  	do_action( 'mtphr_post_duplicator_created', $original_id, $duplicate_id, $settings );
+  }
+
+	return $duplicate_id;
+}
+
+
+/* --------------------------------------------------------- */
+/* !Ajax duplicate post - 2.2.0 */
+/* --------------------------------------------------------- */
+
+function m4c_duplicate_post() {
+
+	// Check the nonce
+	check_ajax_referer( 'm4c_ajax_file_nonce', 'security' );
+	
+	// Get variables
+	$original_id  = $_POST['original_id'];
+	
+	// Duplicate the post
+	$duplicate_id = mtphr_duplicate_post( $original_id );
 
 	echo $duplicate_id;
 
