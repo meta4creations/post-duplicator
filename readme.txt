@@ -2,7 +2,7 @@
 Contributors: metaphorcreations
 Tags: posts, post, duplicate, duplication
 Requires at least: 4.0
-Tested up to: 4.7.2
+Tested up to: 5.5
 Stable tag: /trunk/
 License: GPL2
 
@@ -40,6 +40,9 @@ Check out the 'Installation' tab.
 2. View of the settings page
 
 == Changelog ==
+
+= 2.21 =
+* Javascript update for WP 5.5
 
 = 2.20 =
 * Added "do_action( 'mtphr_post_duplicator_created', $original_id, $duplicate_id, $settings )" action for custom actions on duplicated post
@@ -124,4 +127,4 @@ Must upgrade in order for the plugin to work. The file paths where initially wro
 
 == Upgrade Notice ==
 
-New "mtphr_post_duplicator_created" action, function updates and additions, other updates
+Javascript update for WP 5.5

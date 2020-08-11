@@ -2,7 +2,7 @@
 /*
 Plugin Name: Post Duplicator
 Description: Creates functionality to duplicate any and all post types, including taxonomies & custom fields
-Version: 2.20
+Version: 2.21
 Author: Metaphor Creations
 Author URI: http://www.metaphorcreations.com
 Text Domain: post-duplicator
@@ -30,7 +30,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 /**Define Widget Constants */
-define ( 'MTPHR_POST_DUPLICATOR_VERSION', '2.20' );
+define ( 'MTPHR_POST_DUPLICATOR_VERSION', '2.21' );
 define ( 'MTPHR_POST_DUPLICATOR_DIR', plugin_dir_path(__FILE__) );
 
 

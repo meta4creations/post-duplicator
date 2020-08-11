@@ -9,7 +9,7 @@ jQuery( document ).ready( function() {
 	 * @since 2.12
 	 */
 	 
-	jQuery( '.m4c-duplicate-post' ).live( 'click', function( e ) {
+	jQuery( 'body' ).on( 'click', '.m4c-duplicate-post', function( e ) {
 		
 		e.preventDefault();
 		var $spinner = jQuery(this).next('.spinner');
