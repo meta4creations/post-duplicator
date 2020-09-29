@@ -54,6 +54,8 @@ function mtphr_duplicate_post( $original_id, $args=array(), $do_action=true ) {
 	unset( $duplicate['guid'] );
 	unset( $duplicate['comment_count'] );
 
+	$duplicate['post_content'] = str_replace( array( '\r\n', '\r', '\n' ), '<br />', $duplicate['post_content'] ); //Handles guttenburg escaping in returns for blocks
+
 	// Insert the post into the database
 	$duplicate_id = wp_insert_post( $duplicate );
 	
