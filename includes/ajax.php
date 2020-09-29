@@ -1,7 +1,7 @@
 <?php
 
 /* --------------------------------------------------------- */
-/* !Duplicate the post - 2.20 */
+/* !Duplicate the post - 2.22 */
 /* --------------------------------------------------------- */
 
 function mtphr_duplicate_post( $original_id, $args=array(), $do_action=true ) {

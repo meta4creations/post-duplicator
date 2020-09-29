@@ -2,7 +2,7 @@
 Contributors: metaphorcreations
 Tags: posts, post, duplicate, duplication
 Requires at least: 4.0
-Tested up to: 5.5
+Tested up to: 5.5.1
 Stable tag: /trunk/
 License: GPL2
 
@@ -40,6 +40,9 @@ Check out the 'Installation' tab.
 2. View of the settings page
 
 == Changelog ==
+
+= 2.22 =
+* Fixed Gutenburg escaping in returns for ACF blocks
 
 = 2.21 =
 * Javascript update for WP 5.5
@@ -127,4 +130,4 @@ Must upgrade in order for the plugin to work. The file paths where initially wro
 
 == Upgrade Notice ==
 
-Javascript update for WP 5.5
+Fixed Gutenburg escaping in returns for ACF blocks
