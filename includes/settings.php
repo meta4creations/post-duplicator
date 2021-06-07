@@ -27,6 +27,28 @@ add_action( 'admin_init', 'mtphr_post_duplicator_initialize_settings' );
  * @since 2.16
  */ 
 function mtphr_post_duplicator_initialize_settings() {
+	
+	$settings['post_duplication'] = array(
+		'title' => __( 'Post Duplication', 'post-duplicator' ),
+		'type' => 'radio',
+		'options' => array(
+			'all_users' => __('Allow Duplication of All Users', 'post-duplicator'),
+			'current_user' => __('Limit to Current User', 'post-duplicator')
+		),
+		'display' => 'inline',
+		'default' => 'all_users'
+	);
+	
+	$settings['post_author'] = array(
+		'title' => __( 'Post Author', 'post-duplicator' ),
+		'type' => 'radio',
+		'options' => array(
+			'current_user' => __('Current User', 'post-duplicator'),
+			'original_user' => __('Original Post Author', 'post-duplicator'),
+		),
+		'display' => 'inline',
+		'default' => 'current_user'
+	);
 
 	$settings['status'] = array(
 		'title' => __( 'Post Status', 'post-duplicator' ),

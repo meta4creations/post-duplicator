@@ -48,6 +48,9 @@ function mtphr_duplicate_post( $original_id, $args=array(), $do_action=true ) {
 	$duplicate['post_date_gmt'] = date('Y-m-d H:i:s', $timestamp_gmt);
 	$duplicate['post_modified'] = date('Y-m-d H:i:s', current_time('timestamp',0));
 	$duplicate['post_modified_gmt'] = date('Y-m-d H:i:s', current_time('timestamp',1));
+	if ( 'current_user' == $settings['post_author'] ) {
+		$duplicate['post_author'] = get_current_user_id();
+	}
 
 	// Remove some of the keys
 	unset( $duplicate['ID'] );
