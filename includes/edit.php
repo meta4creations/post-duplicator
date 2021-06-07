@@ -8,6 +8,11 @@
 function mtphr_post_duplicator_action_row_link( $post ) {
 
 	$settings = get_mtphr_post_duplicator_settings();
+	if ( 'current_user' === $settings['post_duplication'] ) {
+		if ( get_current_user_id() != $post->post_author ) {
+			return false;
+		}
+	}
 
 	// Get the post type object
 	$post_type = get_post_type_object( $post->post_type );
@@ -33,7 +38,9 @@ function mtphr_post_duplicator_action_row_link( $post ) {
 // Add the duplicate link to post actions
 function mtphr_post_duplicator_action_row( $actions, $post ){
 	if( function_exists('mtphr_post_duplicator_action_row_link') ) {
-		$actions['duplicate_post'] = mtphr_post_duplicator_action_row_link( $post );
+		if ( $link = mtphr_post_duplicator_action_row_link( $post ) ) {
+			$actions['duplicate_post'] = $link;
+		}	
 	}
 	return $actions;
 }

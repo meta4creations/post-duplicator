@@ -12,6 +12,8 @@ function get_mtphr_post_duplicator_settings() {
 	$settings = get_option('mtphr_post_duplicator_settings', array());
 	
 	$defaults = array(
+		'post_duplication' => 'all_users',
+		'post_author' => 'current_user',
 		'status' => 'same',
 		'type' => 'same',
 		'timestamp' => 'current',
@@ -35,6 +37,12 @@ function get_mtphr_post_duplicator_settings() {
 
 function mtphr_post_duplicator_submitbox( $post ) {
 	if( $post->post_status == 'publish' ) {
+		$settings = get_mtphr_post_duplicator_settings();
+		if ( 'current_user' === $settings['post_duplication'] ) {
+			if ( get_current_user_id() != $post->post_author ) {
+				return false;
+			}
+		}
 		$post_type = get_post_type_object( $post->post_type );
 		$nonce = wp_create_nonce( 'm4c_ajax_file_nonce' );
 		?>
