@@ -41,7 +41,7 @@ Check out the 'Installation' tab.
 
 == Changelog ==
 
-= 2.22 =
+= 2.23 =
 * Added setting to limit post duplication to current user
 * Added setting to setup duplicated post author to current user
 * Set the default setting of duplicated post author to current user
