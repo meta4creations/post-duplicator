@@ -41,7 +41,7 @@ Check out the 'Installation' tab.
 
 == Changelog ==
 
-= 2.23 =
+= 2.24 =
 * Settings sanitization updates
 
 = 2.23 =
