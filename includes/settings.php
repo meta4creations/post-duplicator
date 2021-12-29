@@ -163,7 +163,32 @@ function mtphr_post_duplicator_initialize_settings() {
 	}
 	
 	// Register the fields with WordPress
-	register_setting( 'mtphr_post_duplicator_settings', 'mtphr_post_duplicator_settings' );
+	register_setting( 'mtphr_post_duplicator_settings', 'mtphr_post_duplicator_settings', 'mtphr_post_duplicator_settings_sanitize' );
+}
+
+
+/**
+ * Sanitize the settings
+ *
+ * @since 2.0
+ */
+function mtphr_post_duplicator_settings_sanitize( $fields ) {
+	$sanitized_fields = array(
+		'post_duplication' 			=> isset( $fields['post_duplication'] ) 							? esc_attr( $fields['post_duplication'] ) 			: 'all_users',
+		'post_author' 					=> isset( $fields['post_author'] ) 										? esc_attr( $fields['post_author'] ) 						: 'current_user',
+		'status' 								=> isset( $fields['status'] ) 												? esc_attr( $fields['status'] ) 								: 'draft',
+		'type' 									=> isset( $fields['type'] ) 													? esc_attr( $fields['type'] ) 									: 'same',
+		'timestamp' 						=> isset( $fields['timestamp'] ) 											? esc_attr( $fields['timestamp'] ) 							: 'current',
+		'title' 								=> isset( $fields['title'] ) 													? sanitize_text_field( $fields['title'] ) 			: '',
+		'slug' 									=> isset( $fields['slug'] ) 													? sanitize_text_field( $fields['slug'] ) 				: '',
+		'time_offset' 					=> isset( $fields['time_offset'] ) 										? esc_attr( $fields['time_offset'] ) 						: false,
+		'time_offset_days' 			=> isset( $fields['time_offset_days'] ) 							? intval( $fields['time_offset_days'] ) 				: 0,
+		'time_offset_hours' 		=> isset( $fields['time_offset_hours'] ) 							? intval( $fields['time_offset_hours'] ) 				: 0,
+		'time_offset_minutes' 	=> isset( $fields['time_offset_minutes'] ) 						? intval( $fields['time_offset_minutes'] ) 			: 0,
+		'time_offset_seconds' 	=> isset( $fields['time_otime_offset_secondsffset'] ) ? intval( $fields['time_offset_seconds'] ) 			: 0,
+		'time_offset_direction' => isset( $fields['time_offset_direction'] ) 					? esc_attr( $fields['time_offset_direction'] )	: 'newer',
+	);
+	return $sanitized_fields;
 }
 
 
