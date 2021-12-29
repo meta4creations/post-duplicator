@@ -42,6 +42,9 @@ Check out the 'Installation' tab.
 == Changelog ==
 
 = 2.23 =
+* Settings sanitization updates
+
+= 2.23 =
 * Added setting to limit post duplication to current user
 * Added setting to setup duplicated post author to current user
 * Set the default setting of duplicated post author to current user
@@ -135,4 +138,4 @@ Must upgrade in order for the plugin to work. The file paths where initially wro
 
 == Upgrade Notice ==
 
-Set the default setting of duplicated post author to current user and added additional settings
+Settings sanitization updates
