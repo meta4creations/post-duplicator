@@ -1,7 +1,7 @@
 <?php
 
 /* --------------------------------------------------------- */
-/* !Duplicate the post - 2.22 */
+/* !Duplicate the post - 2.26 */
 /* --------------------------------------------------------- */
 
 function mtphr_duplicate_post( $original_id, $args=array(), $do_action=true ) {
@@ -16,9 +16,9 @@ function mtphr_duplicate_post( $original_id, $args=array(), $do_action=true ) {
 	$settings = wp_parse_args( $args, $global_settings );
 	
 	// Modify some of the elements
-	$appended = ( $settings['title'] != '' ) ? ' '.$settings['title'] : '';
-	$duplicate['post_title'] = $duplicate['post_title'].' '.$appended;
-	$duplicate['post_name'] = sanitize_title($duplicate['post_name'].'-'.$settings['slug']);
+	$appended = isset( $settings['title'] ) ? $settings['title'] : esc_html__( 'Copy', 'post-duplicator' );
+	$duplicate['post_title'] = $duplicate['post_title'] . ' ' . $appended;
+	$duplicate['post_name'] = sanitize_title( $duplicate['post_name'] . '-' . $settings['slug'] );
 	
 	// Set the status
 	if( $settings['status'] != 'same' ) {
@@ -74,11 +74,17 @@ function mtphr_duplicate_post( $original_id, $args=array(), $do_action=true ) {
   foreach ( $custom_fields as $key => $value ) {
 	  if( is_array($value) && count($value) > 0 ) {
 			foreach( $value as $i=>$v ) {
-				$result = $wpdb->insert( $wpdb->prefix.'postmeta', array(
-					'post_id' => $duplicate_id,
-					'meta_key' => $key,
-					'meta_value' => $v
-				));
+				$data = array(
+					'post_id' 		=> $duplicate_id,
+					'meta_key' 		=> $key,
+					'meta_value' 	=> $v,
+				);
+				$formats = array(
+					'%d',
+					'%s',
+					'%s',
+				);
+				$result = $wpdb->insert( $wpdb->prefix.'postmeta', $data, $formats );
 			}
 		}
   }

@@ -3,9 +3,15 @@
 /**
  * Add a duplicate post link.
  *
- * @since 2.25
+ * @since 2.26
  */
 function mtphr_post_duplicator_action_row_link( $post ) {
+	
+	// Do not show on trash page
+	$post_status = isset( $_GET['post_status'] ) ? $_GET['post_status'] : false;
+	if ( 'trash' == $post_status ) {
+		return false;
+	}
 
 	$settings = get_mtphr_post_duplicator_settings();
 	if ( 'current_user' === $settings['post_duplication'] ) {
