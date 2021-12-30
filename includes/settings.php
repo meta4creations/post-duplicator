@@ -9,11 +9,11 @@ add_action( 'admin_menu', 'mtphr_post_duplicator_settings_page' );
 function mtphr_post_duplicator_settings_page() {
 
 	add_management_page(
-		__('Post Duplicator', 'post-duplicator'),														// The value used to populate the browser's title bar when the menu page is active
-		__('Post Duplicator', 'post-duplicator'),														// The label of this submenu item displayed in the menu
-		'administrator',															// What roles are able to access this submenu item
-		'mtphr_post_duplicator_settings_menu',				// The ID used to represent this submenu item
-		'mtphr_post_duplicator_settings_display'			// The callback function used to render the options for this submenu item
+		esc_html__('Post Duplicator', 'post-duplicator'),	// The value used to populate the browser's title bar when the menu page is active
+		esc_html__('Post Duplicator', 'post-duplicator'),	// The label of this submenu item displayed in the menu
+		'administrator',																	// What roles are able to access this submenu item
+		'mtphr_post_duplicator_settings_menu',						// The ID used to represent this submenu item
+		'mtphr_post_duplicator_settings_display'					// The callback function used to render the options for this submenu item
 	);
 }
 
@@ -29,110 +29,110 @@ add_action( 'admin_init', 'mtphr_post_duplicator_initialize_settings' );
 function mtphr_post_duplicator_initialize_settings() {
 	
 	$settings['post_duplication'] = array(
-		'title' => __( 'Post Duplication', 'post-duplicator' ),
+		'title' => esc_html__( 'Post Duplication', 'post-duplicator' ),
 		'type' => 'radio',
 		'options' => array(
-			'all_users' => __('Allow Duplication of All Users', 'post-duplicator'),
-			'current_user' => __('Limit to Current User', 'post-duplicator')
+			'all_users' => esc_html__('Allow Duplication of All Users', 'post-duplicator'),
+			'current_user' => esc_html__('Limit to Current User', 'post-duplicator')
 		),
 		'display' => 'inline',
 		'default' => 'all_users'
 	);
 	
 	$settings['post_author'] = array(
-		'title' => __( 'Post Author', 'post-duplicator' ),
+		'title' => esc_html__( 'Post Author', 'post-duplicator' ),
 		'type' => 'radio',
 		'options' => array(
-			'current_user' => __('Current User', 'post-duplicator'),
-			'original_user' => __('Original Post Author', 'post-duplicator'),
+			'current_user' => esc_html__('Current User', 'post-duplicator'),
+			'original_user' => esc_html__('Original Post Author', 'post-duplicator'),
 		),
 		'display' => 'inline',
 		'default' => 'current_user'
 	);
 
 	$settings['status'] = array(
-		'title' => __( 'Post Status', 'post-duplicator' ),
+		'title' => esc_html__( 'Post Status', 'post-duplicator' ),
 		'type' => 'select',
 		'options' => array(
-			'same' => __('Same as original', 'post-duplicator'),
-			'draft' => __('Draft', 'post-duplicator'),
-			'publish' => __('Published', 'post-duplicator'),
-			'pending' => __('Pending', 'post-duplicator')	
+			'same' => esc_html__('Same as original', 'post-duplicator'),
+			'draft' => esc_html__('Draft', 'post-duplicator'),
+			'publish' => esc_html__('Published', 'post-duplicator'),
+			'pending' => esc_html__('Pending', 'post-duplicator')	
 		),
 		'default' => 'draft'
 	);
 	
 	$settings['type'] = array(
-		'title' => __( 'Post Type', 'post-duplicator' ),
+		'title' => esc_html__( 'Post Type', 'post-duplicator' ),
 		'type' => 'select',
 		'options' => mtphr_post_duplicator_post_types(),
 		'default' => 'same'
 	);
 	
 	$settings['timestamp'] = array(
-		'title' => __( 'Post Date', 'post-duplicator' ),
+		'title' => esc_html__( 'Post Date', 'post-duplicator' ),
 		'type' => 'radio',
 		'options' => array(
-			'duplicate' => __('Duplicate Timestamp', 'post-duplicator'),
-			'current' => __('Current Time', 'post-duplicator')
+			'duplicate' => esc_html__('Duplicate Timestamp', 'post-duplicator'),
+			'current' => esc_html__('Current Time', 'post-duplicator')
 		),
 		'display' => 'inline',
 		'default' => 'current'
 	);
 	
 	$settings['title'] = array(
-		'title' => __( 'Duplicate Title', 'post-duplicator' ),
-		'description' => __('String that should be appended to the duplicate post\'s title', 'post-duplicator'),
+		'title' => esc_html__( 'Duplicate Title', 'post-duplicator' ),
+		'description' => esc_html__('String that should be appended to the duplicate post\'s title', 'post-duplicator'),
 		'type' => 'text',
 		'display' => 'inline',
-		'default' => __('Copy', 'post-duplicator')
+		'default' => esc_html__('Copy', 'post-duplicator')
 	);
 	
 	$settings['slug'] = array(
-		'title' => __( 'Duplicate Slug', 'post-duplicator' ),
-		'description' => __('String that should be appended to the duplicate post\'s slug', 'post-duplicator'),
+		'title' => esc_html__( 'Duplicate Slug', 'post-duplicator' ),
+		'description' => esc_html__('String that should be appended to the duplicate post\'s slug', 'post-duplicator'),
 		'type' => 'text',
 		'display' => 'inline',
 		'default' => 'copy'
 	);
 	
 	$settings['time_offset'] = array(
-		'title' => __( 'Offset Date', 'post-duplicator' ),
+		'title' => esc_html__( 'Offset Date', 'post-duplicator' ),
 		'type' => 'checkbox',
 		'append' => array(
 			'time_offset_days' => array(
 				'type' => 'text',
 				'size' => 2,
-				'after' => __(' days', 'post-duplicator'),
+				'after' => esc_html__(' days', 'post-duplicator'),
 				'text_align' => 'right',
 				'default' => 0
 			),
 			'time_offset_hours' => array(
 				'type' => 'text',
 				'size' => 2,
-				'after' => __(' hours', 'post-duplicator'),
+				'after' => esc_html__(' hours', 'post-duplicator'),
 				'text_align' => 'right',
 				'default' => 0
 			),
 			'time_offset_minutes' => array(
 				'type' => 'text',
 				'size' => 2,
-				'after' => __(' minutes', 'post-duplicator'),
+				'after' => esc_html__(' minutes', 'post-duplicator'),
 				'text_align' => 'right',
 				'default' => 0
 			),
 			'time_offset_seconds' => array(
 				'type' => 'text',
 				'size' => 2,
-				'after' => __(' seconds', 'post-duplicator'),
+				'after' => esc_html__(' seconds', 'post-duplicator'),
 				'text_align' => 'right',
 				'default' => 0
 			),
 			'time_offset_direction' => array(
 				'type' => 'select',
 				'options' => array(
-					'newer' => __('newer', 'post-duplicator'),
-					'older' => __('older', 'post-duplicator')
+					'newer' => esc_html__('newer', 'post-duplicator'),
+					'older' => esc_html__('older', 'post-duplicator')
 				),
 				'default' => 'newer'
 			)
@@ -174,19 +174,19 @@ function mtphr_post_duplicator_initialize_settings() {
  */
 function mtphr_post_duplicator_settings_sanitize( $fields ) {
 	$sanitized_fields = array(
-		'post_duplication' 			=> isset( $fields['post_duplication'] ) 							? esc_attr( $fields['post_duplication'] ) 			: 'all_users',
-		'post_author' 					=> isset( $fields['post_author'] ) 										? esc_attr( $fields['post_author'] ) 						: 'current_user',
-		'status' 								=> isset( $fields['status'] ) 												? esc_attr( $fields['status'] ) 								: 'draft',
-		'type' 									=> isset( $fields['type'] ) 													? esc_attr( $fields['type'] ) 									: 'same',
-		'timestamp' 						=> isset( $fields['timestamp'] ) 											? esc_attr( $fields['timestamp'] ) 							: 'current',
-		'title' 								=> isset( $fields['title'] ) 													? sanitize_text_field( $fields['title'] ) 			: '',
-		'slug' 									=> isset( $fields['slug'] ) 													? sanitize_text_field( $fields['slug'] ) 				: '',
-		'time_offset' 					=> isset( $fields['time_offset'] ) 										? esc_attr( $fields['time_offset'] ) 						: false,
-		'time_offset_days' 			=> isset( $fields['time_offset_days'] ) 							? intval( $fields['time_offset_days'] ) 				: 0,
-		'time_offset_hours' 		=> isset( $fields['time_offset_hours'] ) 							? intval( $fields['time_offset_hours'] ) 				: 0,
-		'time_offset_minutes' 	=> isset( $fields['time_offset_minutes'] ) 						? intval( $fields['time_offset_minutes'] ) 			: 0,
-		'time_offset_seconds' 	=> isset( $fields['time_otime_offset_secondsffset'] ) ? intval( $fields['time_offset_seconds'] ) 			: 0,
-		'time_offset_direction' => isset( $fields['time_offset_direction'] ) 					? esc_attr( $fields['time_offset_direction'] )	: 'newer',
+		'post_duplication' 			=> isset( $fields['post_duplication'] ) 			? esc_attr( $fields['post_duplication'] ) 			: 'all_users',
+		'post_author' 					=> isset( $fields['post_author'] ) 						? esc_attr( $fields['post_author'] ) 						: 'current_user',
+		'status' 								=> isset( $fields['status'] ) 								? esc_attr( $fields['status'] ) 								: 'draft',
+		'type' 									=> isset( $fields['type'] ) 									? esc_attr( $fields['type'] ) 									: 'same',
+		'timestamp' 						=> isset( $fields['timestamp'] ) 							? esc_attr( $fields['timestamp'] ) 							: 'current',
+		'title' 								=> isset( $fields['title'] ) 									? sanitize_text_field( $fields['title'] ) 			: '',
+		'slug' 									=> isset( $fields['slug'] ) 									? sanitize_title_with_dashes( $fields['slug'] ) : '',
+		'time_offset' 					=> isset( $fields['time_offset'] ) 						? esc_attr( $fields['time_offset'] ) 						: false,
+		'time_offset_days' 			=> isset( $fields['time_offset_days'] ) 			? intval( $fields['time_offset_days'] ) 				: 0,
+		'time_offset_hours' 		=> isset( $fields['time_offset_hours'] ) 			? intval( $fields['time_offset_hours'] ) 				: 0,
+		'time_offset_minutes' 	=> isset( $fields['time_offset_minutes'] ) 		? intval( $fields['time_offset_minutes'] ) 			: 0,
+		'time_offset_seconds' 	=> isset( $fields['time_offset_seconds'] ) 		? intval( $fields['time_offset_seconds'] ) 			: 0,
+		'time_offset_direction' => isset( $fields['time_offset_direction'] ) 	? esc_attr( $fields['time_offset_direction'] )	: 'newer',
 	);
 	return $sanitized_fields;
 }
@@ -227,7 +227,7 @@ function mtphr_post_duplicator_settings_display() {
  * @since 2.0
  */ 
 function mtphr_post_duplicator_settings_callback() {
-	echo '<h4>' . __( 'Customize the settings for duplicated posts.', 'post-duplicator' ) . '</h4>';
+	echo '<h4>' . esc_html__( 'Customize the settings for duplicated posts.', 'post-duplicator' ) . '</h4>';
 }
 
 
@@ -252,19 +252,19 @@ function mtphr_post_duplicator_field_display( $args ) {
 	}
 	if( isset($args['type']) ) {
 	
-		echo '<div class="mtphr-post-duplicator-metaboxer-field mtphr-post-duplicator-metaboxer-'.$args['type'].'">';
-		
-		// Call the function to display the field
-		if ( function_exists('mtphr_post_duplicator_metaboxer_'.$args['type']) ) {
-			call_user_func( 'mtphr_post_duplicator_metaboxer_'.$args['type'], $args, $value );
-		}
+		echo '<div class="mtphr-post-duplicator-metaboxer-field mtphr-post-duplicator-metaboxer-' . esc_attr( $args['type'] ) . '">';
+			
+			// Call the function to display the field
+			if ( function_exists('mtphr_post_duplicator_metaboxer_'.$args['type']) ) {
+				call_user_func( 'mtphr_post_duplicator_metaboxer_'.$args['type'], $args, $value );
+			}
 		
 		echo '<div>';
 	}
 	
 	// Add a descriptions
-	if( isset($args['description']) ) {
-		echo '<span class="description"><small>'.$args['description'].'</small></span>';
+	if( isset( $args['description'] ) ) {
+		echo '<span class="description"><small>' . wp_kses_post( $args['description'] ) . '</small></span>';
 	}
 }
 

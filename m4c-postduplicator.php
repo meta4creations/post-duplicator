@@ -2,7 +2,7 @@
 /*
 Plugin Name: Post Duplicator
 Description: Creates functionality to duplicate any and all post types, including taxonomies & custom fields
-Version: 2.24
+Version: 2.25
 Author: Metaphor Creations
 Author URI: http://www.metaphorcreations.com
 Text Domain: post-duplicator
@@ -30,7 +30,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 /**Define Widget Constants */
-define ( 'MTPHR_POST_DUPLICATOR_VERSION', '2.24' );
+define ( 'MTPHR_POST_DUPLICATOR_VERSION', '2.25' );
 define ( 'MTPHR_POST_DUPLICATOR_DIR', plugin_dir_path(__FILE__) );
 
 
@@ -58,7 +58,7 @@ if ( is_admin() ) {
 	// Load Metaboxer
 	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/helpers.php' );
 	require_once( MTPHR_POST_DUPLICATOR_DIR.'metaboxer/metaboxer.php' );
-	require_once( MTPHR_POST_DUPLICATOR_DIR.'metaboxer/metaboxer-class.php' );
+	//require_once( MTPHR_POST_DUPLICATOR_DIR.'metaboxer/metaboxer-class.php' );
 	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/scripts.php' );
 	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/ajax.php' );
 	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/edit.php' );
