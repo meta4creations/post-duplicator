@@ -93,7 +93,7 @@ function mtphr_duplicate_post( $original_id, $args=array(), $do_action=true ) {
 
 
 /* --------------------------------------------------------- */
-/* !Ajax duplicate post - 2.2.0 */
+/* !Ajax duplicate post - 2.25 */
 /* --------------------------------------------------------- */
 
 function m4c_duplicate_post() {
@@ -102,13 +102,14 @@ function m4c_duplicate_post() {
 	check_ajax_referer( 'm4c_ajax_file_nonce', 'security' );
 	
 	// Get variables
-	$original_id  = $_POST['original_id'];
+	$original_id  = intval( $_POST['original_id'] );
 	
 	// Duplicate the post
 	$duplicate_id = mtphr_duplicate_post( $original_id );
-
-	echo $duplicate_id;
-
-	die(); // this is required to return a proper result
+	
+	$data = array(
+		'duplicate_id' => esc_attr( $duplicate_id ),
+	);
+	wp_send_json( $data );
 }
 add_action( 'wp_ajax_m4c_duplicate_post', 'm4c_duplicate_post' );

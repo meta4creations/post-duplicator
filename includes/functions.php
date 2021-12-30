@@ -47,7 +47,7 @@ function mtphr_post_duplicator_submitbox( $post ) {
 		$nonce = wp_create_nonce( 'm4c_ajax_file_nonce' );
 		?>
 		<div class="misc-pub-section misc-pub-duplicator" id="duplicator">
-			<a class="m4c-duplicate-post button button-small" rel="<?php echo $nonce; ?>" href="#" data-postid="<?php echo $post->ID; ?>"><?php printf( __( 'Duplicate %s', 'post-duplicator' ), $post_type->labels->singular_name ); ?></a><span class="spinner" style="float:none;margin-top:2px;margin-left:4px;"></span>
+			<a class="m4c-duplicate-post button button-small" rel="<?php echo esc_attr( $nonce ); ?>" href="#" data-postid="<?php echo esc_attr( $post->ID ); ?>"><?php esc_html_e( sprintf( __( 'Duplicate %s', 'post-duplicator' ), $post_type->labels->singular_name ) ); ?></a><span class="spinner" style="float:none;margin-top:2px;margin-left:4px;"></span>
 		</div>
 		<?php
 	}

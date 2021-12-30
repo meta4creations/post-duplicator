@@ -3,7 +3,7 @@ Contributors: metaphorcreations
 Tags: posts, post, duplicate, duplication
 Requires at least: 4.0
 Tested up to: 5.8.2
-Stable tag: /trunk/
+Stable tag: 2.25
 License: GPL2
 
 Creates functionality to duplicate any and all post types, including taxonomies & custom fields.
@@ -40,6 +40,9 @@ Check out the 'Installation' tab.
 2. View of the settings page
 
 == Changelog ==
+
+= 2.25 =
+* Multiple data sanitization updates
 
 = 2.24 =
 * Settings sanitization updates
@@ -138,4 +141,4 @@ Must upgrade in order for the plugin to work. The file paths where initially wro
 
 == Upgrade Notice ==
 
-Settings sanitization updates
+Multiple data sanitization updates

@@ -1,28 +1,28 @@
 <?php
 
 /* --------------------------------------------------------- */
-/* !Create an admin notice that a post has been duplicated - 2.11 */
+/* !Create an admin notice that a post has been duplicated - 2.25 */
 /* --------------------------------------------------------- */
 
 function mtphr_post_duplicator_notice() {
 	
-	$duplicated_id = isset($_GET['post-duplicated']) ? htmlspecialchars($_GET['post-duplicated'], ENT_QUOTES, 'UTF-8') : '';
+	$duplicated_id = isset( $_GET['post-duplicated'] ) ? intval( $_GET['post-duplicated'] ) : '';
 	if( $duplicated_id != '' ) {
 		
 		$settings = get_mtphr_post_duplicator_settings();
 	
 		// Get the post type object
-		$duplicated_post = get_post($duplicated_id);
+		$duplicated_post = get_post( $duplicated_id );
 		$post_type = get_post_type_object( $duplicated_post->post_type );
 		
 		// Set the button label
 		$pt = $post_type->labels->singular_name;
-		$link = '<a href="'.get_edit_post_link($duplicated_id).'">'.__('here', 'post-duplicator').'</a>';
+		$link = '<a href="'.get_edit_post_link( $duplicated_id ).'">'.esc_html__( 'here', 'post-duplicator' ).'</a>';
 		$label = sprintf( __( 'Successfully Duplicated! You can edit your new %1$s %2$s.', 'post-duplicator' ), $pt, $link );
 		
 		?>
     <div class="updated">
-       <p><?php echo $label; ?></p>
+       <p><?php echo wp_kses_post( $label ); ?></p>
     </div>
     <?php
 	}

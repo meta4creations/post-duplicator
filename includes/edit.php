@@ -3,7 +3,7 @@
 /**
  * Add a duplicate post link.
  *
- * @since 2.20
+ * @since 2.25
  */
 function mtphr_post_duplicator_action_row_link( $post ) {
 
@@ -32,7 +32,7 @@ function mtphr_post_duplicator_action_row_link( $post ) {
 	$nonce = wp_create_nonce( 'm4c_ajax_file_nonce' );
 	
 	// Return the link
-	return '<a class="m4c-duplicate-post" rel="'.$nonce.'" href="#" data-postid="'.$post->ID.'">'.$label.'</a>';
+	return '<a class="m4c-duplicate-post" rel="'.esc_attr( $nonce ).'" href="#" data-postid="'.esc_attr( $post->ID ).'">'.wp_kses_post( $label ).'</a>';
 }
 
 // Add the duplicate link to post actions
