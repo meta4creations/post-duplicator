@@ -18,20 +18,20 @@ function mtphr_post_duplicator_metaboxer_container( $field, $context ) {
 
 	global $post;
 
-	$default = isset( $field['default'] ) ? $field['default'] : '';
-	$value = ( get_post_meta( $post->ID, $field['id'], true ) != '' ) ? get_post_meta( $post->ID, $field['id'], true ) : $default;
-	$display = isset( $field['display'] ) ? $field['display'] : '';
+	$default = isset( $field['default'] ) ? sanitize_text_field( $field['default'] ) : '';
+	$value = ( get_post_meta( $post->ID, $field['id'], true ) != '' ) ? sanitize_text_field( get_post_meta( $post->ID, $field['id'], true ) ) : $default;
+	$display = isset( $field['display'] ) ? sanitize_text_field( $field['display'] ) : '';
 	?>
 	<tr class="mtphr-post-duplicator-metaboxer-field mtphr-post-duplicator-metaboxer-field-<?php esc_attr_e( $field['type'] ); ?> mtphr-post-duplicator-metaboxer<?php esc_attr_e( $field['id'] ); ?><?php if( isset($field['class']) ) { esc_attr_e( ' ' . $field['class'] ); } ?> clearfix">	
 		
 		<?php
-		$content_class = 'mtphr-post-duplicator-metaboxer-field-content mtphr-post-duplicator-metaboxer-field-content-full mtphr-post-duplicator-metaboxer-'.$field['type'].' clearfix';
+		$content_class = 'mtphr-post-duplicator-metaboxer-field-content mtphr-post-duplicator-metaboxer-field-content-full mtphr-post-duplicator-metaboxer-'.esc_attr( $field['type'] ).' clearfix';
 		$content_span = ' colspan="2"';
 		$label = false;
 		
 		if ( isset($field['name']) || isset($field['description']) ) {
 		
-			$content_class = 'mtphr-post-duplicator-metaboxer-field-content mtphr-post-duplicator-metaboxer-'.$field['type'].' clearfix';
+			$content_class = 'mtphr-post-duplicator-metaboxer-field-content mtphr-post-duplicator-metaboxer-'.esc_attr( $field['type'] ).' clearfix';
 			$content_span = '';
 			$label = true;
 			?>
@@ -54,8 +54,8 @@ function mtphr_post_duplicator_metaboxer_container( $field, $context ) {
 		<td<?php esc_html_e( $content_span ); ?> class="<?php esc_attr_e( $content_class ); ?>" id="<?php esc_attr_e( $post->ID ); ?>">
 			<?php
 			// Call the function to display the field
-			if ( function_exists('mtphr_post_duplicator_metaboxer_'.$field['type']) ) {
-				call_user_func( 'mtphr_post_duplicator_metaboxer_'.$field['type'], $field, $value );
+			if ( function_exists('mtphr_post_duplicator_metaboxer_'.esc_attr( $field['type'] )) ) {
+				call_user_func( 'mtphr_post_duplicator_metaboxer_'.esc_attr( $field['type'] ), $field, $value );
 			}
 			?>
 		</td>
@@ -80,39 +80,27 @@ function mtphr_post_duplicator_metaboxer_append_field( $field ) {
 	if( isset($field['append']) ) {
 		
 		$fields = $field['append'];
-		$settings = ( isset($field['option'] ) ) ? $field['option'] : false;
 
 		if( is_array($fields) ) {
 		
 			foreach( $fields as $id => $field ) {
-				
-				// Get the value
-				if( $settings) {
-					$options = get_option( $settings );
-					$value = isset( $options[$id] ) ? $options[$id] : get_option( $id );	
-				} else {
-					global $post;
-					$value = get_post_meta( $post->ID, $id, true );
-				}
-				
-				// Set the default if no value
-				if( $value == '' && isset($field['default']) ) {
-					$value = $field['default'];
-				}
 	
 				if( isset($field['type']) ) {
-		
-					if( $settings ) {
-						$field['id'] = $settings.'['.$id.']';
-						$field['option'] = $settings;
-					} else {
-						$field['id'] = $id;
+					
+					// Set the default if no value
+					$value = '';
+					if( isset($field['default']) ) {
+						$value = sanitize_text_field( $field['default'] );
 					}
+					
+					$field['option_id'] = $id;
+					$field['id'] = 'mtphr_post_duplicator_settings['.sanitize_text_field( $id ).']';
 	
 					// Call the function to display the field
-					if ( function_exists('mtphr_post_duplicator_metaboxer_' . esc_attr( $field['type'] ) ) ) {
+					$function_name  = 'mtphr_post_duplicator_metaboxer_' . esc_attr( $field['type'] );
+					if ( function_exists( $function_name ) ) {
 						echo '<div class="mtphr-post-duplicator-metaboxer-appended mtphr-post-duplicator-metaboxer' . esc_attr( $field['id'] ) . '">';
-						call_user_func( 'mtphr_post_duplicator_metaboxer_' . esc_attr( $field['type'] ), $field, $value );
+						call_user_func( $function_name, $field, $value );
 						echo '</div>';
 					}
 				}
@@ -141,11 +129,11 @@ function mtphr_post_duplicator_metaboxer_select( $field, $value='' ) {
   	
 	  foreach ( $field['options'] as $key => $option ) {
 	  	if( is_numeric($key) && !$key_val ) {
-				$name = ( is_array( $option ) ) ? $option['name'] : $option;
-				$val = ( is_array( $option ) ) ? $option['value'] : $option;
+				$name = ( is_array( $option ) ) ? sanitize_text_field( $option['name'] ) : sanitize_text_field( $option );
+				$val = ( is_array( $option ) ) ? sanitize_text_field( $option['value'] ) : sanitize_text_field( $option );
 			} else {
-				$name = $option;
-				$val = $key;
+				$name = sanitize_text_field( $option );
+				$val = sanitize_text_field( $key );
 			}
 			echo '<option value="'.esc_attr( $val ).'" '.selected( $val, $value, false ).'>'.stripslashes( wp_kses_post( $name ) ).'</option>';
 		}
@@ -233,10 +221,10 @@ function mtphr_post_duplicator_metaboxer_checkbox( $field, $value='' ) {
 /**
  * Renders an text field.
  *
- * @since 2.25
+ * @since 2.27
  */
 function mtphr_post_duplicator_metaboxer_text( $field, $value='' ) {
-	$size = ( isset($field['size']) ) ? $field['size'] : 40;
+	$size = ( isset( $field['size'] ) ) ? intval( $field['size'] ) : 40;
 	$before = ( isset($field['before']) ) ? '<span>'.$field['before'].' </span>' : '';
 	$after = ( isset($field['after']) ) ? '<span> '.$field['after'].'</span>' : '';
 	$text_align = ( isset($field['text_align']) ) ? ' style="text-align:'.$field['text_align'].'"' : '' ;
@@ -254,8 +242,8 @@ function mtphr_post_duplicator_metaboxer_text( $field, $value='' ) {
  * @since 2.25
  */
 function mtphr_post_duplicator_metaboxer_textarea( $field, $value='' ) {
-	$rows = ( isset($field['rows']) ) ? $field['rows'] : 5;
-	$cols = ( isset($field['cols']) ) ? $field['cols'] : 40;
+	$rows = ( isset($field['rows']) ) ? intval( $field['rows'] ) : 5;
+	$cols = ( isset($field['cols']) ) ? intval( $field['cols'] ) : 40;
 	echo '<textarea name="'.esc_attr( $field['id'] ).'" id="'.esc_attr( $field['id'] ).'" rows="'.esc_attr( $rows ).'" cols="'.esc_attr( $cols ).'">'.wp_kses_post( $value ).'</textarea>';
 	
 	// Add appended fields

@@ -1,7 +1,7 @@
 <?php
 	
 /* --------------------------------------------------------- */
-/* !Return an array of post types - 2.12 */
+/* !Return an array of post types - 2.27 */
 /* --------------------------------------------------------- */
 
 if( !function_exists('mtphr_post_duplicator_post_types') ) {
@@ -18,7 +18,7 @@ function mtphr_post_duplicator_post_types() {
 
 	if( is_array($pts) && count($pts) > 0 ) {
 		foreach( $pts as $i=>$pt ) {
-			$post_types[$i] = $pt->labels->singular_name;
+			$post_types[$i] = sanitize_text_field( $pt->labels->singular_name );
 		}
 	}
 	

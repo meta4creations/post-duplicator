@@ -3,12 +3,12 @@
 /**
  * Add a duplicate post link.
  *
- * @since 2.26
+ * @since 2.27
  */
 function mtphr_post_duplicator_action_row_link( $post ) {
 	
 	// Do not show on trash page
-	$post_status = isset( $_GET['post_status'] ) ? $_GET['post_status'] : false;
+	$post_status = isset( $_GET['post_status'] ) ? sanitize_text_field( $_GET['post_status'] ) : false;
 	if ( 'trash' == $post_status ) {
 		return false;
 	}
