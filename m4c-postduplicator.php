@@ -65,14 +65,13 @@ function mtphr_post_duplicator_localization() {
 /**
  * Include files.
  *
- * @since 2.0
+ * @since 2.27
  */
 if ( is_admin() ) {
 
 	// Load Metaboxer
 	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/helpers.php' );
 	require_once( MTPHR_POST_DUPLICATOR_DIR.'metaboxer/metaboxer.php' );
-	//require_once( MTPHR_POST_DUPLICATOR_DIR.'metaboxer/metaboxer-class.php' );
 	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/scripts.php' );
 	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/ajax.php' );
 	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/edit.php' );

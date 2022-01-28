@@ -1,7 +1,7 @@
 <?php
 
 /* --------------------------------------------------------- */
-/* !Duplicate the post - 2.26 */
+/* !Duplicate the post - 2.27 */
 /* --------------------------------------------------------- */
 
 function mtphr_duplicate_post( $original_id, $args=array(), $do_action=true ) {
@@ -16,18 +16,18 @@ function mtphr_duplicate_post( $original_id, $args=array(), $do_action=true ) {
 	$settings = wp_parse_args( $args, $global_settings );
 	
 	// Modify some of the elements
-	$appended = isset( $settings['title'] ) ? $settings['title'] : esc_html__( 'Copy', 'post-duplicator' );
-	$duplicate['post_title'] = $duplicate['post_title'] . ' ' . $appended;
+	$appended = isset( $settings['title'] ) ? sanitize_text_field( $settings['title'] ) : esc_html__( 'Copy', 'post-duplicator' );
+	$duplicate['post_title'] = wp_kses_post( $duplicate['post_title'] ) . ' ' . $appended;
 	$duplicate['post_name'] = sanitize_title( $duplicate['post_name'] . '-' . $settings['slug'] );
 	
 	// Set the status
 	if( $settings['status'] != 'same' ) {
-		$duplicate['post_status'] = $settings['status'];
+		$duplicate['post_status'] = sanitize_text_field( $settings['status'] );
 	}
 	
 	// Set the type
 	if( $settings['type'] != 'same' ) {
-		$duplicate['post_type'] = $settings['type'];
+		$duplicate['post_type'] = sanitize_text_field( $settings['type'] );
 	}
 	
 	// Set the post date
@@ -57,7 +57,7 @@ function mtphr_duplicate_post( $original_id, $args=array(), $do_action=true ) {
 	unset( $duplicate['guid'] );
 	unset( $duplicate['comment_count'] );
 
-	$duplicate['post_content'] = str_replace( array( '\r\n', '\r', '\n' ), '<br />', $duplicate['post_content'] ); //Handles guttenburg escaping in returns for blocks
+	$duplicate['post_content'] = str_replace( array( '\r\n', '\r', '\n' ), '<br />', wp_kses_post( $duplicate['post_content'] ) ); //Handles guttenburg escaping in returns for blocks
 
 	// Insert the post into the database
 	$duplicate_id = wp_insert_post( $duplicate );
@@ -68,16 +68,16 @@ function mtphr_duplicate_post( $original_id, $args=array(), $do_action=true ) {
 		$terms = wp_get_post_terms( $original_id, $taxonomy, array('fields' => 'names') );
 		wp_set_object_terms( $duplicate_id, $terms, $taxonomy );
 	}
-  
-  // Duplicate all the custom fields
+	
+	// Duplicate all the custom fields
 	$custom_fields = get_post_custom( $original_id );
-  foreach ( $custom_fields as $key => $value ) {
-	  if( is_array($value) && count($value) > 0 ) {
+	foreach ( $custom_fields as $key => $value ) {
+		if( is_array($value) && count($value) > 0 ) {
 			foreach( $value as $i=>$v ) {
 				$data = array(
-					'post_id' 		=> $duplicate_id,
-					'meta_key' 		=> $key,
-					'meta_value' 	=> $v,
+					'post_id' 		=> intval( $duplicate_id ),
+					'meta_key' 		=> sanitize_text_field( $key ),
+					'meta_value' 	=> wp_kses_post( $v ),
 				);
 				$formats = array(
 					'%d',
@@ -87,12 +87,12 @@ function mtphr_duplicate_post( $original_id, $args=array(), $do_action=true ) {
 				$result = $wpdb->insert( $wpdb->prefix.'postmeta', $data, $formats );
 			}
 		}
-  }
-  
-  // Add an action for others to do custom stuff
-  if( $do_action ) {
-  	do_action( 'mtphr_post_duplicator_created', $original_id, $duplicate_id, $settings );
-  }
+	}
+	
+	// Add an action for others to do custom stuff
+	if( $do_action ) {
+		do_action( 'mtphr_post_duplicator_created', $original_id, $duplicate_id, $settings );
+	}
 
 	return $duplicate_id;
 }

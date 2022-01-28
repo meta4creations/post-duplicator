@@ -1,7 +1,7 @@
 <?php
 
 /* --------------------------------------------------------- */
-/* !Create an admin notice that a post has been duplicated - 2.25 */
+/* !Create an admin notice that a post has been duplicated - 2.27 */
 /* --------------------------------------------------------- */
 
 function mtphr_post_duplicator_notice() {
@@ -16,8 +16,8 @@ function mtphr_post_duplicator_notice() {
 		$post_type = get_post_type_object( $duplicated_post->post_type );
 		
 		// Set the button label
-		$pt = $post_type->labels->singular_name;
-		$link = '<a href="'.get_edit_post_link( $duplicated_id ).'">'.esc_html__( 'here', 'post-duplicator' ).'</a>';
+		$pt = sanitize_text_field( $post_type->labels->singular_name );
+		$link = wp_kses_post( '<a href="'.get_edit_post_link( $duplicated_id ).'">'.esc_html__( 'here', 'post-duplicator' ).'</a>' );
 		$label = sprintf( __( 'Successfully Duplicated! You can edit your new %1$s %2$s.', 'post-duplicator' ), $pt, $link );
 		
 		?>
