@@ -3,7 +3,7 @@ Contributors: metaphorcreations
 Tags: posts, post, duplicate, duplication
 Requires at least: 4.0
 Tested up to: 5.9
-Stable tag: 2.26
+Stable tag: 2.27
 License: GPL2
 
 Creates functionality to duplicate any and all post types, including taxonomies & custom fields.
@@ -40,6 +40,10 @@ Check out the 'Installation' tab.
 2. View of the settings page
 
 == Changelog ==
+
+= 2.27 =
+* Sanitization and validation updates
+* Settings page optimization
 
 = 2.26 =
 * Removed duplicate functionality from post trash pages
@@ -146,4 +150,4 @@ Must upgrade in order for the plugin to work. The file paths where initially wro
 
 == Upgrade Notice ==
 
-Sanitization updates and removed trashed post duplication
+Sanitization updates settings optimization
