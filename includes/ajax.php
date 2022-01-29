@@ -1,7 +1,7 @@
 <?php
 
 /* --------------------------------------------------------- */
-/* !Duplicate the post - 2.27 */
+/* !Duplicate the post - 2.28 */
 /* --------------------------------------------------------- */
 
 function mtphr_duplicate_post( $original_id, $args=array(), $do_action=true ) {
@@ -77,7 +77,7 @@ function mtphr_duplicate_post( $original_id, $args=array(), $do_action=true ) {
 				$data = array(
 					'post_id' 		=> intval( $duplicate_id ),
 					'meta_key' 		=> sanitize_text_field( $key ),
-					'meta_value' 	=> wp_kses_post( $v ),
+					'meta_value' 	=> $v,
 				);
 				$formats = array(
 					'%d',
