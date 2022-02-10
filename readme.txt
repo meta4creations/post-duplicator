@@ -41,6 +41,9 @@ Check out the 'Installation' tab.
 
 == Changelog ==
 
+= 2.29 =
+* Updated duplicate post_content sanitization
+
 = 2.28 =
 * Bug fix from last update
 
