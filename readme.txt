@@ -2,7 +2,7 @@
 Contributors: metaphorcreations
 Tags: posts, post, duplicate, duplication
 Requires at least: 4.0
-Tested up to: 5.9
+Tested up to: 6.1.1
 Stable tag: 2.28
 License: GPL2
 
@@ -40,9 +40,6 @@ Check out the 'Installation' tab.
 2. View of the settings page
 
 == Changelog ==
-
-= 2.29 =
-* Updated duplicate post_content sanitization
 
 = 2.28 =
 * Bug fix from last update

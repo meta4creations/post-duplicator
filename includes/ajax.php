@@ -1,7 +1,7 @@
 <?php
 
 /* --------------------------------------------------------- */
-/* !Duplicate the post - 2.29 */
+/* !Duplicate the post - 2.28 */
 /* --------------------------------------------------------- */
 
 function mtphr_duplicate_post( $original_id, $args=array(), $do_action=true ) {
@@ -57,14 +57,7 @@ function mtphr_duplicate_post( $original_id, $args=array(), $do_action=true ) {
 	unset( $duplicate['guid'] );
 	unset( $duplicate['comment_count'] );
 
-	$allowed_html = wp_kses_allowed_html();
-	$allowed_html['center'] = [];
-	$allowed_html['script'] = [
-		'type' 	=> [],
-		'src'  	=> [],
-		'async'	=> [],
-	];
-	$duplicate['post_content'] = str_replace( array( '\r\n', '\r', '\n' ), '<br />', wp_kses( $duplicate['post_content'], $allowed_html ) ); //Handles guttenburg escaping in returns for blocks
+	$duplicate['post_content'] = str_replace( array( '\r\n', '\r', '\n' ), '<br />', wp_kses_post( $duplicate['post_content'] ) ); //Handles guttenburg escaping in returns for blocks
 
 	// Insert the post into the database
 	$duplicate_id = wp_insert_post( $duplicate );
