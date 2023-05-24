@@ -57,7 +57,8 @@ function mtphr_duplicate_post( $original_id, $args=array(), $do_action=true ) {
 	unset( $duplicate['guid'] );
 	unset( $duplicate['comment_count'] );
 
-	$duplicate['post_content'] = wp_slash( str_replace( array( '\r\n', '\r', '\n' ), '<br />', wp_kses_post( $duplicate['post_content'] ) ) ); 
+	//$duplicate['post_content'] = wp_slash( str_replace( array( '\r\n', '\r', '\n' ), '<br />', wp_kses_post( $duplicate['post_content'] ) ) ); 
+	$duplicate['post_content'] = wp_slash( wp_kses_post( $duplicate['post_content'] ) ); 
 
 	// Insert the post into the database
 	$duplicate_id = wp_insert_post( $duplicate );
