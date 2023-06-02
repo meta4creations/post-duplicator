@@ -3,7 +3,7 @@ Contributors: metaphorcreations
 Tags: posts, post, duplicate, duplication
 Requires at least: 4.0
 Tested up to: 6.2.2
-Stable tag: 2.30
+Stable tag: 2.31
 License: GPL2
 
 Creates functionality to duplicate any and all post types, including taxonomies & custom fields.
@@ -40,6 +40,9 @@ Check out the 'Installation' tab.
 2. View of the settings page
 
 == Changelog ==
+
+= 2.31 =
+* Disabled Polylang post_translations taxonomy from attaching to duplicated posts
 
 = 2.30 =
 * Additional fix to issue with unicode characters in Gutenberg blocks
@@ -159,4 +162,4 @@ Must upgrade in order for the plugin to work. The file paths where initially wro
 
 == Upgrade Notice ==
 
-Additional fix to issue with unicode characters in Gutenberg blocks
+Disabled Polylang post_translations taxonomy from attaching to duplicated posts

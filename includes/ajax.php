@@ -1,7 +1,7 @@
 <?php
 
 /* --------------------------------------------------------- */
-/* !Duplicate the post - 2.28 */
+/* !Duplicate the post - 2.31 */
 /* --------------------------------------------------------- */
 
 function mtphr_duplicate_post( $original_id, $args=array(), $do_action=true ) {
@@ -65,7 +65,11 @@ function mtphr_duplicate_post( $original_id, $args=array(), $do_action=true ) {
 	
 	// Duplicate all the taxonomies/terms
 	$taxonomies = get_object_taxonomies( $duplicate['post_type'] );
+	$disabled_taxonomies = ['post_translations'];
 	foreach( $taxonomies as $taxonomy ) {
+		if ( in_array( $taxonomy, $disabled_taxonomies ) ) {
+			continue;
+		}
 		$terms = wp_get_post_terms( $original_id, $taxonomy, array('fields' => 'names') );
 		wp_set_object_terms( $duplicate_id, $terms, $taxonomy );
 	}
