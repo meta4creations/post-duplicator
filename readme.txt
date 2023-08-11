@@ -2,7 +2,7 @@
 Contributors: metaphorcreations
 Tags: posts, post, duplicate, duplication
 Requires at least: 4.0
-Tested up to: 6.2.2
+Tested up to: 6.3
 Stable tag: 2.31
 License: GPL2
 
