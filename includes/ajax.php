@@ -25,6 +25,14 @@ function mtphr_duplicate_post( $original_id, $args=array(), $do_action=true ) {
 		$duplicate['post_status'] = sanitize_text_field( $settings['status'] );
 	}
 	
+	// Check if a user has publish get_post_type_capabilities. If not, make sure they can't _publish
+	if ( ! current_user_can( 'publish_posts' ) ) {
+		// Force the post status to pending
+		if ( 'publish' == $duplicate['post_status'] ) {
+			$duplicate['post_status'] = 'pending';
+		}
+	}
+	
 	// Set the type
 	if( $settings['type'] != 'same' ) {
 		$duplicate['post_type'] = sanitize_text_field( $settings['type'] );
