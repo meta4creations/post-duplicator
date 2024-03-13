@@ -10,14 +10,14 @@ function mtphr_duplicate_post( $original_id, $args=array(), $do_action=true ) {
 	global $wpdb;
 	
 	// Get the post as an array
-	$duplicate = get_post( $original_id, 'ARRAY_A' );
+	$duplicate = $orig = get_post( $original_id, 'ARRAY_A' );
 		
 	$global_settings = get_mtphr_post_duplicator_settings();
 	$settings = wp_parse_args( $args, $global_settings );
 	
 	// Modify some of the elements
 	$appended = isset( $settings['title'] ) ? sanitize_text_field( $settings['title'] ) : esc_html__( 'Copy', 'post-duplicator' );
-	$duplicate['post_title'] = wp_kses_post( $duplicate['post_title'] ) . ' ' . $appended;
+	$duplicate['post_title'] = $duplicate['post_title'] . ' ' . $appended;
 	$duplicate['post_name'] = sanitize_title( $duplicate['post_name'] . '-' . $settings['slug'] );
 	
 	// Set the status
@@ -107,7 +107,9 @@ function mtphr_duplicate_post( $original_id, $args=array(), $do_action=true ) {
 		do_action( 'mtphr_post_duplicator_created', $original_id, $duplicate_id, $settings );
 	}
 
-	return $duplicate_id;
+	return [
+		'duplicate_id' => $duplicate_id,
+	];
 }
 
 
@@ -124,11 +126,8 @@ function m4c_duplicate_post() {
 	$original_id  = intval( $_POST['original_id'] );
 	
 	// Duplicate the post
-	$duplicate_id = mtphr_duplicate_post( $original_id );
-	
-	$data = array(
-		'duplicate_id' => esc_attr( $duplicate_id ),
-	);
+	$data = mtphr_duplicate_post( $original_id );
+
 	wp_send_json( $data );
 }
 add_action( 'wp_ajax_m4c_duplicate_post', 'm4c_duplicate_post' );
