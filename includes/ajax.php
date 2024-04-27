@@ -1,7 +1,7 @@
 <?php
 
 /* --------------------------------------------------------- */
-/* !Duplicate the post - 2.31 */
+/* !Duplicate the post - 2.34 */
 /* --------------------------------------------------------- */
 
 function mtphr_duplicate_post( $original_id, $args=array(), $do_action=true ) {
@@ -87,10 +87,14 @@ function mtphr_duplicate_post( $original_id, $args=array(), $do_action=true ) {
 	foreach ( $custom_fields as $key => $value ) {
 		if( is_array($value) && count($value) > 0 ) {
 			foreach( $value as $i=>$v ) {
+        if ( ! apply_filters( "mtphr_post_duplicator_meta_{$key}_enabled", true ) ) {
+          continue;
+        }
+        $meta_value = apply_filters( "mtphr_post_duplicator_meta_value", $v, $key, $duplicate_id, $duplicate['post_type'] );
 				$data = array(
 					'post_id' 		=> intval( $duplicate_id ),
 					'meta_key' 		=> sanitize_text_field( $key ),
-					'meta_value' 	=> $v,
+					'meta_value' 	=> $meta_value,
 				);
 				$formats = array(
 					'%d',
