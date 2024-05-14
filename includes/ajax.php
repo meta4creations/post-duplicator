@@ -66,7 +66,9 @@ function mtphr_duplicate_post( $original_id, $args=array(), $do_action=true ) {
 	unset( $duplicate['comment_count'] );
 
 	//$duplicate['post_content'] = wp_slash( str_replace( array( '\r\n', '\r', '\n' ), '<br />', wp_kses_post( $duplicate['post_content'] ) ) ); 
+	add_filter( 'wp_kses_allowed_html', 'mtphr_duplicate_post_additional_kses', 10, 2 );
 	$duplicate['post_content'] = wp_slash( wp_kses_post( $duplicate['post_content'] ) ); 
+	remove_filter( 'wp_kses_allowed_html', 'mtphr_duplicate_post_additional_kses', 10, 2 );
 
 	// Insert the post into the database
 	$duplicate_id = wp_insert_post( $duplicate );
@@ -135,3 +137,17 @@ function m4c_duplicate_post() {
 	wp_send_json( $data );
 }
 add_action( 'wp_ajax_m4c_duplicate_post', 'm4c_duplicate_post' );
+
+
+// Allow additional tags to wp_kses_post
+function mtphr_duplicate_post_additional_kses( $allowed_tags ) {
+	// Allow the center tag with its attributes
+	$allowed_tags['center'] = array(
+			'align' => true,
+			'class' => true,
+			'id' => true,
+			'style' => true,
+	);
+	
+	return $allowed_tags;
+}
