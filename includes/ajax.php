@@ -130,6 +130,14 @@ function m4c_duplicate_post() {
 	
 	// Get variables
 	$original_id  = intval( $_POST['original_id'] );
+  $author_id = get_post_field( 'post_author', $original_id );
+
+  $settings = get_mtphr_post_duplicator_settings();
+  if ( 'current_user' === $settings['post_duplication'] ) {
+    if ( get_current_user_id() != $author_id ) {
+      return wp_send_json( [] );
+    }
+  }
 	
 	// Duplicate the post
 	$data = mtphr_duplicate_post( $original_id );

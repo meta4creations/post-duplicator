@@ -2,7 +2,7 @@
 Contributors: metaphorcreations
 Tags: posts, post, duplicate, duplication
 Requires at least: 4.0
-Tested up to: 6.5.3
+Tested up to: 6.6.1
 Stable tag: 2.35
 License: GPL2
 
@@ -40,6 +40,9 @@ Check out the 'Installation' tab.
 2. View of the settings page
 
 == Changelog ==
+
+= 2.36 [2024-09-02] =
+* Security update. Fixed bug that allowed non-author to duplicate post.
 
 = 2.35 [2024-05-14] =
 * Allowed for center tag to be duplicated
@@ -176,4 +179,4 @@ Must upgrade in order for the plugin to work. The file paths where initially wro
 
 == Upgrade Notice ==
 
-Allowed for center tag to be duplicated
+Security update
