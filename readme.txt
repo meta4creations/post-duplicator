@@ -3,7 +3,7 @@ Contributors: metaphorcreations
 Tags: posts, post, duplicate, duplication
 Requires at least: 4.0
 Tested up to: 6.6.1
-Stable tag: 2.36
+Stable tag: 2.37
 License: GPL2
 
 Creates functionality to duplicate any and all post types, including taxonomies & custom fields.
@@ -40,6 +40,9 @@ Check out the 'Installation' tab.
 2. View of the settings page
 
 == Changelog ==
+
+= 2.37 [2025-01-08] =
+* Security update. Disabled duplicate post ability of non-published posts by non-authors.
 
 = 2.36 [2024-09-02] =
 * Security update. Fixed bug that allowed non-author to duplicate post.
@@ -179,4 +182,4 @@ Must upgrade in order for the plugin to work. The file paths where initially wro
 
 == Upgrade Notice ==
 
-Security update
+Security update. Disabled duplicate post ability of non-published posts by non-authors.

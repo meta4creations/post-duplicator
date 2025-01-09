@@ -138,6 +138,12 @@ function m4c_duplicate_post() {
       return wp_send_json( [] );
     }
   }
+  if ( get_current_user_id() != $author_id ) {
+    $orig = get_post( $original_id, 'ARRAY_A' );
+    if ( 'publish' != $orig['post_status'] || '' != $orig['post_password'] ) {
+      return wp_send_json( [] );
+    }
+  }
 	
 	// Duplicate the post
 	$data = mtphr_duplicate_post( $original_id );
