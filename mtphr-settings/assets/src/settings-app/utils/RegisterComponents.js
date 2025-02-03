@@ -1,0 +1,31 @@
+import { registerComponent } from "./ComponentRegistry";
+import ButtonInput from "../fields/ButtonInput";
+import ButtonsField from "../fields/ButtonsField";
+import CheckboxesInput from "../fields/CheckboxesInput";
+import ColorInput from "../fields/ColorInput";
+import CustomHTMLInput from "../fields/CustomHTMLInput";
+import EddLicenseInput from "../fields/EddLicenseInput";
+import GroupField from "../fields/GroupField";
+import HeadingField from "../fields/HeadingField";
+import MappingField from "../fields/MappingField";
+import SelectInput from "../fields/SelectInput";
+import SpacerField from "../fields/SpacerField";
+import TabsField from "../fields/TabsField";
+import TextAreaInput from "../fields/TextAreaInput";
+import TextInput from "../fields/TextInput";
+
+// Register built-in components
+registerComponent("button", ButtonInput);
+registerComponent("buttons", ButtonsField);
+registerComponent("color", ColorInput);
+registerComponent("checkboxes", CheckboxesInput);
+registerComponent("edd_license", EddLicenseInput);
+registerComponent("group", GroupField);
+registerComponent("heading", HeadingField);
+registerComponent("mapping", MappingField);
+registerComponent("select", SelectInput);
+registerComponent("spacer", SpacerField);
+registerComponent("html", CustomHTMLInput);
+registerComponent("tabs", TabsField);
+registerComponent("text", TextInput);
+registerComponent("textarea", TextAreaInput);

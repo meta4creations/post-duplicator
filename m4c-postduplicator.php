@@ -67,6 +67,9 @@ function mtphr_post_duplicator_localization() {
  *
  * @since 2.27
  */
+require_once( MTPHR_POST_DUPLICATOR_DIR.'mtphr-settings/index.php' );
+
+
 if ( is_admin() ) {
 
 	// Load Metaboxer
@@ -82,11 +85,6 @@ if ( is_admin() ) {
 } else {
 	//require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/hooks.php' );
 }
-
-
-
-
-
 
 
 

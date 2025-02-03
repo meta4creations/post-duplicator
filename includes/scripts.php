@@ -11,7 +11,7 @@ function mtphr_post_duplicator_metaboxer_scripts( $hook ) {
 		wp_enqueue_style( 'mtphr-post-duplicator-metaboxer', MTPHR_POST_DUPLICATOR_URL . 'metaboxer/metaboxer.css', false, $version );
 	}
 }
-add_action( 'admin_enqueue_scripts', 'mtphr_post_duplicator_metaboxer_scripts' );
+//add_action( 'admin_enqueue_scripts', 'mtphr_post_duplicator_metaboxer_scripts' );
 
 /**
  * Add the necessary jquery.
@@ -22,4 +22,4 @@ function m4c_duplicate_post_scripts( $hook_suffix ) {
   $version = WP_DEBUG ? time() : MTPHR_POST_DUPLICATOR_VERSION;
 	wp_enqueue_script( 'mtphr-post-duplicator', MTPHR_POST_DUPLICATOR_URL . 'assets/js/pd-admin.js', array('jquery'), $version );
 }
-add_action( 'admin_enqueue_scripts', 'm4c_duplicate_post_scripts' );
+//add_action( 'admin_enqueue_scripts', 'm4c_duplicate_post_scripts' );

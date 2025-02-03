@@ -1,0 +1,22 @@
+.mtphrSettings {
+  &__tabs {
+    .components-tab-panel__tabs {
+      flex-wrap: wrap;
+    }
+  }
+}
+
+// .mtphrSettingsAppsettings__form {
+//   padding-left: 0;
+// }
+// .my-tab-panel {
+//   display: flex;
+//   flex-direction: row;
+//   align-content: stretch;
+//   .components-tab-panel__tabs {
+//       flex-direction: column;
+//   }
+//   .components-tab-panel__tab-content {
+//       flex: 1;
+//   }
+// }
