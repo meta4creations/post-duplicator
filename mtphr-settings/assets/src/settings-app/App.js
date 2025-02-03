@@ -59,6 +59,7 @@ export default ({ settingsId }) => {
     if (!section) {
       section = {
         id: sectionName,
+        slug: sectionData.slug,
         label: sectionData.label,
         order:
           typeof sectionData.order !== "undefined" ? sectionData.order : 10,
@@ -91,13 +92,16 @@ export default ({ settingsId }) => {
 
   // Prepare tabs for the TabPanel component
   const tabs = enabledSections.map((section) => ({
-    name: section.id,
+    id: section.id,
+    name: section.slug,
     title: section.label,
   }));
 
   // Determine initial active tab from URL
   const params = new URLSearchParams(window.location.search);
-  const initialSection = params.get("section") || "general";
+  const initialSection = params.get("section")
+    ? params.get("section")
+    : sections[0].slug;
   const validTabNames = tabs.map((tab) => tab.name);
   const initialTab = validTabNames.includes(initialSection)
     ? initialSection
@@ -168,7 +172,6 @@ export default ({ settingsId }) => {
       };
     });
   };
-
   const handleSave = () => {
     setIsSaving(true);
     fetch(`${settingVars.restUrl}settings`, {
@@ -179,7 +182,22 @@ export default ({ settingsId }) => {
       },
       body: JSON.stringify(settings),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          // Attempt to extract error message from response JSON, if available
+          return response
+            .json()
+            .then((errData) => {
+              const errorMessage =
+                errData?.message || `HTTP Error ${response.status}`;
+              throw new Error(errorMessage);
+            })
+            .catch(() => {
+              throw new Error(`HTTP Error ${response.status}`);
+            });
+        }
+        return response.json(); // Parse response only if it's OK
+      })
       .then((data) => {
         // Update the settings with sanitized results
         setSettings(data);
@@ -193,9 +211,10 @@ export default ({ settingsId }) => {
         setIsSaving(false);
         setNotice({
           status: "error",
-          message: __("Error saving settings.", "mtphr-emailcustomizer"),
+          message: `${__("Error saving settings.", "mtphr-emailcustomizer")} ${
+            error.message
+          }`,
         });
-        console.error("Error:", error);
       });
   };
 
@@ -203,9 +222,7 @@ export default ({ settingsId }) => {
     <SlotFillProvider>
       <Card className={`mtphrSettings ${settingsId}`}>
         <CardHeader>
-          <Heading level={1}>
-            {__("Email Customizer Settings", "mtphr-emailcustomizer")}
-          </Heading>
+          <Heading level={1}>{__("Settings", "mtphr-emailcustomizer")}</Heading>
         </CardHeader>
         <div className="toolbar">
           <Slot />
@@ -222,7 +239,7 @@ export default ({ settingsId }) => {
           >
             {(tab) => {
               const currentSection = enabledSections.find(
-                (section) => section.id === tab.name
+                (section) => section.id === tab.id
               );
               return (
                 <div className={`mtphrSettings__section`}>
