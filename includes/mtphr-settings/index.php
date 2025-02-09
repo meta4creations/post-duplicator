@@ -1,6 +1,10 @@
 <?php
+// Update the namespace after every update!!!
 namespace Mtphr\PostDuplicator;
 
+/**
+ * Create the class
+ */
 final class Settings {
 
   private static $instance;
@@ -30,7 +34,7 @@ final class Settings {
 			self::$instance = new Settings;
       add_action( 'admin_menu', array( self::$instance, 'create_admin_pages' ) );
       add_action( 'admin_enqueue_scripts', array( self::$instance, 'enqueue_scripts' ) );
-      add_action( 'rest_api_init',array( self::$instance, 'register_routes' ) );
+      add_action( 'rest_api_init', array( self::$instance, 'register_routes' ) );
     }
     return self::$instance;
   }
@@ -541,47 +545,51 @@ final class Settings {
   }
 
   /**
+   * Return an individual options values
+   */
+  public function get_option_values( $option, $decrypt = true ) {
+    
+    // If the option values have been compiled, return them
+    if ( isset( self::$instance->values[$option] ) ) {
+      return self::$instance->values[$option];
+    }
+
+    // $options is a single string
+    $settings = get_option( $option, [] );
+
+    // Decrypt
+    if ( $decrypt ) {
+      $enc_settings = $this->get_encryption_settings( $option );
+      $settings     = $this->decrypt_values( $settings, $enc_settings );
+    }
+
+    // Inject defaults
+    $parsed_settings = self::$instance->inject_default_values( $settings, $option );
+    
+    // Sanitize
+    $sanitized_settings = self::$instance->sanitize_values( $parsed_settings, $option );
+    
+    // Add to the global values array
+    self::$instance->values[$option] = $sanitized_settings;
+
+    return $sanitized_settings;
+  }
+
+  /**
    * Return values
    */
   public function get_values( $options = false, $decrypt = true ) {
     $options = $options ? $options : self::$instance->get_options();
-
     if ( is_array( $options ) ) {
       if ( ! empty( $options ) ) {
         $values = [];
         foreach ( $options as $option ) {
-          // 1. Grab stored settings
-          $settings = get_option( $option, [] );
-
-          // 2. Decrypt
-          if ( $decrypt ) {
-            $enc_settings = $this->get_encryption_settings( $option );
-            $settings     = $this->decrypt_values( $settings, $enc_settings );
-          }
-
-          // 3. Inject default values
-          $parsed_settings = self::$instance->inject_default_values( $settings, $option );
-          
-          // 4. Sanitize
-          $values[$option] = self::$instance->sanitize_values( $parsed_settings, $option );
+          $values[$option] = self::$instance->get_option_values( $option, $decrypt );
         }
         return $values;
       }
     } else {
-      // $options is a single string
-      $settings = get_option( $options, [] );
-
-      // Decrypt
-      if ( $decrypt ) {
-        $enc_settings = $this->get_encryption_settings( $options );
-        $settings     = $this->decrypt_values( $settings, $enc_settings );
-      }
-
-      // Inject defaults
-      $parsed_settings = self::$instance->inject_default_values( $settings, $options );
-      
-      // Sanitize
-      return self::$instance->sanitize_values( $parsed_settings, $options );
+      return self::$instance->get_option_values( $options, $decrypt );
     }
 
     // If empty, just return an empty array or something suitable
@@ -603,9 +611,9 @@ final class Settings {
             $admin_page['menu_title'],
             $admin_page['capability'],
             $admin_page['menu_slug'],
-            function () {
+            function () use ( $admin_page ) {
               echo '<div class="wrap">';
-                echo '<div id="mtphr-settings-app" namespace="' . self::$instance->get_id() . '">Test Page</div>'; // React App will be injected here
+                echo '<div id="mtphr-settings-app" data-id="' . self::$instance->get_id() . '" data-title="' . esc_attr( $admin_page['page_title'] ) . '"></div>'; // React App will be injected here
               echo '</div>';
             },
             isset( $admin_page['position'] ) ? $admin_page['position'] : null,
@@ -708,7 +716,7 @@ final class Settings {
    * Inject default values into $values if they do not exist.
    */
   private function inject_default_values( $values, $option ) { 
-    $default_values = MTPHR_POST_DUPLICATOR_SETTINGS()->get_default_values( $option );
+    $default_values = self::$instance->get_default_values( $option );
     return $this->recursive_inject_default_values( $values, $default_values );
   }
 
@@ -746,8 +754,8 @@ final class Settings {
    * Update the settings
    */
   public function update_values( $option, $values = [] ) {
-    $sanitize_settings = MTPHR_POST_DUPLICATOR_SETTINGS()->get_sanitize_settings( $option );
-    $option_values     = get_option( $option, [] );
+    $sanitize_settings = self::$instance->get_sanitize_settings( $option );
+    $option_values     = self::$instance->get_option_values( $option );
 
     // 1) Recursively merge and sanitize
     $updated_values = $this->recursive_update_values(
@@ -765,6 +773,9 @@ final class Settings {
 
     // 4) Finally save the updated (and possibly encrypted) array
     update_option( $option, $updated_values );
+
+    // Add to the global values array
+    self::$instance->values[$option] = $updated_values;
 
     return $updated_values;
   }
@@ -803,7 +814,7 @@ final class Settings {
    * Sanitize a value
    */
   private function sanitize_values( $values, $option ) { 
-    $sanitize_settings = MTPHR_POST_DUPLICATOR_SETTINGS()->get_sanitize_settings( $option );
+    $sanitize_settings = self::$instance->get_sanitize_settings( $option );
     return $this->recursive_sanitize_values( $values, $sanitize_settings, $option );
   }
 
@@ -984,11 +995,3 @@ final class Settings {
     return (json_last_error() === JSON_ERROR_NONE) ? $decoded : $output;
   }
 }
-
-/**
- * Get things started
- */
-function MTPHR_POST_DUPLICATOR_SETTINGS() {
-	return Settings::instance();
-}
-MTPHR_POST_DUPLICATOR_SETTINGS();

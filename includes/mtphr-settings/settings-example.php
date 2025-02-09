@@ -1,8 +1,17 @@
 <?php
 namespace Mtphr\PostDuplicator;
-require_once __DIR__ . '/settings-class.php';
 
-add_action( 'init', __NAMESPACE__ . '\init_settings' );
+// Update the namespace in the index.php after every update!!!
+require_once __DIR__ . '/index.php';
+
+/**
+ * Get things started
+ * Add a custom function name for your settings to differentiate from other settings
+ */
+function YOUR_CUSTOM_SETTINGS() {
+	return Settings::instance();
+}
+YOUR_CUSTOM_SETTINGS();
 
 /**
  * Initialize the settings
@@ -10,16 +19,16 @@ add_action( 'init', __NAMESPACE__ . '\init_settings' );
 function init_settings() {
 
   // Initialize the settings
-  MTPHR_POST_DUPLICATOR_SETTINGS()->init( [
+  YOUR_CUSTOM_SETTINGS()->init( [
     'id' => 'postDuplicator',
     'textdomain' => 'post-duplicator',
     'settings_dir' => MTPHR_POST_DUPLICATOR_DIR . 'mtphr-settings',
     'settings_url' => MTPHR_POST_DUPLICATOR_URL . 'mtphr-settings',
   ] );
   
-  // Add a settings page
-  MTPHR_POST_DUPLICATOR_SETTINGS()->add_admin_page( [
-    'page_title' => esc_html__( 'Post Duplicator', 'post-duplicator' ),
+  // Add an admin page for your settings page
+  YOUR_CUSTOM_SETTINGS()->add_admin_page( [
+    'page_title' => esc_html__( 'Post Duplicator Settings', 'post-duplicator' ),
     'menu_title' => esc_html__( 'Post Duplicator', 'post-duplicator' ),
     'capability' => 'manage_options',
     'menu_slug'  => 'mtphr_post_duplicator_settings_menu', 
@@ -27,8 +36,8 @@ function init_settings() {
     'position' => 25,
   ] );
 
-  // Add a setting sections
-  MTPHR_POST_DUPLICATOR_SETTINGS()->add_section( [
+  // Add setting sections.
+  YOUR_CUSTOM_SETTINGS()->add_section( [
     'id' => 'defaults',
     'slug' => 'defaults',
     'label' => __( 'Defaults', 'post-duplicator' ),
@@ -37,7 +46,7 @@ function init_settings() {
     'parent_slug' => 'tools.php',
   ] );
 
-  MTPHR_POST_DUPLICATOR_SETTINGS()->add_section( [
+  YOUR_CUSTOM_SETTINGS()->add_section( [
     'id' => 'security',
     'slug' => 'security',
     'label' => __( 'Security', 'post-duplicator' ),
@@ -47,7 +56,7 @@ function init_settings() {
   ] );
 
   // Add some settings
-  MTPHR_POST_DUPLICATOR_SETTINGS()->add_settings( [
+  YOUR_CUSTOM_SETTINGS()->add_settings( [
     'section' => 'defaults',
     'fields' => [
       [
@@ -66,7 +75,7 @@ function init_settings() {
         'type'    => 'select',
         'id'      => 'type',
         'label'   => __( 'Post Type', 'post-duplicator' ),
-        'options' => \mtphr_post_duplicator_post_types(),
+        'options' => duplicator_post_types(),
         'default' => 'same',
       ],
       [
@@ -178,7 +187,7 @@ function init_settings() {
     ],
   ] );
 
-  MTPHR_POST_DUPLICATOR_SETTINGS()->add_settings( [
+  YOUR_CUSTOM_SETTINGS()->add_settings( [
     'section' => 'security',
     'fields' => [
       [
@@ -194,10 +203,5 @@ function init_settings() {
       ],
     ],
   ] );
-
-  $default_values = MTPHR_POST_DUPLICATOR_SETTINGS()->get_default_values();
-  $sanitize_settings = MTPHR_POST_DUPLICATOR_SETTINGS()->get_sanitize_settings();
-  $encryption_settings = MTPHR_POST_DUPLICATOR_SETTINGS()->get_encryption_settings();
-  $settings = MTPHR_POST_DUPLICATOR_SETTINGS()->get_settings();
-  $values = MTPHR_POST_DUPLICATOR_SETTINGS()->get_values( false, false );
 }
+add_action( 'init', __NAMESPACE__ . '\init_settings' );

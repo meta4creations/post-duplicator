@@ -87,24 +87,15 @@ const EddLicenseInput = ({
         setLicenseData(data);
         setIsUpdating(false);
         let status = "success";
-        let message = __(
-          "License key saved successfully!",
-          "mtphr-emailcustomizer"
-        );
+        let message = __("License key saved successfully!", "mtphr-settings");
         switch (data.license) {
           case "valid":
             status = "success";
-            message = __(
-              "License key has been activated!",
-              "mtphr-emailcustomizer"
-            );
+            message = __("License key has been activated!", "mtphr-settings");
             break;
           case "deactivated":
             status = "warning";
-            message = __(
-              "License key has been deactivated.",
-              "mtphr-emailcustomizer"
-            );
+            message = __("License key has been deactivated.", "mtphr-settings");
             break;
           default:
             break;
@@ -118,10 +109,7 @@ const EddLicenseInput = ({
         setIsUpdating(false);
         setNotice({
           status: "error",
-          message: __(
-            "Error saving license key updates.",
-            "mtphr-emailcustomizer"
-          ),
+          message: __("Error saving license key updates.", "mtphr-settings"),
         });
         console.error("Error:", error);
       });
@@ -178,7 +166,7 @@ const EddLicenseInput = ({
           </Spacer>
           <ButtonGroup>
             {licenseData.license && "valid" == licenseData.license && (
-              <Tooltip text={__("Refresh License", "mtphr-emailcustomizer")}>
+              <Tooltip text={__("Refresh License", "mtphr-settings")}>
                 <Button
                   style={{ height: "50px", width: "50px" }}
                   variant="secondary"
@@ -191,7 +179,7 @@ const EddLicenseInput = ({
               </Tooltip>
             )}
             {licenseData.license && "valid" == licenseData.license ? (
-              <Tooltip text={__("Deactivate License", "mtphr-emailcustomizer")}>
+              <Tooltip text={__("Deactivate License", "mtphr-settings")}>
                 <Button
                   style={{ height: "50px", width: "50px" }}
                   variant="primary"
@@ -204,7 +192,7 @@ const EddLicenseInput = ({
                 </Button>
               </Tooltip>
             ) : (
-              <Tooltip text={__("Activate License", "mtphr-emailcustomizer")}>
+              <Tooltip text={__("Activate License", "mtphr-settings")}>
                 <Button
                   style={{ height: "50px", width: "50px" }}
                   variant="primary"

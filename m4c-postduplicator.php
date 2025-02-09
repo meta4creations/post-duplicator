@@ -67,21 +67,19 @@ function mtphr_post_duplicator_localization() {
  *
  * @since 2.27
  */
-require_once( MTPHR_POST_DUPLICATOR_DIR.'mtphr-settings/index.php' );
+require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/api.php' );
+require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/settings.php' );
 
 require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/helpers.php' );
 if ( is_admin() ) {
-	// Load Metaboxer
+	
   require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/hooks.php' );
-	require_once( MTPHR_POST_DUPLICATOR_DIR.'metaboxer/metaboxer.php' );
 	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/scripts.php' );
 	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/ajax.php' );
 	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/edit.php' );
 	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/functions.php' );
 	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/notices.php' );
-	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/settings.php' );
-} else {
-	//require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/hooks.php' );
+	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/scripts.php' );
 }
 
 

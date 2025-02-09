@@ -1,25 +1,30 @@
 <?php
+namespace Mtphr\PostDuplicator;
+
+add_action( 'admin_enqueue_scripts', __NAMESPACE__ . '\enqueue_scripts' );
 
 /**
- * Load the metaboxer scripts
- *
- * @since 2.26
+ * Enqueue admin scripts
  */
-function mtphr_post_duplicator_metaboxer_scripts( $hook ) {
-	if( $hook == 'tools_page_mtphr_post_duplicator_settings_menu' ) {
-    $version = WP_DEBUG ? time() : MTPHR_POST_DUPLICATOR_VERSION;
-		wp_enqueue_style( 'mtphr-post-duplicator-metaboxer', MTPHR_POST_DUPLICATOR_URL . 'metaboxer/metaboxer.css', false, $version );
-	}
-}
-//add_action( 'admin_enqueue_scripts', 'mtphr_post_duplicator_metaboxer_scripts' );
+function enqueue_scripts() {
 
-/**
- * Add the necessary jquery.
- *
- * @since 2.26
- */
-function m4c_duplicate_post_scripts( $hook_suffix ) {
-  $version = WP_DEBUG ? time() : MTPHR_POST_DUPLICATOR_VERSION;
-	wp_enqueue_script( 'mtphr-post-duplicator', MTPHR_POST_DUPLICATOR_URL . 'assets/js/pd-admin.js', array('jquery'), $version );
+  $asset_file = include( MTPHR_POST_DUPLICATOR_DIR . 'assets/build/postDuplicator.asset.php' );
+  wp_enqueue_style(
+    'post-duplicator',
+    MTPHR_POST_DUPLICATOR_URL . 'assets/build/postDuplicator.css',
+    ['wp-components'],
+    $asset_file['version']
+  );
+  wp_enqueue_script(
+    'post-duplicator',
+    MTPHR_POST_DUPLICATOR_URL . 'assets/build/postDuplicator.js',
+    $asset_file['dependencies'],
+    $asset_file['version'],
+    true
+  ); 
+  wp_localize_script( 'post-duplicator', 'postDuplicatorVars', [
+    'siteUrl'  => site_url(),
+    'restUrl'  => esc_url_raw( rest_url( 'post-duplicator/v1/' ) ),
+    'nonce'    => wp_create_nonce( 'wp_rest' )
+  ] );
 }
-//add_action( 'admin_enqueue_scripts', 'm4c_duplicate_post_scripts' );

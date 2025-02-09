@@ -15,7 +15,7 @@ import {
 import Field from "./fields/Field";
 import { shouldRenderField } from "./utils/fieldVisibility";
 
-export default ({ settingsId }) => {
+export default ({ settingsId, settingsTitle }) => {
   const settingVars = window[`${settingsId}Vars`];
   const [values, setValues] = useState(settingVars.values);
   const [updatedValueKeys, setUpdatedValueKeys] = useState({});
@@ -208,14 +208,14 @@ export default ({ settingsId }) => {
         setIsSaving(false);
         setNotice({
           status: "success",
-          message: __("Settings saved successfully!", "mtphr-emailcustomizer"),
+          message: __("Settings saved successfully!", "mtphr-settings"),
         });
       })
       .catch((error) => {
         setIsSaving(false);
         setNotice({
           status: "error",
-          message: `${__("Error saving settings.", "mtphr-emailcustomizer")} ${
+          message: `${__("Error saving settings.", "mtphr-settings")} ${
             error.message
           }`,
         });
@@ -226,7 +226,7 @@ export default ({ settingsId }) => {
     <SlotFillProvider>
       <Card className={`mtphrSettings ${settingsId}`}>
         <CardHeader>
-          <Heading level={1}>{__("Settings", "mtphr-emailcustomizer")}</Heading>
+          <Heading level={1}>{settingsTitle}</Heading>
         </CardHeader>
         <div className="toolbar">
           <Slot />
