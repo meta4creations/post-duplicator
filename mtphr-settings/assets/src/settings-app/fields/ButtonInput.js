@@ -7,7 +7,7 @@ import {
 } from "@wordpress/components";
 const { useState } = wp.element;
 
-const ButtonInput = ({ field, settings, settingsId }) => {
+const ButtonInput = ({ field, values, settingsOption, settingsId }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [notice, setNotice] = useState(null);
 
@@ -65,7 +65,7 @@ const ButtonInput = ({ field, settings, settingsId }) => {
           "X-WP-Nonce": settingVars.nonce,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(settings), // Pass the current settings
+        body: JSON.stringify(values), // Pass the current values
       })
         .then((response) => response.json())
         .then((data) => {

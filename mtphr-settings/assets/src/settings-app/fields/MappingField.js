@@ -5,7 +5,7 @@ import {
 } from "@wordpress/components";
 import { useState } from "@wordpress/element";
 
-const MappingField = ({ field, value = {}, onChange }) => {
+const MappingField = ({ field, value = {}, settingsOption, onChange }) => {
   const { label, id, help, map_source, map_options, disabled } = field;
 
   // Initialize state to track mapped values
@@ -37,7 +37,7 @@ const MappingField = ({ field, value = {}, onChange }) => {
       return acc;
     }, {});
 
-    onChange({ id, value: newValues });
+    onChange({ id, value: newValues, settingsOption });
   };
 
   const availableOptions = (currentValue) =>

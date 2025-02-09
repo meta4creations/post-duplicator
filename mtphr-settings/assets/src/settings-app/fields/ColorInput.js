@@ -1,13 +1,12 @@
 import {
   BaseControl,
   ColorPalette,
-  ColorPicker,
   useBaseControlProps,
 } from "@wordpress/components";
 
 import { useState } from "react";
 
-const ColorInput = ({ field, value = [], onChange }) => {
+const ColorInput = ({ field, value = [], settingsOption, onChange }) => {
   // State to keep track of the currently selected color index
   const [colorIndex, setColorIndex] = useState(null);
 
@@ -28,7 +27,7 @@ const ColorInput = ({ field, value = [], onChange }) => {
     updatedValues[colorIndex] = color;
 
     // Call the onChange prop with the updated values
-    onChange({ id, value: updatedValues });
+    onChange({ id, value: updatedValues, settingsOption });
   };
 
   // Function to add a new color to the list

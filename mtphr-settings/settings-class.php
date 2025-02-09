@@ -15,9 +15,12 @@ final class Settings {
   private $sections = [];
   private $settings = [];
   private $values = [];
-  private $encrypted_keys = [];
-  private $encription_key_1 = '7Q@_DvLVTiHPEA';
-  private $encription_key_2 = 'YgM2iCX-BtoBpJ';
+  private $default_values = [];
+  private $sanitize_settings = [];
+  private $encryption_settings = [];
+  private $default_sanitizer = 'esc_attr';
+  private $encryption_key_1 = '7Q@_DvLVTiHPEA';
+  private $encryption_key_2 = 'YgM2iCX-BtoBpJ';
 
   /**
    * Set up the instance
@@ -26,8 +29,8 @@ final class Settings {
     if ( ! isset( self::$instance ) && ! ( self::$instance instanceof Settings ) ) {	
 			self::$instance = new Settings;
       add_action( 'admin_menu', array( self::$instance, 'create_admin_pages' ) );
-      //add_action( 'admin_menu', array( self::$instance, 'additional_pages' ) );
       add_action( 'admin_enqueue_scripts', array( self::$instance, 'enqueue_scripts' ) );
+      add_action( 'rest_api_init',array( self::$instance, 'register_routes' ) );
     }
     return self::$instance;
   }
@@ -51,7 +54,7 @@ final class Settings {
    */
   public function init( $args = [] ) {
     if ( isset( $args['id'] ) ) {
-      self::$instance->id = esc_attr(  self::$instance->to_camel_case( $args['id'] ) );
+      self::$instance->id = esc_attr( str_replace( [' ', '-'], '', $args['id'] ) );
     }
     if ( isset( $args['textdomain'] ) ) {
       self::$instance->textdomain = esc_attr( $args['textdomain'] );
@@ -97,6 +100,32 @@ final class Settings {
    */
   public function get_textdomain() {
     return self::$instance->textdomain;
+  }
+
+  /**
+   * Set the default sanitizer
+   */
+  public function set_default_sanitizer( $sanitizer ) {
+    self::$instance->default_sanitizer = $sanitizer;
+  }
+
+  /**
+   * Get the default sanitizer
+   */
+  public function get_default_sanitizer() {
+    return self::$instance->default_sanitizer;
+  }
+
+  /**
+   * Set the default sanitizer
+   */
+  public function set_default_encryption_keys( $keys = [] ) {
+    if ( isset( $keys['key_1'] ) ) {
+      self::$instance->encryption_key_1 = esc_attr( $keys['key_1'] );
+    }
+    if ( isset( $keys['key_2'] ) ) {
+      self::$instance->encryption_key_1 = esc_attr( $keys['key_2'] );
+    }
   }
 
   /**
@@ -152,16 +181,6 @@ final class Settings {
   }
 
   /**
-   * Add an option key
-   */
-  public function add_option( $option ) {
-    $options = self::$instance->get_options();
-    $options[] = esc_attr( $option );
-    self::$instance->options = array_unique( $options );
-    return self::$instance->options;
-  }
-
-  /**
    * Return available options keys
    */
   public function get_options( $option = false ) {
@@ -179,10 +198,35 @@ final class Settings {
   }
 
   /**
+   * Return option keys by sections
+   */
+  public function get_option_keys( $sections = false ) {
+    if ( $sections ) {
+      if ( is_array( $sections ) ) {
+        if ( ! empty( $sections ) ) {
+          $option_keys = [];
+          foreach ( $sections as $section ) {
+            if ( isset( $section['option'] ) ) {
+              $option_keys[$section['option']] = $section['option'];
+            }
+          }
+          return array_values( $option_keys );
+        }
+      } else {
+        if ( isset( $sections['option'] ) ) {
+          return $section['option'];
+        }
+      }
+    }
+  }
+
+  /**
    * Add an option key
    */
   public function add_section( $section ) {
     $sections = self::$instance->get_sections();
+    $options = self::$instance->get_options();
+
     $id = false;
     $label = false;
     $order = 10;
@@ -219,8 +263,15 @@ final class Settings {
     }
 
     $sections[] = $section;
-
     self::$instance->sections = $sections;
+
+    $section_option = $section['option'];
+
+    // Add to the options array
+    if ( ! in_array( $section_option, $options ) ) {
+      $options[] = $section_option;
+      self::$instance->options = $options;
+    }
 
     return self::$instance->sections;
   }
@@ -265,6 +316,8 @@ final class Settings {
     }
 
     $sections = self::$instance->get_sections();
+    $settings = self::$instance->get_settings();
+
     if ( empty( $sections ) ) {
       return false;
     }
@@ -286,10 +339,11 @@ final class Settings {
     if ( ! in_array( $setting['section'], array_column( $sections, 'id' ) ) ) {
       return false;
     }
-
-    $settings = self::$instance->get_settings();
+ 
     $settings[] = $setting;
     self::$instance->settings = $settings;
+
+    self::$instance->process_setting_data( $setting );
 
     return $setting;
   }
@@ -343,17 +397,201 @@ final class Settings {
     return $settings;
   }
 
+  private function process_setting_data( $setting, $option = false, $parents = [] ) {
+    // Reference to instance storage
+    $default_storage =& self::$instance->default_values;
+    $sanitize_storage =& self::$instance->sanitize_settings;
+    $encryption_storage =& self::$instance->encryption_settings;
+
+    // Extract setting data
+    $id = isset( $setting['id'] ) ? $setting['id'] : false;
+    $default = isset( $setting['default'] ) ? $setting['default'] : null;
+    $sanitize = isset( $setting['sanitize'] ) ? $setting['sanitize'] : self::$instance->get_default_sanitizer();
+    $encrypt = isset( $setting['encrypt'] ) ? $setting['encrypt'] : false;
+    $option = isset( $setting['option'] ) ? $setting['option'] : $option;
+
+    if ( $option && $id !== false ) {
+      // Ensure option storage exists
+      if ( !isset( $default_storage[$option] ) ) {
+        $default_storage[$option] = [];
+      }
+      if ( !isset( $sanitize_storage[$option] ) ) {
+        $sanitize_storage[$option] = [];
+      }
+      if ( !isset( $encryption_storage[$option] ) ) {
+        $encryption_storage[$option] = [];
+      }
+
+      // Reference correct location in storage
+      $default_target =& $default_storage[$option];
+      $sanitize_target =& $sanitize_storage[$option];
+      $encryption_target =& $encryption_storage[$option];
+
+      // Traverse parents to ensure proper nesting
+      if ( !empty( $parents ) ) {
+        foreach ( $parents as $parent ) {
+          if ( !isset( $default_target[$parent] ) || !is_array( $default_target[$parent] ) ) {
+            $default_target[$parent] = [];
+          }
+          if ( !isset( $sanitize_target[$parent] ) || !is_array( $sanitize_target[$parent] ) ) {
+            $sanitize_target[$parent] = [];
+          }
+          if ( !isset( $encryption_target[$parent] ) || !is_array( $encryption_target[$parent] ) ) {
+            $encryption_target[$parent] = [];
+          }
+          $default_target =& $default_target[$parent];
+          $sanitize_target =& $sanitize_target[$parent];
+          $encryption_target =& $encryption_target[$parent];
+        }
+      }
+
+      // Assign values at the correct depth
+      $default_target[$id] = $default;
+      $sanitize_target[$id] = $sanitize;
+
+      // Handle encryption settings
+      if ( $encrypt !== false ) {
+        if ( is_array( $encrypt ) ) {
+          $encryption_target[$id] = [
+            'key_1' => isset( $encrypt['key_1'] ) ? esc_attr( $encrypt['key_1'] ) : self::$instance->encryption_key_1,
+            'key_2' => isset( $encrypt['key_2'] ) ? esc_attr( $encrypt['key_2'] ) : self::$instance->encryption_key_2,
+          ];
+        } elseif ( $encrypt === true || $encrypt === 1 ) {
+          $encryption_target[$id] = [
+            'key_1' => self::$instance->encryption_key_1,
+            'key_2' => self::$instance->encryption_key_2,
+          ];
+        }
+      }
+    }
+
+    // Process sub-fields if they exist
+    if ( !empty( $setting['fields'] ) && is_array( $setting['fields'] ) ) {
+      $new_parents = $parents;
+      if ( $id !== false ) {
+        $new_parents[] = $id;
+      }
+      foreach ( $setting['fields'] as $field ) {
+        self::$instance->process_setting_data( $field, $option, $new_parents );
+      }
+    }
+  }
+
   /**
-   * Return all values
+   * Get default values
    */
-  public function get_values() {
-    return self::$instance->values;
+  public function get_default_values( $options = false ) {
+    $default_values = self::$instance->default_values;
+    if ( $options ) {
+      if ( is_array( $options ) ) {
+        if ( ! empty( $options ) ) {
+          $values = [];
+          foreach ( $options as $option ) {
+            $values[$option] = isset( $default_values[$option] ) ? $default_values[$option] : [];
+          }
+          return $values;
+        }
+      } else {
+        return isset( $default_values[$options] ) ? $default_values[$options] : [];
+      }
+    }
+    return $default_values;
+  }
+
+  /**
+   * Get sanitize settings
+   */
+  public function get_sanitize_settings( $options = false ) {
+    $sanitize_settings = self::$instance->sanitize_settings;
+    if ( $options ) {
+      if ( is_array( $options ) ) {
+        if ( ! empty( $options ) ) {
+          $settings = [];
+          foreach ( $options as $option ) {
+            $settings[$option] = isset( $sanitize_settings[$option] ) ? $sanitize_settings[$option] : [];
+          }
+          return $settings;
+        }
+      } else {
+        return isset( $sanitize_settings[$options] ) ? $sanitize_settings[$options] : [];
+      }
+    }
+    return $sanitize_settings;
+  }
+
+  /**
+   * Get sanitize settings
+   */
+  public function get_encryption_settings( $options = false ) {
+    $encryption_settings = self::$instance->encryption_settings;
+    if ( $options ) {
+      if ( is_array( $options ) ) {
+        if ( ! empty( $options ) ) {
+          $settings = [];
+          foreach ( $options as $option ) {
+            $settings[$option] = isset( $encryption_settings[$option] ) ? $encryption_settings[$option] : [];
+          }
+          return $settings;
+        }
+      } else {
+        return isset( $encryption_settings[$options] ) ? $encryption_settings[$options] : [];
+      }
+    }
+    return $encryption_settings;
+  }
+
+  /**
+   * Return values
+   */
+  public function get_values( $options = false, $decrypt = true ) {
+    $options = $options ? $options : self::$instance->get_options();
+
+    if ( is_array( $options ) ) {
+      if ( ! empty( $options ) ) {
+        $values = [];
+        foreach ( $options as $option ) {
+          // 1. Grab stored settings
+          $settings = get_option( $option, [] );
+
+          // 2. Decrypt
+          if ( $decrypt ) {
+            $enc_settings = $this->get_encryption_settings( $option );
+            $settings     = $this->decrypt_values( $settings, $enc_settings );
+          }
+
+          // 3. Inject default values
+          $parsed_settings = self::$instance->inject_default_values( $settings, $option );
+          
+          // 4. Sanitize
+          $values[$option] = self::$instance->sanitize_values( $parsed_settings, $option );
+        }
+        return $values;
+      }
+    } else {
+      // $options is a single string
+      $settings = get_option( $options, [] );
+
+      // Decrypt
+      if ( $decrypt ) {
+        $enc_settings = $this->get_encryption_settings( $options );
+        $settings     = $this->decrypt_values( $settings, $enc_settings );
+      }
+
+      // Inject defaults
+      $parsed_settings = self::$instance->inject_default_values( $settings, $options );
+      
+      // Sanitize
+      return self::$instance->sanitize_values( $parsed_settings, $options );
+    }
+
+    // If empty, just return an empty array or something suitable
+    return [];
   }
 
   /**
    * Create admin pages
    */
-  function create_admin_pages() {
+  public function create_admin_pages() {
     $admin_pages = self::$instance->get_admin_pages();
     $updated_admin_pages = [];
     if ( is_array( $admin_pages ) && ! empty( $admin_pages ) ) {
@@ -397,7 +635,7 @@ final class Settings {
   /**
    * Enqueue admin scripts
    */
-  function enqueue_scripts() {
+  public function enqueue_scripts() {
 
     // Only load script if on an admin page
     $current_screen = get_current_screen();
@@ -409,6 +647,8 @@ final class Settings {
     $admin_page = $admin_pages[$current_screen->id];
     $sections = self::$instance->get_sections( $admin_page );
     $settings = self::$instance->get_settings( $sections );
+    $options = self::$instance->get_option_keys( $sections );
+    $values = self::$instance->get_values( $options );
 
     $asset_file = include( self::$instance->settings_dir . 'assets/build/mtphrSettings.asset.php' );
     wp_enqueue_style(
@@ -426,12 +666,322 @@ final class Settings {
     ); 
     wp_localize_script( self::$instance->get_id(), self::$instance->get_id() . 'Vars', array(
       'siteUrl'        => site_url(),
-      'restUrl'        => esc_url_raw( rest_url( 'mtphrSettings/v1/' ) ),
-      'settings'       => [],
+      'restUrl'        => esc_url_raw( rest_url( self::$instance->get_id() . '\/v1/' ) ),
+      'values'         => $values,
       'fields'         => $settings,
       'field_sections' => $sections,
       'nonce'          => wp_create_nonce( 'wp_rest' )
     ) );
+  }
+
+  /**
+   * Register rest routes
+   */
+  public function register_routes() {
+    register_rest_route( self::$instance->get_id() . '/v1', 'settings', array(
+      'methods' 	=> 'POST',
+      'permission_callback' => function () {
+        return current_user_can('manage_options');
+      },
+      'callback' => function( $request ) {
+        $args = $request->get_params();
+        $data = $request->get_json_params();
+
+        $value_keys = isset( $data['valueKeys'] ) ? $data['valueKeys'] : [];
+        $values = isset( $data['values'] ) ? $data['values'] : [];
+
+        if ( is_array( $value_keys ) && ! empty( $value_keys ) ) {
+          foreach ( $value_keys as $option => $keys ) {
+            $values_to_update = array_intersect_key( $values[$option], array_flip( $keys ) );
+            $updated_values = self::$instance->update_values( $option, $values_to_update );
+            $values[$option] = $updated_values;
+          }
+        }
+        
+        //self::$instance->update_values( $values );
+        return rest_ensure_response( $values , 200);
+      },
+    ) );
+  }
+
+  /**
+   * Inject default values into $values if they do not exist.
+   */
+  private function inject_default_values( $values, $option ) { 
+    $default_values = MTPHR_POST_DUPLICATOR_SETTINGS()->get_default_values( $option );
+    return $this->recursive_inject_default_values( $values, $default_values );
+  }
+
+  /**
+  * Recursively inject default values into the values array.
+  */
+  private function recursive_inject_default_values( $values, $default_values ) {
+    if ( !is_array( $default_values ) || empty( $default_values ) ) {
+      return $values; // No defaults to inject
+    }
+
+    foreach ( $default_values as $key => $default_value ) {
+      if ( is_array( $default_value ) ) {
+        // Ensure $values[$key] is an array before merging
+        if ( !isset( $values[$key] ) || !is_array( $values[$key] ) ) {
+          $values[$key] = [];
+        }
+
+        // Recursively process nested arrays
+        $values[$key] = $this->recursive_inject_default_values( 
+          $values[$key], 
+          $default_value 
+        );
+      } else {
+        // Only inject default if key does not exist in $values
+        if ( !array_key_exists( $key, $values ) ) {
+          $values[$key] = $default_value;
+        }
+      }
+    }
+    return $values;
+  }
+
+  /**
+   * Update the settings
+   */
+  public function update_values( $option, $values = [] ) {
+    $sanitize_settings = MTPHR_POST_DUPLICATOR_SETTINGS()->get_sanitize_settings( $option );
+    $option_values     = get_option( $option, [] );
+
+    // 1) Recursively merge and sanitize
+    $updated_values = $this->recursive_update_values(
+      $option_values,
+      $values,
+      $sanitize_settings,
+      $option
+    );
+
+    // 2) Retrieve the encryption settings for this option
+    $encryption_settings = $this->get_encryption_settings( $option );
+    
+    // 3) Recursively encrypt the updated values
+    $updated_values = $this->encrypt_values( $updated_values, $encryption_settings );
+
+    // 4) Finally save the updated (and possibly encrypted) array
+    update_option( $option, $updated_values );
+
+    return $updated_values;
+  }
+
+  /**
+   * Recursively update and sanitize values.
+   */
+  private function recursive_update_values( $existing_values, $new_values, $sanitize_settings, $option ) {
+    if ( ! is_array( $new_values ) || empty( $new_values ) ) {
+      return $existing_values;
+    }
+
+    foreach ( $new_values as $key => $value ) {
+      if ( is_array( $value ) ) {
+        // Recursively update nested arrays, keeping existing structure
+        $existing_values[$key] = $this->recursive_update_values(
+          isset( $existing_values[$key] ) ? $existing_values[$key] : [],
+          $value,
+          isset( $sanitize_settings[$key] ) ? $sanitize_settings[$key] : [],
+          $option
+        );
+      } else {
+        // Get the sanitizer for this specific key, or fallback to default
+        $sanitizer = isset( $sanitize_settings[$key] ) 
+          ? $sanitize_settings[$key] 
+          : self::$instance->get_default_sanitizer();
+
+        $existing_values[$key] = self::$instance->sanitize_value( $value, $sanitizer, $key, $option );
+      }
+    }
+
+    return $existing_values;
+  }
+
+  /**
+   * Sanitize a value
+   */
+  private function sanitize_values( $values, $option ) { 
+    $sanitize_settings = MTPHR_POST_DUPLICATOR_SETTINGS()->get_sanitize_settings( $option );
+    return $this->recursive_sanitize_values( $values, $sanitize_settings, $option );
+  }
+
+  /**
+   * Recursively sanitize values based on the sanitize settings structure.
+   */
+  private function recursive_sanitize_values( $values, $sanitize_settings, $option ) {
+    $sanitized_values = [];
+    if ( is_array( $values ) && ! empty( $values ) ) {
+      foreach ( $values as $key => $value ) {
+        if ( is_array( $value ) ) {
+          // Recursively sanitize nested arrays using the same key structure
+          $sanitized_values[$key] = $this->recursive_sanitize_values(
+            $value, 
+            isset( $sanitize_settings[$key] ) ? $sanitize_settings[$key] : [],
+            $option
+          );
+        } else {
+          // Retrieve the appropriate sanitizer or fallback to the default
+          $sanitizer = isset( $sanitize_settings[$key] ) 
+            ? $sanitize_settings[$key] 
+            : self::$instance->get_default_sanitizer();
+
+          $sanitized_values[$key] = self::$instance->sanitize_value( $value, $sanitizer, $key, $option );
+        }
+      }
+    }
+    return $sanitized_values;
+  }
+
+  /**
+   * Sanitize a value
+   */
+  private function sanitize_value( $value, $sanitizer, $key, $option ) { 
+    switch( $sanitizer ) {
+      case 'esc_attr':
+        return esc_attr( $value );
+      case 'sanitize_text_field':
+        return sanitize_text_field( $value );
+      case 'wp_kses_post':
+        return wp_kses_post( $value );
+      case 'intval':
+        return intval( $value );
+      case 'floatval':
+        return floatval( $value );
+      case 'boolval':
+        return boolval( $value );
+      default:
+        if ( function_exists( $sanitizer ) ) {
+          return $sanitizer( $value, $key, $option );
+        } else {
+          $default = self::$instance->get_default_sanitizer();
+          return $default( $value );
+        }
+        break;
+    }
+  }
+
+  /**
+   * Recursively encrypt values based on encryption settings.
+   * 
+   * - If `['key_1' => X, 'key_2' => Y]` is found at `$encryption_settings[$key]`, 
+   *   encrypt the entire `$values[$key]` with those keys and **do not** recurse deeper.
+   * - Otherwise, if `$encryption_settings[$key]` is an array but lacks `key_1`/`key_2`, 
+   *   we assume it's a nested structure and continue recursing.
+   */
+  private function encrypt_values( $values, $encryption_settings ) {
+    // If there is no encryption to apply or $values isn't an array, bail early.
+    if ( ! is_array( $encryption_settings ) || ! is_array( $values ) ) {
+      return $values;
+    }
+
+    foreach ( $encryption_settings as $key => $enc_info ) {
+      // Skip if $values does not have this key at all.
+      if ( ! array_key_exists( $key, $values ) ) {
+        continue;
+      }
+
+      // Check if we have an actual encryption array with 'key_1'/'key_2'.
+      if ( is_array( $enc_info ) && isset( $enc_info['key_1'] ) && isset( $enc_info['key_2'] ) ) {
+        // Encrypt this entire branch with the custom keys and skip children.
+        $values[$key] = $this->encrypt( $values[$key], $enc_info['key_1'], $enc_info['key_2'] );
+      } 
+      // If $enc_info is an array but no direct 'key_1'/'key_2', 
+      // it's likely nested encryption settings. Recurse deeper if $values[$key] is array.
+      elseif ( is_array( $enc_info ) ) {
+        if ( is_array( $values[$key] ) ) {
+          $values[$key] = $this->encrypt_values( $values[$key], $enc_info );
+        }
+      }
+    }
+
+    return $values;
+  }
+
+  /**
+   * Encrypt data
+  */
+  private function encrypt( $string = '', $custom_key_1 = null, $custom_key_2 = null ) {
+    // Convert arrays to JSON so we can encrypt them as strings.
+    if ( is_array( $string ) ) {
+      $string = json_encode( $string );
+    }
+
+    // Use custom keys if provided, otherwise fall back to defaults.
+    $key_1 = $custom_key_1 ?: $this->encryption_key_1;
+    $key_2 = $custom_key_2 ?: $this->encryption_key_2;
+
+    $key = hash( 'sha256', $key_1 );
+    $iv  = substr( hash( 'sha256', $key_2 ), 0, 16 );
+
+    return base64_encode(
+      openssl_encrypt( $string, 'AES-256-CBC', $key, 0, $iv )
+    );
+  }
+
+  /**
+   * Recursively decrypt values based on the same encryption settings structure.
+   *
+   * - If we find `['key_1' => ..., 'key_2' => ...]` at `$encryption_settings[$key]`,
+   *   we decrypt the entire `$values[$key]` with those keys, and do NOT recurse deeper.
+   * - If `$enc_info` is an array but lacks `key_1`/`key_2`, we assume it's nested settings.
+   *   We keep recursing into `$values[$key]` if it's an array.
+   */
+  private function decrypt_values( $values, $encryption_settings ) {
+    if ( ! is_array( $values ) || ! is_array( $encryption_settings ) ) {
+      return $values;
+    }
+
+    foreach ( $encryption_settings as $key => $enc_info ) {
+      // Skip if $values does not have this key at all
+      if ( ! array_key_exists( $key, $values ) ) {
+        continue;
+      }
+
+      // If this level has explicit 'key_1' and 'key_2', decrypt the entire branch
+      if ( is_array( $enc_info ) && isset( $enc_info['key_1'] ) && isset( $enc_info['key_2'] ) ) {
+        $values[$key] = $this->decrypt( $values[$key], $enc_info['key_1'], $enc_info['key_2'] );
+      }
+      // If $enc_info is an array but no direct 'key_1'/'key_2',
+      // it might be nested encryption settings. Recurse deeper if $values[$key] is array
+      elseif ( is_array( $enc_info ) ) {
+        if ( is_array( $values[$key] ) ) {
+          $values[$key] = $this->decrypt_values( $values[$key], $enc_info );
+        }
+      }
+    }
+
+    return $values;
+  }
+
+  /**
+   * Decrypt data with optional custom keys.
+   */
+  private function decrypt( $string, $custom_key_1 = null, $custom_key_2 = null ) {
+    // If already an array, it might have been double-processed or not encrypted at all
+    if ( is_array( $string ) ) {
+      return $string;
+    }
+
+    // Use custom keys if provided; otherwise, use defaults
+    $key_1 = $custom_key_1 ?: $this->encryption_key_1;
+    $key_2 = $custom_key_2 ?: $this->encryption_key_2;
+
+    $key = hash( 'sha256', $key_1 );
+    $iv  = substr( hash( 'sha256', $key_2 ), 0, 16 );
+
+    $output = openssl_decrypt(
+      base64_decode( $string ), 
+      'AES-256-CBC', 
+      $key, 
+      0, 
+      $iv
+    );
+
+    // Attempt to JSON-decode the result to restore arrays if originally encrypted from an array
+    $decoded = json_decode( $output, true );
+    return (json_last_error() === JSON_ERROR_NONE) ? $decoded : $output;
   }
 }
 
@@ -442,150 +992,3 @@ function MTPHR_POST_DUPLICATOR_SETTINGS() {
 	return Settings::instance();
 }
 MTPHR_POST_DUPLICATOR_SETTINGS();
-
-
-
-class SettingsX {
-
-  private $id = 'mtphr';
-  private $settings = [];
-  private $values = [];
-  private $encrypted_keys = [];
-  private $encription_key_1 = '7Q@_DvLVTiHPEA';
-  private $encription_key_2 = 'YgM2iCX-BtoBpJ';
-
-  public function __construct( $id = '', $defaults = [], $encrypted_keys = [] ) {
-    if ( '' != $id ) {
-      $this->id = $id;
-    }
-    if ( ! empty( $defaults ) ) {
-      $this->defaults = $defaults;
-    }
-    if ( ! empty( $encrypted_keys ) ) {
-      $this->encrypted_keys = $encrypted_keys;
-    }
-  }
-
-  /**
-   * Return the defaults settings
-   */
-  public function get_defaults() {
-    return apply_filters( "{$this->id}Settings/defaults", $this->$defaults );
-  }
-
-  /**
-   * Return the encrypted setting keys
-   */
-  private function get_encrypted_keys() {
-    return apply_filters( "{$this->id}Settings/encrypted_keys", $this->$encrypted_keys );
-  }
-
-  /**
-   * Return the encrypted setting keys
-   */
-  public function set_encryption_keys( $key_1, $key_2 ) {
-    $this->encription_key_1 = $key_1;
-    $this->encription_key_2 = $key_2;
-  }
-
-  /**
-   * Return the settings
-   */
-  public function get_settings( $id = false ) {
-    if ( empty( $this->settings ) ) {
-      $defaults = $this->get_defaults();
-      $settings = get_option( "{$this->id}_settings" );
-      $settings = wp_parse_args( $settings, $defaults );
-
-      // Possibly decript settings
-      $encrypted_keys = $this->get_encrypted_keys();
-      if ( ! empty( $encrypted_keys ) ) {
-        if ( is_array( $encrypted_keys ) && ! empty( $encrypted_keys ) ) {
-          foreach ( $encrypted_keys as $key ) {
-            if ( isset( $settings[$key] ) ) {
-              $settings[$key] = $this->decrypt( $settings[$key] );
-            }
-          }
-        }
-      }
-      $this->settings = $settings;
-    }
-    return $this->settings;
-  }
-
-  /**
-   * Return an individual settings
-   */
-  public function get_setting( $id ) {
-    $settings = $this->get_settings();
-    if ( isset( $settings[$id] ) ) {
-      return $settings[$id];
-    }
-  }
-
-  /**
-   * Update the settings
-   */
-  function update_settings( $key, $value = false ) {
-    $defaults = $this->get_defaults();
-    $settings = $this->get_settings();
-    if ( is_array( $key ) ) {
-      foreach ( $key as $k => $v ) {
-        if ( ! array_key_exists( $k, $defaults ) ) {
-          continue;
-        }
-        $settings[$k] = apply_filters( 'mtphrSettings/sanitize_setting', $v, $k );
-      }  
-    } else {
-      if ( $value ) {
-        if ( array_key_exists( $key, $defaults ) ) {
-          $settings[$key] = apply_filters( 'mtphrSettings/sanitize_setting', $value, $key );
-        }
-      }
-    }
-
-    update_option( 'mtphr_emailcustomizer_settings', encrypt( $settings ) );
-
-    $settings = wp_parse_args( $settings, $defaults );
-    $settings = apply_filters( 'mtphrSettings/update_settings_after', $settings, $key, $value );
-
-    if ( $key && ! is_array( $key ) ) {
-      if ( isset( $settings[$key] ) ) {
-        return $settings[$key];
-      }
-    } else {
-      return $settings;
-    }
-  }
-
-  private function sanitize_setting( $key, $value ) {
-    $settings[$k] = apply_filters( 'mtphrSettings/sanitize_setting', $v, $k );
-  }
-
-  /**
-   * Encrypt data
-  */
-  function encrypt( $string = '' ) {
-    if ( is_array( $string ) ) {
-      $string = json_encode( $string );
-    }
-    $key = hash( 'sha256', $this->encription_key_1 );
-    $iv = substr( hash( 'sha256', $this->encription_key_2 ), 0, 16 );
-    $output = base64_encode( openssl_encrypt( $string, "AES-256-CBC", $key, 0, $iv ) );
-    return $output;
-  }
-
-  /**
-   * Decrypt data
-  */
-  function decrypt( $string ) {
-    if ( is_array( $string ) ) {
-      return $string;
-    }
-    $key = hash( 'sha256', $this->encription_key_1 );
-    $iv = substr( hash( 'sha256', $this->encription_key_2 ), 0, 16 );
-    $output = openssl_decrypt( base64_decode( $string ), "AES-256-CBC", $key, 0, $iv );
-    return json_decode( $output, true );
-  }
-}
-

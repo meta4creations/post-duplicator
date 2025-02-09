@@ -2,7 +2,7 @@ import { TabPanel } from "@wordpress/components";
 import Field from "./Field";
 import { useEffect, useState } from "@wordpress/element";
 
-const TabsField = ({ field, value = {}, onChange, settings, settingsId }) => {
+const TabsField = ({ field, onChange, values, settingsOption, settingsId }) => {
   const { tabs } = field;
 
   // Get the initial tab from the URL or default to the first tab
@@ -52,9 +52,10 @@ const TabsField = ({ field, value = {}, onChange, settings, settingsId }) => {
                 <Field
                   key={tabField.id}
                   field={tabField}
-                  value={settings[tabField.id] || ""}
+                  value={values[tabField.id] || ""}
                   onChange={onChange}
-                  settings={settings}
+                  values={values}
+                  settingsOption={settingsOption}
                   settingsId={settingsId}
                 />
               ))}

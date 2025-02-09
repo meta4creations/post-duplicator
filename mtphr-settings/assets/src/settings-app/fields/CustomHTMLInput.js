@@ -1,14 +1,9 @@
-import {
-  BaseControl,
-  ColorPalette,
-  ColorPicker,
-  useBaseControlProps,
-} from "@wordpress/components";
+import { BaseControl, useBaseControlProps } from "@wordpress/components";
 
-const CustomHTMLInput = ({ field, value, onChange }) => {
+const CustomHTMLInput = ({ field }) => {
   const { class: className, std } = field;
 
-  const { baseControlProps, controlProps } = useBaseControlProps(field);
+  const { baseControlProps } = useBaseControlProps(field);
 
   return (
     <BaseControl {...baseControlProps}>

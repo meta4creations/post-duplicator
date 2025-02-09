@@ -1,3 +1,5 @@
+import classNames from "classnames";
+
 import {
   Card,
   CardHeader,
@@ -7,8 +9,15 @@ import {
 } from "@wordpress/components";
 import { getComponent } from "../utils/ComponentRegistry";
 
-const Field = ({ field, value, onChange, settings, settingsId }) => {
-  const { container } = field;
+const Field = ({
+  field,
+  value,
+  onChange,
+  values,
+  settingsOption,
+  settingsId,
+}) => {
+  const { container, inline } = field;
   const { isBorderless, padding } = container || {};
 
   const Component = getComponent(field.type);
@@ -22,14 +31,20 @@ const Field = ({ field, value, onChange, settings, settingsId }) => {
     );
   }
 
+  const CardClassName = classNames(
+    "mtphrSettings__field",
+    `mtphrSettings__field--${field.type}`,
+    field.class,
+    { "mtphrSettings__field--inline": inline }
+  );
+
   return (
     <Card
-      className={`mtphrSettings__field mtphrSettings__field--${field.type} ${
-        field.class || ""
-      }`}
+      className={CardClassName}
       isRounded={false}
       size="small"
       isBorderless={isBorderless}
+      style={{ flex: 1 }}
     >
       {field.type === "group" && field.label && (
         <CardHeader className={`$mtphrSettings__field__heading`}>
@@ -44,7 +59,8 @@ const Field = ({ field, value, onChange, settings, settingsId }) => {
           field={field}
           value={value}
           onChange={onChange}
-          settings={settings}
+          values={values}
+          settingsOption={settingsOption}
           settingsId={settingsId}
         />
       </CardBody>

@@ -8,13 +8,13 @@ add_action( 'admin_menu', 'mtphr_post_duplicator_settings_page' );
  */
 function mtphr_post_duplicator_settings_page() {
 
-	add_management_page(
-		esc_html__('Post Duplicator', 'post-duplicator'),	// The value used to populate the browser's title bar when the menu page is active
-		esc_html__('Post Duplicator', 'post-duplicator'),	// The label of this submenu item displayed in the menu
-		'administrator',																	// What roles are able to access this submenu item
-		'mtphr_post_duplicator_settings_menu',						// The ID used to represent this submenu item
-		'mtphr_post_duplicator_settings_display'					// The callback function used to render the options for this submenu item
-	);
+	// add_management_page(
+	// 	esc_html__('Post Duplicator', 'post-duplicator'),	// The value used to populate the browser's title bar when the menu page is active
+	// 	esc_html__('Post Duplicator', 'post-duplicator'),	// The label of this submenu item displayed in the menu
+	// 	'administrator',																	// What roles are able to access this submenu item
+	// 	'mtphr_post_duplicator_settings_menu',						// The ID used to represent this submenu item
+	// 	'mtphr_post_duplicator_settings_display'					// The callback function used to render the options for this submenu item
+	// );
 }
 
 

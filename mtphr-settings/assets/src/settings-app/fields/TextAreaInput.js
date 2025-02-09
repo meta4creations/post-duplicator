@@ -1,6 +1,6 @@
 import { TextareaControl } from "@wordpress/components";
 
-const TextAreaInput = ({ field, value, onChange }) => {
+const TextAreaInput = ({ field, value, settingsOption, onChange }) => {
   const {
     class: className,
     disabled,
@@ -15,7 +15,7 @@ const TextAreaInput = ({ field, value, onChange }) => {
   } = field;
 
   const onChangeHandler = (nextValue) => {
-    onChange({ id: id, value: nextValue });
+    onChange({ id, value: nextValue, settingsOption });
   };
 
   return (

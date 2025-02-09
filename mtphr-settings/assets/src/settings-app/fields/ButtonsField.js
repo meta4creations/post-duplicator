@@ -6,7 +6,7 @@ import {
 } from "@wordpress/components";
 import ButtonInput from "./ButtonInput";
 
-const ButtonsField = ({ field, settings, settingsId }) => {
+const ButtonsField = ({ field, values, settingsOption, settingsId }) => {
   const {
     alignment,
     direction,
@@ -34,7 +34,8 @@ const ButtonsField = ({ field, settings, settingsId }) => {
             <ButtonInput
               key={button.id || index}
               field={button}
-              settings={settings}
+              values={values}
+              settingsOption={settingsOption}
               settingsId={settingsId}
             />
           );

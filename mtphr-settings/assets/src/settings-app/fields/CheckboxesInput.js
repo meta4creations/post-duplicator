@@ -5,7 +5,7 @@ import {
   useBaseControlProps,
 } from "@wordpress/components";
 
-const CheckboxesInput = ({ field, value = [], onChange }) => {
+const CheckboxesInput = ({ field, value = [], settingsOption, onChange }) => {
   const { class: className, disabled, help, label, id, choices } = field;
 
   const onChangeHandler = (checked, option) => {
@@ -13,10 +13,10 @@ const CheckboxesInput = ({ field, value = [], onChange }) => {
       ? [...value, option]
       : value.filter((item) => item !== option);
 
-    onChange({ id: id, value: updatedValues });
+    onChange({ id, value: updatedValues, settingsOption });
   };
 
-  const { baseControlProps, controlProps } = useBaseControlProps(field);
+  const { baseControlProps } = useBaseControlProps(field);
 
   return (
     <BaseControl {...baseControlProps}>

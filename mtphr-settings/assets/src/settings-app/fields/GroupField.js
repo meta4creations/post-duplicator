@@ -3,8 +3,16 @@ import {
   __experimentalVStack as VStack,
 } from "@wordpress/components";
 import Field from "./Field";
+import { shouldRenderField } from "../utils/fieldVisibility";
 
-const GroupField = ({ field, value, onChange, settings, settingsId }) => {
+const GroupField = ({
+  field,
+  value,
+  onChange,
+  values,
+  settingsOption,
+  settingsId,
+}) => {
   const {
     alignment,
     direction,
@@ -13,10 +21,10 @@ const GroupField = ({ field, value, onChange, settings, settingsId }) => {
     wrap,
     class: className = "",
     id,
-    label,
-    tooltip,
     fields,
   } = field;
+
+  const groupValue = id || value ? value || {} : values;
 
   return (
     <HStack
@@ -28,15 +36,22 @@ const GroupField = ({ field, value, onChange, settings, settingsId }) => {
       className={className}
     >
       {fields.map((subField, index) => {
+        const fieldValue = subField.id ? groupValue[subField.id] : groupValue;
+
+        if (!shouldRenderField(subField, values)) return null; // Don't render if conditions fail
+
         return (
           <Field
-            key={subField.id}
+            key={subField.id || index}
             field={subField}
-            value={value[index] || subField.default_value || ""}
+            value={fieldValue}
             onChange={(data) => {
-              onChange(data, id, index);
+              const { id: subFieldId, value: newValue } = data;
+              const updatedValue = { ...value, [subFieldId]: newValue };
+              onChange(id ? { id, value: updatedValue, settingsOption } : data);
             }}
-            settings={settings}
+            values={values}
+            settingsOption={settingsOption}
             settingsId={settingsId}
           />
         );

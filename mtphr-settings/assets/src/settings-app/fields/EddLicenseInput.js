@@ -17,7 +17,13 @@ import { Icon, check, closeSmall, rotateRight } from "@wordpress/icons";
 
 const { useState } = wp.element;
 
-const EddLicenseInput = ({ field, value, onChange, settingsId }) => {
+const EddLicenseInput = ({
+  field,
+  value,
+  onChange,
+  settingsOption,
+  settingsId,
+}) => {
   const {
     class: className,
     id,
@@ -123,8 +129,9 @@ const EddLicenseInput = ({ field, value, onChange, settingsId }) => {
 
   const onChangeHandler = (nextValue) => {
     onChange({
-      id: id,
+      id,
       value: nextValue,
+      settingsOption,
     });
   };
 

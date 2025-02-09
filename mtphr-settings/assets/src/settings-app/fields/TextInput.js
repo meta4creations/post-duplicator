@@ -1,6 +1,7 @@
+import he from "he";
 import { __experimentalInputControl as InputControl } from "@wordpress/components";
 
-const TextInput = ({ field, value, onChange }) => {
+const TextInput = ({ field, value, settingsOption, onChange }) => {
   const {
     class: className,
     disabled,
@@ -15,14 +16,14 @@ const TextInput = ({ field, value, onChange }) => {
   } = field;
 
   const onChangeHandler = (nextValue) => {
-    onChange({ id: id, value: nextValue });
+    onChange({ id, value: nextValue, settingsOption });
   };
 
   return (
     <InputControl
       className={className}
       disabled={disabled}
-      help={help}
+      help={help ? he.decode(help) : false}
       label={label}
       labelPosition={labelPosition}
       onChange={onChangeHandler}

@@ -1,10 +1,9 @@
 <?php
 	
-/* --------------------------------------------------------- */
-/* !Return an array of post types - 2.27 */
-/* --------------------------------------------------------- */
 
-if( !function_exists('mtphr_post_duplicator_post_types') ) {
+/**
+ * Return an array of post types
+ */
 function mtphr_post_duplicator_post_types() {
 	
 	$post_types = array('same' => __('Same as original', 'post-duplicator'));
@@ -23,5 +22,4 @@ function mtphr_post_duplicator_post_types() {
 	}
 	
 	return $post_types;	
-}
 }

@@ -1,17 +1,8 @@
-import { SelectControl } from "@wordpress/components";
+// RadioButtonsInput.js
+import { RadioControl } from "@wordpress/components";
 
-const SelectInput = ({ field, value, settingsOption, onChange }) => {
-  const {
-    class: className,
-    disabled,
-    help,
-    label,
-    labelPosition,
-    multiple,
-    id,
-    options,
-    variant,
-  } = field;
+const RadioButtonsInput = ({ field, value, settingsOption, onChange }) => {
+  const { class: className, disabled, help, label, id, options } = field;
 
   const onChangeHandler = (nextValue) => {
     onChange({ id, value: nextValue, settingsOption });
@@ -39,21 +30,16 @@ const SelectInput = ({ field, value, settingsOption, onChange }) => {
   };
 
   return (
-    <SelectControl
+    <RadioControl
       className={className}
       label={label}
-      labelPosition={labelPosition}
       help={help}
-      onChange={onChangeHandler}
-      multiple={multiple}
-      name={id}
+      selected={value}
       options={formattedOptions()}
-      value={value}
-      variant={variant}
+      onChange={onChangeHandler}
       disabled={disabled}
-      __nextHasNoMarginBottom
     />
   );
 };
 
-export default SelectInput;
+export default RadioButtonsInput;

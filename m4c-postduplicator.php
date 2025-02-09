@@ -69,11 +69,9 @@ function mtphr_post_duplicator_localization() {
  */
 require_once( MTPHR_POST_DUPLICATOR_DIR.'mtphr-settings/index.php' );
 
-
+require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/helpers.php' );
 if ( is_admin() ) {
-
 	// Load Metaboxer
-	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/helpers.php' );
   require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/hooks.php' );
 	require_once( MTPHR_POST_DUPLICATOR_DIR.'metaboxer/metaboxer.php' );
 	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/scripts.php' );

@@ -4,6 +4,31 @@
       flex-wrap: wrap;
     }
   }
+  &__field {
+    &--radio_buttons {
+      &.mtphrSettings__field--inline {
+        .components-radio-control__group-wrapper {
+          flex-direction: row;
+          justify-content: flex-start;
+          flex-wrap: wrap;
+        }
+      }
+    }
+  }
+}
+@media screen and (max-width: 782px) {
+  .mtphrSettings {
+    .mtphrSettings__field--group {
+      .mtphrSettings__field__input-wrapper {
+        > .components-h-stack {
+          flex-direction: column;
+          > div {
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
 }
 
 // .mtphrSettingsAppsettings__form {
