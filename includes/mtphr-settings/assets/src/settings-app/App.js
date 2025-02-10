@@ -41,8 +41,6 @@ export default ({ settingsId, settingsTitle }) => {
     );
   };
 
-  //console.log("values", values["mtphr_post_duplicator_settings"]);
-
   // Build a map of section ids to section data for easy lookup
   const fieldSectionsMap = fieldSections.reduce((map, section) => {
     map[section.id] = section;

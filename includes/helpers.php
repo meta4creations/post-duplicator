@@ -53,7 +53,7 @@ function user_can_duplicate( $post ) {
     if ( 'future' == $post->post_status && 'disabled' === get_option_value( 'duplicate_other_future' ) ) {
       return false;
     }
-
-    return true;
   }
+  
+  return true;
 }

@@ -199,7 +199,7 @@ function init_settings() {
           'all_users' => esc_html__( 'Allow Duplication of All Users', 'post-duplicator' ),
         ],
         'inline' => true,
-        'default' => 'current_user',
+        'default' => 'all_users',
       ],
       [
         'type'    => 'heading',
@@ -220,7 +220,7 @@ function init_settings() {
           'enabled' => esc_html__( 'Enabled', 'post-duplicator' ),
         ],
         'inline' => true,
-        'default' => 'disabled',
+        'default' => 'enabled',
         'show'    => [
           'id' => 'post_duplication',
           'value' => 'all_users',
@@ -236,7 +236,7 @@ function init_settings() {
           'enabled' => esc_html__( 'Enabled', 'post-duplicator' ),
         ],
         'inline' => true,
-        'default' => 'disabled',
+        'default' => 'enabled',
         'show'    => [
           'id' => 'post_duplication',
           'value' => 'all_users',
@@ -252,7 +252,7 @@ function init_settings() {
           'enabled' => esc_html__( 'Enabled', 'post-duplicator' ),
         ],
         'inline' => true,
-        'default' => 'disabled',
+        'default' => 'enabled',
         'show'    => [
           'id' => 'post_duplication',
           'value' => 'all_users',
@@ -268,7 +268,7 @@ function init_settings() {
           'enabled' => esc_html__( 'Enabled', 'post-duplicator' ),
         ],
         'inline' => true,
-        'default' => 'disabled',
+        'default' => 'enabled',
         'show'    => [
           'id' => 'post_duplication',
           'value' => 'all_users',
@@ -284,7 +284,7 @@ function init_settings() {
           'enabled' => esc_html__( 'Enabled', 'post-duplicator' ),
         ],
         'inline' => true,
-        'default' => 'disabled',
+        'default' => 'enabled',
         'show'    => [
           'id' => 'post_duplication',
           'value' => 'all_users',

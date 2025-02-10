@@ -1,15 +1,16 @@
 <?php
+namespace Mtphr\PostDuplicator;
+
+add_action('admin_notices', __NAMESPACE__ . '\notice');
 
 /* --------------------------------------------------------- */
 /* !Create an admin notice that a post has been duplicated - 2.27 */
 /* --------------------------------------------------------- */
 
-function mtphr_post_duplicator_notice() {
+function notice() {
 	
 	$duplicated_id = isset( $_GET['post-duplicated'] ) ? intval( $_GET['post-duplicated'] ) : '';
 	if( $duplicated_id != '' ) {
-		
-		$settings = get_mtphr_post_duplicator_settings();
 	
 		// Get the post type object
 		$duplicated_post = get_post( $duplicated_id );
@@ -27,4 +28,3 @@ function mtphr_post_duplicator_notice() {
     <?php
 	}
 }
-add_action('admin_notices', 'mtphr_post_duplicator_notice');
