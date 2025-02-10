@@ -724,7 +724,7 @@ final class Settings {
   * Recursively inject default values into the values array.
   */
   private function recursive_inject_default_values( $values, $default_values ) {
-    if ( !is_array( $default_values ) || empty( $default_values ) ) {
+    if ( ! is_array( $default_values ) || empty( $default_values ) ) {
       return $values; // No defaults to inject
     }
 
@@ -742,7 +742,7 @@ final class Settings {
         );
       } else {
         // Only inject default if key does not exist in $values
-        if ( !array_key_exists( $key, $values ) ) {
+        if ( is_array( $values ) && ! array_key_exists( $key, $values ) ) {
           $values[$key] = $default_value;
         }
       }
@@ -889,7 +889,7 @@ final class Settings {
 
     foreach ( $encryption_settings as $key => $enc_info ) {
       // Skip if $values does not have this key at all.
-      if ( ! array_key_exists( $key, $values ) ) {
+      if ( ! is_array( $values ) || ! array_key_exists( $key, $values ) ) {
         continue;
       }
 
@@ -946,7 +946,7 @@ final class Settings {
 
     foreach ( $encryption_settings as $key => $enc_info ) {
       // Skip if $values does not have this key at all
-      if ( ! array_key_exists( $key, $values ) ) {
+      if ( ! is_array( $values ) || ! array_key_exists( $key, $values ) ) {
         continue;
       }
 

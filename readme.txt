@@ -3,7 +3,7 @@ Contributors: metaphorcreations
 Tags: posts, post, duplicate, duplication
 Requires at least: 5.0
 Tested up to: 6.7.1
-Stable tag: 2.38
+Stable tag: 2.39
 License: GPL2
 
 Creates functionality to duplicate any and all post types, including taxonomies & custom fields.
@@ -40,6 +40,9 @@ Check out the 'Installation' tab.
 2. View of the settings page
 
 == Changelog ==
+
+= 2.39 [2025-02-10] =
+* Bug fix
 
 = 2.38 [2025-02-10] =
 * Setting updates
