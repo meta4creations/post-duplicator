@@ -65,10 +65,6 @@ export default ({ settingsId, settingsTitle }) => {
         label: sectionData.label,
         order:
           typeof sectionData.order !== "undefined" ? sectionData.order : 10,
-        // isIntegration:
-        //   typeof sectionData.is_integration !== "undefined"
-        //     ? sectionData.is_integration
-        //     : false,
         fields: [],
       };
       acc.push(section);
@@ -84,13 +80,6 @@ export default ({ settingsId, settingsTitle }) => {
   // Filter sections by enabled integrations and always-visible sections
   const enabledSections = sections.filter((section) => {
     return true;
-    // return (
-    //   section.id === "general" ||
-    //   section.id === "advanced" ||
-    //   (section.isIntegration
-    //     ? values.integrations?.includes(section.id)
-    //     : true)
-    // );
   });
 
   // Prepare tabs for the TabPanel component
@@ -107,11 +96,8 @@ export default ({ settingsId, settingsTitle }) => {
     : enabledSections.length
     ? enabledSections[0].slug
     : false;
-  //const validTabNames = tabs.map((tab) => tab.name);
+
   const initialTab = initialSection;
-  // const initialTab = validTabNames.includes(initialSection)
-  //   ? initialSection
-  //   : "general";
 
   const [activeTab, setActiveTab] = useState(initialTab);
 
@@ -126,32 +112,6 @@ export default ({ settingsId, settingsTitle }) => {
     const newUrl = `${window.location.pathname}?${params.toString()}`;
     window.history.replaceState(null, "", newUrl);
   }, [activeTab]);
-
-  // useEffect(() => {
-  //   // Update menu visibility whenever values change
-  //   const integrations = values.integrations || [];
-  //   const alwaysVisible = ["general", "advanced"];
-
-  //   // Get all submenu links
-  //   const menuItems = document.querySelectorAll(
-  //     ".wp-submenu a[href*='edit.php?post_type=mtphr_email_template&page=settings&section=']"
-  //   );
-
-  //   menuItems.forEach((menuItem) => {
-  //     const href = menuItem.getAttribute("href");
-
-  //     // Extract the section id from the URL
-  //     const urlParams = new URLSearchParams(href.split("?")[1]);
-  //     const section = urlParams.get("section");
-
-  //     // Show if it's always visible or enabled in integrations
-  //     if (alwaysVisible.includes(section) || integrations.includes(section)) {
-  //       menuItem.closest("li").style.display = "";
-  //     } else {
-  //       menuItem.closest("li").style.display = "none";
-  //     }
-  //   });
-  // }, [values]);
 
   const handleInputChange = (data) => {
     const { id, value, settingsOption } = data;

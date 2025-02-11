@@ -554,8 +554,11 @@ final class Settings {
       return self::$instance->values[$option];
     }
 
-    // $options is a single string
+    // Get the option
     $settings = get_option( $option, [] );
+    if ( ! is_array( $settings ) ) {
+      $settings = [];
+    }
 
     // Decrypt
     if ( $decrypt ) {

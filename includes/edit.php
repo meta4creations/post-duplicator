@@ -31,10 +31,11 @@ function add_row_action_link( $post ) {
 	
 	// Modify the label if duplicating to new post type
 	if( 'same' != get_option_value( 'type' ) ) {
-		$new_post_type = get_post_type_object( get_option_value( 'type' ) );
-		if( $post_type->name != $new_post_type->name ) {
-			$label = sprintf( __( 'Duplicate %1$s to %2$s', 'post-duplicator' ), $post_type->labels->singular_name, $new_post_type->labels->singular_name );
-		}
+		if ( $new_post_type = get_post_type_object( get_option_value( 'type' ) ) ) {
+      if ( $post_type->name != $new_post_type->name ) {
+        $label = sprintf( __( 'Duplicate %1$s to %2$s', 'post-duplicator' ), $post_type->labels->singular_name, $new_post_type->labels->singular_name );
+      }
+    }
 	}
 
 	// Return the link
