@@ -9,7 +9,7 @@ const SelectInput = ({ field, value, settingsOption, onChange }) => {
     labelPosition,
     multiple,
     id,
-    options,
+    choices,
     variant,
   } = field;
 
@@ -18,17 +18,17 @@ const SelectInput = ({ field, value, settingsOption, onChange }) => {
   };
 
   /**
-   * Format the options
+   * Format the choices
    */
-  const formattedOptions = () => {
+  const formattedChoices = () => {
     // If it's already an array, return it as is
-    if (Array.isArray(options)) {
-      return options;
+    if (Array.isArray(choices)) {
+      return choices;
     }
 
     // If it's an object, convert it to an array of objects
-    if (typeof options === "object" && options !== null) {
-      return Object.entries(options).map(([value, label]) => ({
+    if (typeof choices === "object" && choices !== null) {
+      return Object.entries(choices).map(([value, label]) => ({
         value,
         label,
       }));
@@ -47,7 +47,7 @@ const SelectInput = ({ field, value, settingsOption, onChange }) => {
       onChange={onChangeHandler}
       multiple={multiple}
       name={id}
-      options={formattedOptions()}
+      options={formattedChoices()}
       value={value}
       variant={variant}
       disabled={disabled}

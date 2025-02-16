@@ -2,24 +2,24 @@
 import { RadioControl } from "@wordpress/components";
 
 const RadioButtonsInput = ({ field, value, settingsOption, onChange }) => {
-  const { class: className, disabled, help, label, id, options } = field;
+  const { class: className, disabled, help, label, id, choices } = field;
 
   const onChangeHandler = (nextValue) => {
     onChange({ id, value: nextValue, settingsOption });
   };
 
   /**
-   * Format the options
+   * Format the choices
    */
-  const formattedOptions = () => {
+  const formattedChoices = () => {
     // If it's already an array, return it as is
-    if (Array.isArray(options)) {
-      return options;
+    if (Array.isArray(choices)) {
+      return choices;
     }
 
     // If it's an object, convert it to an array of objects
-    if (typeof options === "object" && options !== null) {
-      return Object.entries(options).map(([value, label]) => ({
+    if (typeof choices === "object" && choices !== null) {
+      return Object.entries(choices).map(([value, label]) => ({
         value,
         label,
       }));
@@ -35,7 +35,7 @@ const RadioButtonsInput = ({ field, value, settingsOption, onChange }) => {
       label={label}
       help={help}
       selected={value}
-      options={formattedOptions()}
+      options={formattedChoices()}
       onChange={onChangeHandler}
       disabled={disabled}
     />

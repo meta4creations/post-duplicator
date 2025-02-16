@@ -25,11 +25,12 @@ const GroupField = ({
   } = field;
 
   const groupValue = id || value ? value || {} : values;
+  const Container = "column" === direction ? VStack : HStack;
 
   return (
-    <HStack
+    <Container
       alignment={alignment}
-      direction={direction}
+      //direction={direction}
       justify={justify}
       spacing={spacing}
       wrap={wrap}
@@ -56,7 +57,7 @@ const GroupField = ({
           />
         );
       })}
-    </HStack>
+    </Container>
   );
 };
 

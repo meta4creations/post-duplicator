@@ -5,13 +5,17 @@ import {
   useBaseControlProps,
 } from "@wordpress/components";
 
-const CheckboxesInput = ({ field, value = [], settingsOption, onChange }) => {
+const CheckboxesInput = ({ field, value, settingsOption, onChange }) => {
   const { class: className, disabled, help, label, id, choices } = field;
 
-  const onChangeHandler = (checked, option) => {
+  const onChangeHandler = (checked, choice) => {
+    if (!Array.isArray(value)) {
+      value = [];
+    }
+
     const updatedValues = checked
-      ? [...value, option]
-      : value.filter((item) => item !== option);
+      ? [...value, choice]
+      : value.filter((item) => item !== choice);
 
     onChange({ id, value: updatedValues, settingsOption });
   };
@@ -19,14 +23,14 @@ const CheckboxesInput = ({ field, value = [], settingsOption, onChange }) => {
   const { baseControlProps } = useBaseControlProps(field);
 
   return (
-    <BaseControl {...baseControlProps}>
+    <BaseControl {...baseControlProps} __nextHasNoMarginBottom>
       <fieldset>
-        {Object.entries(choices).map(([option, optionLabel]) => (
+        {Object.entries(choices).map(([choice, choiceLabel]) => (
           <CheckboxControl
-            key={option}
-            label={optionLabel}
-            checked={value.includes(option)}
-            onChange={(checked) => onChangeHandler(checked, option)}
+            key={choice}
+            label={choiceLabel}
+            checked={value && value.includes(choice)}
+            onChange={(checked) => onChangeHandler(checked, choice)}
             disabled={disabled}
           />
         ))}

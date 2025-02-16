@@ -18,6 +18,8 @@ MTPHR_POSTDUPLICATOR_SETTINGS();
  */
 function init_settings() {
 
+  //delete_option( 'disabled' );
+
   // Initialize the settings
   MTPHR_POSTDUPLICATOR_SETTINGS()->init( [
     'id' => 'postDuplicator',
@@ -47,9 +49,18 @@ function init_settings() {
   ] );
 
   MTPHR_POSTDUPLICATOR_SETTINGS()->add_section( [
-    'id' => 'security',
-    'slug' => 'security',
-    'label' => __( 'Security', 'post-duplicator' ),
+    'id' => 'permissions',
+    'slug' => 'permissions',
+    'label' => __( 'Permissions', 'post-duplicator' ),
+    'option' => 'disabled',
+    'menu_slug' => 'mtphr_post_duplicator_settings_menu',
+    'parent_slug' => 'tools.php',
+  ] );
+
+  MTPHR_POSTDUPLICATOR_SETTINGS()->add_section( [
+    'id' => 'advanced',
+    'slug' => 'advanced',
+    'label' => __( 'Advanced', 'post-duplicator' ),
     'option' => 'mtphr_post_duplicator_settings',
     'menu_slug' => 'mtphr_post_duplicator_settings_menu',
     'parent_slug' => 'tools.php',
@@ -60,10 +71,14 @@ function init_settings() {
     'section' => 'defaults',
     'fields' => [
       [
+        'type'    => 'heading',
+        'label'   => __( 'Defaults', 'post-duplicator' ),
+      ],
+      [
         'type'    => 'select',
         'id'      => 'status',
         'label'   => __( 'Post Status', 'post-duplicator' ),
-        'options' => [
+        'choices' => [
           'same' => esc_html__( 'Same as original', 'post-duplicator' ),
 			    'draft' => esc_html__( 'Draft', 'post-duplicator' ),
 			    'publish' => esc_html__( 'Published', 'post-duplicator' ),
@@ -75,30 +90,25 @@ function init_settings() {
         'type'    => 'select',
         'id'      => 'type',
         'label'   => __( 'Post Type', 'post-duplicator' ),
-        'options' => duplicator_post_types(),
+        'choices' => duplicator_post_types(),
         'default' => 'same',
       ],
       [
         'type'    => 'radio_buttons',
         'id'      => 'post_author',
         'label'   => __( 'Post Author', 'post-duplicator' ),
-        'options' => [
+        'choices' => [
           'current_user' => esc_html__( 'Current User', 'post-duplicator' ),
 			    'original_user' => esc_html__( 'Original Post Author', 'post-duplicator' ),
         ],
         'inline' => true,
         'default' => 'current_user',
-        'show' => [
-          'id' => 'post_duplication',
-          'value' => 'all_users',
-          'compare' => '='
-        ]
       ],
       [
         'type'    => 'radio_buttons',
         'id'      => 'timestamp',
         'label'   => __( 'Post Date', 'post-duplicator' ),
-        'options' => [
+        'choices' => [
           'duplicate' => esc_html__( 'Duplicate Timestamp', 'post-duplicator' ),
 			    'current' => esc_html__( 'Current Time', 'post-duplicator' )
         ],
@@ -172,7 +182,7 @@ function init_settings() {
         'type'    => 'radio_buttons',
         'id'      => 'time_offset_direction',
         'label'   => __( 'Offset direction', 'post-duplicator' ),
-        'options' => [
+        'choices' => [
           'newer' => esc_html__( 'Newer', 'post-duplicator' ),
           'older' => esc_html__( 'Older', 'post-duplicator' )
         ],
@@ -188,111 +198,91 @@ function init_settings() {
   ] );
 
   MTPHR_POSTDUPLICATOR_SETTINGS()->add_settings( [
-    'section' => 'security',
+    'section' => 'advanced',
     'fields' => [
       [
-        'type'    => 'radio_buttons',
-        'id'      => 'post_duplication',
-        'label'   => __( 'Post Duplication', 'post-duplicator' ),
-        'options' => [
-          'current_user' => esc_html__( 'Limit to Current User', 'post-duplicator' ),
-          'all_users' => esc_html__( 'Allow Duplication of All Users', 'post-duplicator' ),
-        ],
-        'inline' => true,
-        'default' => 'all_users',
-      ],
-      [
         'type'    => 'heading',
-        'label'   => __( 'Other User Posts', 'post-duplicator' ),
-        'help'    => __( "Adjust post duplication functionality for duplication of other user posts.", 'post-duplicator' ),
-        'show'    => [
-          'id' => 'post_duplication',
-          'value' => 'all_users',
-          'compare' => '='
-        ],
+        'label'   => __( 'Advanced Duplication Settings', 'post-duplicator' ),
+        'help'    => __( "Advanced settings related to duplication of other user posts.", 'post-duplicator' ),
       ],
       [
         'type'    => 'radio_buttons',
         'id'      => 'duplicate_other_draft',
         'label'   => __( 'Draft Posts', 'post-duplicator' ),
-        'options' => [
+        'help'    => __( "Should users be able to duplicate other's draft posts?", 'post-duplicator' ),
+        'choices' => [
           'disabled' => esc_html__( 'Disabled', 'post-duplicator' ),
           'enabled' => esc_html__( 'Enabled', 'post-duplicator' ),
         ],
         'inline' => true,
         'default' => 'enabled',
-        'show'    => [
-          'id' => 'post_duplication',
-          'value' => 'all_users',
-          'compare' => '='
-        ],
       ],
       [
         'type'    => 'radio_buttons',
         'id'      => 'duplicate_other_pending',
         'label'   => __( 'Pending Posts', 'post-duplicator' ),
-        'options' => [
+        'help'    => __( "Should users be able to duplicate other's pending posts?", 'post-duplicator' ),
+        'choices' => [
           'disabled' => esc_html__( 'Disabled', 'post-duplicator' ),
           'enabled' => esc_html__( 'Enabled', 'post-duplicator' ),
         ],
         'inline' => true,
         'default' => 'enabled',
-        'show'    => [
-          'id' => 'post_duplication',
-          'value' => 'all_users',
-          'compare' => '='
-        ],
       ],
       [
         'type'    => 'radio_buttons',
         'id'      => 'duplicate_other_private',
         'label'   => __( 'Private Posts', 'post-duplicator' ),
-        'options' => [
+        'help'    => __( "Should users be able to duplicate other's private posts?", 'post-duplicator' ),
+        'choices' => [
           'disabled' => esc_html__( 'Disabled', 'post-duplicator' ),
           'enabled' => esc_html__( 'Enabled', 'post-duplicator' ),
         ],
         'inline' => true,
         'default' => 'enabled',
-        'show'    => [
-          'id' => 'post_duplication',
-          'value' => 'all_users',
-          'compare' => '='
-        ],
       ],
       [
         'type'    => 'radio_buttons',
         'id'      => 'duplicate_other_password',
         'label'   => __( 'Password Protected Posts', 'post-duplicator' ),
-        'options' => [
+        'help'    => __( "Should users be able to duplicate other's password protected posts?", 'post-duplicator' ),
+        'choices' => [
           'disabled' => esc_html__( 'Disabled', 'post-duplicator' ),
           'enabled' => esc_html__( 'Enabled', 'post-duplicator' ),
         ],
         'inline' => true,
         'default' => 'enabled',
-        'show'    => [
-          'id' => 'post_duplication',
-          'value' => 'all_users',
-          'compare' => '='
-        ],
       ],
       [
         'type'    => 'radio_buttons',
         'id'      => 'duplicate_other_future',
         'label'   => __( 'Future Posts', 'post-duplicator' ),
-        'options' => [
+        'help'    => __( "Should users be able to duplicate other's future posts?", 'post-duplicator' ),
+        'choices' => [
           'disabled' => esc_html__( 'Disabled', 'post-duplicator' ),
           'enabled' => esc_html__( 'Enabled', 'post-duplicator' ),
         ],
         'inline' => true,
         'default' => 'enabled',
-        'show'    => [
-          'id' => 'post_duplication',
-          'value' => 'all_users',
-          'compare' => '='
-        ],
       ],
     ],
   ] );
+
+  MTPHR_POSTDUPLICATOR_SETTINGS()->add_settings( [
+    'section' => 'permissions',
+    'fields'  => [
+      [
+        'id' 		    => 'permissions',
+        'label'     => esc_html__( 'Permissions', 'post-duplicator' ),
+        'type'      => 'group',
+        'direction' => 'column',
+        'fields'    => user_roles_and_capabilities(),
+      ]
+    ],
+  ] );
+
+  $get_values = MTPHR_POSTDUPLICATOR_SETTINGS()->get_default_values();
+  //echo '<pre>';print_r($get_values);echo '</pre>';
 }
 add_action( 'init', __NAMESPACE__ . '\init_settings' );
 
@@ -310,4 +300,97 @@ function get_option_value( $setting = false, $option = 'mtphr_post_duplicator_se
       return $values;
     }
   }
+}
+
+/**
+ * Return user roles and capabilities
+ */
+function user_roles_and_capabilities() {
+  $wp_roles_instance = wp_roles();
+  $all_roles = $wp_roles_instance->roles;
+  $fields = [];
+
+  $capabilities = get_capabilities();
+  $active_capabilities = get_active_capabilities();
+
+  foreach ($all_roles as $role_key => $role) {
+    $role_capabilities = $capabilities;
+    $role_group = [
+      'id' 		    => $role_key,
+      'label'     => sprintf( esc_html__( '%s Permissions', 'post-duplicator' ), $role['name'] ),
+      'type'      => 'checkboxes',
+      'inline'    => false,
+      'choices'   => $role_capabilities,
+      'default'   => $active_capabilities[$role_key],
+      'noupdate'  => true,
+      'sanitize'  => __NAMESPACE__ . '\update_capabilities',
+    ];
+    $fields[] = $role_group;
+  }
+
+  return $fields;
+}
+
+/**
+ * Get capabilities
+ */
+function get_capabilities() {
+  $capabilities = [
+    'duplicate_posts',
+    'duplicate_others_posts',
+  ];
+  return array_combine( $capabilities, $capabilities );
+}
+
+/**
+ * Get active capabilities
+ */
+function get_active_capabilities( $role = false) {
+  $duplicator_capabilities = get_capabilities();
+  $active_capabilities = [];
+  if ( $role ) {
+    foreach ( $role->capabilities as $capability => $enabled ) {
+      if ( $enabled && in_array( $capability, $duplicator_capabilities ) ) {
+        $active_capabilities[] = $capability;
+      }
+    }
+  } else {
+    $wp_roles_instance = wp_roles();
+    $all_roles = $wp_roles_instance->roles;
+    foreach ($all_roles as $role_key => $role) {
+      $capabilities = [];
+      foreach ( $role['capabilities'] as $capability => $enabled ) {
+        if ( $enabled && in_array( $capability, $duplicator_capabilities ) ) {
+          $capabilities[] = $capability;
+        }
+      }
+      $active_capabilities[$role_key] = $capabilities;
+    }
+  }
+  return $active_capabilities;
+}
+
+/**
+ * Update a role capability
+ */
+function update_capabilities( $value, $key, $option, $type ) {
+  if ( 'update' == $type ) {
+    $role = get_role( $key );
+    $active_capabilities = get_active_capabilities( $role );
+    $capability_value = is_array( $value ) ? $value : [];;
+
+    $added_capabilities = array_diff( $capability_value, $active_capabilities );
+    $removed_capabilities = array_diff( $active_capabilities, $capability_value );
+    if ( is_array( $added_capabilities ) && count( $added_capabilities ) > 0 ) {
+      foreach ( $added_capabilities as $added_capability ) {
+        $role->add_cap( esc_attr( $added_capability ) );
+      }
+    }
+    if ( is_array( $removed_capabilities ) && count( $removed_capabilities ) > 0 ) {
+      foreach ( $removed_capabilities as $removed_capability ) {
+        $role->remove_cap( esc_attr( $removed_capability ) );
+      }
+    }
+  }
+  return $value;
 }

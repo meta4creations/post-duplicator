@@ -8,10 +8,13 @@ import {
   CardFooter,
   Notice,
   SlotFillProvider,
+  SnackbarList,
   TabPanel,
   __experimentalHeading as Heading,
   createSlotFill,
 } from "@wordpress/components";
+import { dispatch, useDispatch, useSelect } from "@wordpress/data";
+
 import Field from "./fields/Field";
 import { shouldRenderField } from "./utils/fieldVisibility";
 
@@ -40,6 +43,12 @@ export default ({ settingsId, settingsTitle }) => {
       )
     );
   };
+
+  const notices = useSelect(
+    (select) => select("core/notices").getNotices(),
+    []
+  );
+  const { removeNotice } = useDispatch("core/notices");
 
   // Build a map of section ids to section data for easy lookup
   const fieldSectionsMap = fieldSections.reduce((map, section) => {
@@ -164,6 +173,11 @@ export default ({ settingsId, settingsTitle }) => {
         // Update the values with sanitized results
         setValues(data);
         setIsSaving(false);
+        // dispatch("core/notices").createNotice(
+        //   "success",
+        //   "Your settings have been saved!",
+        //   { type: "snackbar" }
+        // );
         setNotice({
           status: "success",
           message: __("Settings saved successfully!", "mtphr-settings"),
@@ -182,7 +196,10 @@ export default ({ settingsId, settingsTitle }) => {
 
   return (
     <SlotFillProvider>
-      <Card className={`mtphrSettings ${settingsId}`}>
+      <Card
+        className={`mtphrSettings ${settingsId}`}
+        style={{ position: "relative" }}
+      >
         <CardHeader>
           <Heading level={1}>{settingsTitle}</Heading>
         </CardHeader>
@@ -239,6 +256,10 @@ export default ({ settingsId, settingsTitle }) => {
           </Button>
         </CardFooter>
         <Notification />
+        <SnackbarList
+          notices={notices.filter((notice) => notice.type === "snackbar")}
+          onRemove={removeNotice}
+        />
       </Card>
     </SlotFillProvider>
   );

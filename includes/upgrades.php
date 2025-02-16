@@ -1,6 +1,6 @@
 <?php
 namespace Mtphr\PostDuplicator\Upgrages;
-use function Mtphr\PostDuplicator;
+use function Mtphr\PostDuplicator\get_option_value;
 
 add_action( 'admin_init', __NAMESPACE__ . '\run_updates' );
 
@@ -11,14 +11,9 @@ add_action( 'admin_init', __NAMESPACE__ . '\run_updates' );
  * @return void
  */
 function run_updates() {
-	$current_version = get_option( 'mtphr_postduplicator_version' );
-  if ( ! $current_version ) {
-		update_option( 'mtphr_postduplicator_version', MTPHR_POST_DUPLICATOR_VERSION );
-    return false;
-  }
-
-	if ( version_compare( $current_version, '2.38', '<' ) ) {
-    update_v2_38();
+	$current_version = get_option( 'mtphr_postduplicator_version', 0 );
+	if ( version_compare( $current_version, '2.41', '<' ) ) {
+    update_v2_41();
 	}
 
 	if ( MTPHR_POST_DUPLICATOR_VERSION != $current_version ) {
@@ -28,7 +23,30 @@ function run_updates() {
 }
 
 /**
- * Version 2.38 updates
+ * Version 2.41 updates
  */
-function update_v2_38() {
+function update_v2_41() {
+  $duplicate_roles = [
+    'administrator',
+    'editor',
+    'author',
+    'contributor',
+  ];
+  $duplicate_others_roles = [
+    'administrator',
+  ];
+  if ( 'all_users' === get_option_value( 'post_duplication' ) ) {
+    $duplicate_others_roles[] = 'editor';
+  }
+
+  if ( is_array( $duplicate_roles ) && ! empty( $duplicate_roles ) ) {
+    foreach ( $duplicate_roles as $slug ) {
+      if ( $role = get_role( $slug ) ) {
+        $role->add_cap( 'duplicate_posts' );
+        if ( in_array( $slug, $duplicate_others_roles ) ) {
+          $role->add_cap( 'duplicate_others_posts' );
+        }
+      }
+    }
+  }
 }

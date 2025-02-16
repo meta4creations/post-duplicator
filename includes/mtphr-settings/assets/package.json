@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@wordpress/icons": "10.17.0",
+    "@wordpress/notices": "5.18.0",
     "classnames": "2.3.2",
     "he": "1.2.0"
   }

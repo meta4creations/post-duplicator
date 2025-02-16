@@ -28,12 +28,16 @@ function duplicator_post_types() {
  * Check if a user can duplicate
  */
 function user_can_duplicate( $post ) {
+
+  if ( ! current_user_can( 'duplicate_posts' ) ) {
+    return false;
+  }
   
   if ( get_current_user_id() != $post->post_author ) {
-    if ( 'current_user' === get_option_value( 'post_duplication' ) ) {
+    if ( ! current_user_can( 'duplicate_others_posts' ) ) {
       return false;
     }
-
+    
     if ( 'draft' == $post->post_status && 'disabled' === get_option_value( 'duplicate_other_draft' ) ) {
       return false;
     }

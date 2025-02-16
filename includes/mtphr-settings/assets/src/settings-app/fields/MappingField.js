@@ -6,7 +6,7 @@ import {
 import { useState } from "@wordpress/element";
 
 const MappingField = ({ field, value = {}, settingsOption, onChange }) => {
-  const { label, id, help, map_source, map_options, disabled } = field;
+  const { label, id, help, map_source, map_choices, disabled } = field;
 
   // Initialize state to track mapped values
   const [mappedValues, setMappedValues] = useState(() => {
@@ -40,13 +40,13 @@ const MappingField = ({ field, value = {}, settingsOption, onChange }) => {
     onChange({ id, value: newValues, settingsOption });
   };
 
-  const availableOptions = (currentValue) =>
-    map_options.map((option) => ({
-      value: option.tag,
-      label: option.label,
+  const availableChoices = (currentValue) =>
+    map_choices.map((choice) => ({
+      value: choice.tag,
+      label: choice.label,
       disabled: mappedValues.some(
         (mapping) =>
-          mapping.value === option.tag && mapping.value !== currentValue
+          mapping.value === choice.tag && mapping.value !== currentValue
       ),
     }));
 
@@ -67,7 +67,7 @@ const MappingField = ({ field, value = {}, settingsOption, onChange }) => {
               value={item.value}
               options={[
                 { value: "", label: "-- Select --", disabled: false },
-                ...availableOptions(item.value),
+                ...availableChoices(item.value),
               ]}
               onChange={(value) => handleSelectChange(value, item.tag)}
               disabled={disabled}

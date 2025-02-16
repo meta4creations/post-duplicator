@@ -22,6 +22,8 @@ final class Settings {
   private $default_values = [];
   private $sanitize_settings = [];
   private $encryption_settings = [];
+  private $type_settings = [];
+  private $noupdate_settings = [];
   private $default_sanitizer = 'esc_attr';
   private $encryption_key_1 = '7Q@_DvLVTiHPEA';
   private $encryption_key_2 = 'YgM2iCX-BtoBpJ';
@@ -312,6 +314,23 @@ final class Settings {
   }
 
   /**
+   * Return available options keys
+   */
+  public function get_section( $id ) {
+    $sections = self::$instance->get_sections();
+    if ( ! is_array( $sections ) ) {
+      return false;
+    }
+    if ( is_array( $sections ) && ! empty( $sections ) ) {
+      foreach ( $sections as $section ) {
+        if ( $id == $section['id'] ) {
+          return $section;
+        }
+      }
+    }
+  }
+
+  /**
    * Add a single setting
    */
   private function add_setting( $setting ) {
@@ -321,20 +340,21 @@ final class Settings {
 
     $sections = self::$instance->get_sections();
     $settings = self::$instance->get_settings();
-
     if ( empty( $sections ) ) {
       return false;
     }
     $default_section = $sections[0]['id'];
-    $default_option = $sections[0]['option'];
     $default_order = 10;
 
-    if ( ! isset( $setting['option'] ) ) {
-      $setting['option'] = $default_option;
-    }
     if ( ! isset( $setting['section'] ) ) {
       $setting['section'] = $default_section;
     }
+
+    if ( ! isset( $setting['option'] ) ) {
+      $section = self::$instance->get_section( $setting['section'] );
+      $setting['option'] = $section['option'];
+    }
+    
     if ( ! isset( $setting['order'] ) ) {
       $setting['order'] = $default_order;
     }
@@ -401,21 +421,31 @@ final class Settings {
     return $settings;
   }
 
+  /**
+   * Process settings data
+   */
   private function process_setting_data( $setting, $option = false, $parents = [] ) {
     // Reference to instance storage
+    $type_storage =& self::$instance->type_settings;
     $default_storage =& self::$instance->default_values;
     $sanitize_storage =& self::$instance->sanitize_settings;
     $encryption_storage =& self::$instance->encryption_settings;
+    $noupdate_storage =& self::$instance->noupdate_settings;
 
     // Extract setting data
     $id = isset( $setting['id'] ) ? $setting['id'] : false;
+    $type = isset( $setting['type'] ) ? $setting['type'] : false;
     $default = isset( $setting['default'] ) ? $setting['default'] : null;
     $sanitize = isset( $setting['sanitize'] ) ? $setting['sanitize'] : self::$instance->get_default_sanitizer();
     $encrypt = isset( $setting['encrypt'] ) ? $setting['encrypt'] : false;
+    $noupdate = isset( $setting['noupdate'] ) ? $setting['noupdate'] : false;
     $option = isset( $setting['option'] ) ? $setting['option'] : $option;
 
     if ( $option && $id !== false ) {
       // Ensure option storage exists
+      if ( !isset( $type_storage[$option] ) ) {
+        $type_storage[$option] = [];
+      }
       if ( !isset( $default_storage[$option] ) ) {
         $default_storage[$option] = [];
       }
@@ -425,15 +455,25 @@ final class Settings {
       if ( !isset( $encryption_storage[$option] ) ) {
         $encryption_storage[$option] = [];
       }
+      if ( !isset( $noupdate_storage[$option] ) ) {
+        $noupdate_storage[$option] = [];
+      }
 
       // Reference correct location in storage
+      $type_target =& $type_storage[$option];
       $default_target =& $default_storage[$option];
       $sanitize_target =& $sanitize_storage[$option];
       $encryption_target =& $encryption_storage[$option];
+      $noupdate_target =& $noupdate_storage[$option];
 
       // Traverse parents to ensure proper nesting
       if ( !empty( $parents ) ) {
         foreach ( $parents as $parent ) {
+          if ( !isset( $type_target[$parent] ) || !is_array( $type_target[$parent] ) ) {
+            $type_target[$parent] = [
+              '__type' => $type
+            ];
+          }
           if ( !isset( $default_target[$parent] ) || !is_array( $default_target[$parent] ) ) {
             $default_target[$parent] = [];
           }
@@ -443,15 +483,22 @@ final class Settings {
           if ( !isset( $encryption_target[$parent] ) || !is_array( $encryption_target[$parent] ) ) {
             $encryption_target[$parent] = [];
           }
+          if ( !isset( $noupdate_target[$parent] ) || !is_array( $noupdate_target[$parent] ) ) {
+            $noupdate_target[$parent] = [];
+          }
+          $type_target =& $type_target[$parent];
           $default_target =& $default_target[$parent];
           $sanitize_target =& $sanitize_target[$parent];
           $encryption_target =& $encryption_target[$parent];
+          $noupdate_target =& $noupdate_target[$parent];
         }
       }
 
       // Assign values at the correct depth
+      $type_target[$id] = $type;
       $default_target[$id] = $default;
       $sanitize_target[$id] = $sanitize;
+      $noupdate_target[$id] = $noupdate;
 
       // Handle encryption settings
       if ( $encrypt !== false ) {
@@ -480,6 +527,9 @@ final class Settings {
       }
     }
   }
+
+
+
 
   /**
    * Get default values
@@ -543,6 +593,48 @@ final class Settings {
     }
     return $encryption_settings;
   }
+  
+  /**
+   * Get field type settings
+   */
+  public function get_type_settings( $options = false ) {
+    $type_settings = self::$instance->type_settings;
+    if ( $options ) {
+      if ( is_array( $options ) ) {
+        if ( ! empty( $options ) ) {
+          $settings = [];
+          foreach ( $options as $option ) {
+            $settings[$option] = isset( $type_settings[$option] ) ? $type_settings[$option] : [];
+          }
+          return $settings;
+        }
+      } else {
+        return isset( $type_settings[$options] ) ? $type_settings[$options] : [];
+      }
+    }
+    return $type_settings;
+  }
+
+  /**
+   * Get no update settings
+   */
+  public function get_noupdate_settings( $options = false ) {
+    $noupdate_settings = self::$instance->noupdate_settings;
+    if ( $options ) {
+      if ( is_array( $options ) ) {
+        if ( ! empty( $options ) ) {
+          $settings = [];
+          foreach ( $options as $option ) {
+            $settings[$option] = isset( $noupdate_settings[$option] ) ? $noupdate_settings[$option] : [];
+          }
+          return $settings;
+        }
+      } else {
+        return isset( $noupdate_settings[$options] ) ? $noupdate_settings[$options] : [];
+      }
+    }
+    return $noupdate_settings;
+  }
 
   /**
    * Return an individual options values
@@ -570,7 +662,7 @@ final class Settings {
     $parsed_settings = self::$instance->inject_default_values( $settings, $option );
     
     // Sanitize
-    $sanitized_settings = self::$instance->sanitize_values( $parsed_settings, $option );
+    $sanitized_settings = self::$instance->sanitize_values( $parsed_settings, $option, 'get' );
     
     // Add to the global values array
     self::$instance->values[$option] = $sanitized_settings;
@@ -671,7 +763,7 @@ final class Settings {
     wp_enqueue_script(
       self::$instance->get_id(),
       self::$instance->settings_url . 'assets/build/mtphrSettings.js',
-      array_unique( array_merge( $asset_file['dependencies'], ['wp-element'] ) ),
+      array_unique( array_merge( $asset_file['dependencies'], ['wp-element', 'wp-data', 'wp-components', 'wp-notices'] ) ),
       $asset_file['version'],
       true
     ); 
@@ -757,14 +849,17 @@ final class Settings {
    * Update the settings
    */
   public function update_values( $option, $values = [] ) {
+    $settings = self::$instance->get_settings( $option );
     $sanitize_settings = self::$instance->get_sanitize_settings( $option );
     $option_values     = self::$instance->get_option_values( $option );
+    $type_settings     = self::$instance->get_type_settings( $option );
 
     // 1) Recursively merge and sanitize
     $updated_values = $this->recursive_update_values(
       $option_values,
       $values,
       $sanitize_settings,
+      $type_settings,
       $option
     );
 
@@ -775,7 +870,9 @@ final class Settings {
     $updated_values = $this->encrypt_values( $updated_values, $encryption_settings );
 
     // 4) Finally save the updated (and possibly encrypted) array
-    update_option( $option, $updated_values );
+    if ( 'disabled' != $option ) {
+      update_option( $option, $updated_values );
+    }
 
     // Add to the global values array
     self::$instance->values[$option] = $updated_values;
@@ -786,45 +883,51 @@ final class Settings {
   /**
    * Recursively update and sanitize values.
    */
-  private function recursive_update_values( $existing_values, $new_values, $sanitize_settings, $option ) {
+  private function recursive_update_values( $existing_values, $new_values, $sanitize_settings, $type_settings, $option ) {
     if ( ! is_array( $new_values ) || empty( $new_values ) ) {
-      return $existing_values;
+        return $existing_values;
     }
 
     foreach ( $new_values as $key => $value ) {
-      if ( is_array( $value ) ) {
-        // Recursively update nested arrays, keeping existing structure
-        $existing_values[$key] = $this->recursive_update_values(
-          isset( $existing_values[$key] ) ? $existing_values[$key] : [],
-          $value,
-          isset( $sanitize_settings[$key] ) ? $sanitize_settings[$key] : [],
-          $option
-        );
-      } else {
-        // Get the sanitizer for this specific key, or fallback to default
-        $sanitizer = isset( $sanitize_settings[$key] ) 
-          ? $sanitize_settings[$key] 
-          : self::$instance->get_default_sanitizer();
+        // Get the field type data for this key at the current level
+        $current_field_type = isset( $type_settings[$key] ) ? $type_settings[$key] : null;
+        $has_child_fields = is_array( $current_field_type ) && isset( $current_field_type['__type'] );
 
-        $existing_values[$key] = self::$instance->sanitize_value( $value, $sanitizer, $key, $option );
-      }
+        if ( is_array( $value ) && $has_child_fields ) {
+            // Recursively update only if this key actually has child fields
+            $existing_values[$key] = $this->recursive_update_values(
+                isset( $existing_values[$key] ) ? $existing_values[$key] : [],
+                $value,
+                isset( $sanitize_settings[$key] ) ? $sanitize_settings[$key] : [],
+                $current_field_type, // Pass only the relevant section of type_settings
+                $option
+            );
+        } else {
+            // Get the sanitizer for this specific key, or fallback to default
+            $sanitizer = isset( $sanitize_settings[$key] ) 
+                ? $sanitize_settings[$key] 
+                : self::$instance->get_default_sanitizer();
+
+            $existing_values[$key] = self::$instance->sanitize_value( $value, $sanitizer, $key, $option, 'update' );
+        }
     }
 
     return $existing_values;
-  }
+}
+
 
   /**
    * Sanitize a value
    */
-  private function sanitize_values( $values, $option ) { 
+  private function sanitize_values( $values, $option, $type = false ) { 
     $sanitize_settings = self::$instance->get_sanitize_settings( $option );
-    return $this->recursive_sanitize_values( $values, $sanitize_settings, $option );
+    return $this->recursive_sanitize_values( $values, $sanitize_settings, $option, $type );
   }
 
   /**
    * Recursively sanitize values based on the sanitize settings structure.
    */
-  private function recursive_sanitize_values( $values, $sanitize_settings, $option ) {
+  private function recursive_sanitize_values( $values, $sanitize_settings, $option, $type = false ) {
     $sanitized_values = [];
     if ( is_array( $values ) && ! empty( $values ) ) {
       foreach ( $values as $key => $value ) {
@@ -833,7 +936,8 @@ final class Settings {
           $sanitized_values[$key] = $this->recursive_sanitize_values(
             $value, 
             isset( $sanitize_settings[$key] ) ? $sanitize_settings[$key] : [],
-            $option
+            $option,
+            $type
           );
         } else {
           // Retrieve the appropriate sanitizer or fallback to the default
@@ -841,7 +945,7 @@ final class Settings {
             ? $sanitize_settings[$key] 
             : self::$instance->get_default_sanitizer();
 
-          $sanitized_values[$key] = self::$instance->sanitize_value( $value, $sanitizer, $key, $option );
+            $sanitized_values[$key] = self::$instance->sanitize_value( $value, $sanitizer, $key, $option, $type );
         }
       }
     }
@@ -851,7 +955,7 @@ final class Settings {
   /**
    * Sanitize a value
    */
-  private function sanitize_value( $value, $sanitizer, $key, $option ) { 
+  private function sanitize_value( $value, $sanitizer, $key, $option, $type = false ) { 
     switch( $sanitizer ) {
       case 'esc_attr':
         return esc_attr( $value );
@@ -867,10 +971,14 @@ final class Settings {
         return boolval( $value );
       default:
         if ( function_exists( $sanitizer ) ) {
-          return $sanitizer( $value, $key, $option );
+          return $sanitizer( $value, $key, $option, $type );
         } else {
-          $default = self::$instance->get_default_sanitizer();
-          return $default( $value );
+          if ( is_array( $value ) ) {
+            return $value;
+          } else {
+            $default = self::$instance->get_default_sanitizer();
+            return $default( $value );
+          }
         }
         break;
     }
