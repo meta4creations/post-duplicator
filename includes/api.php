@@ -26,10 +26,6 @@ function duplicate_post_permissions( $request ) {
     return new \WP_Error( 'no_original_id', esc_html__( 'No original id passed.', 'post-duplicator' ), array( 'status' => 403 ) );
   }
 
-  if ( ! current_user_can( 'edit_post', $original_id ) ) {
-    return new \WP_Error( 'no_permission', esc_html__( 'User does not have permission to edit original post.', 'post-duplicator' ), array( 'status' => 403 ) );
-  }
-
   $post = get_post( $original_id );
   if ( ! user_can_duplicate( $post ) ) {
 	  return new \WP_Error( 'no_permission', esc_html__( 'User does not have permission to duplicate post.', 'post-duplicator' ), array( 'status' => 403 ) );
