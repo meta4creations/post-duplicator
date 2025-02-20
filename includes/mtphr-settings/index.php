@@ -1,4 +1,8 @@
 <?php
+/**
+ * Version: 1.0.0
+ */
+
 // Update the namespace after every update!!!
 namespace Mtphr\PostDuplicator;
 
