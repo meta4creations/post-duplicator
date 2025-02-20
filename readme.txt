@@ -3,7 +3,7 @@ Contributors: metaphorcreations
 Tags: posts, post, duplicate, duplication
 Requires at least: 5.0
 Requires PHP: 7.4
-Tested up to: 6.7.1
+Tested up to: 6.7.2
 Stable tag: 2.42
 License: GPL2
 
