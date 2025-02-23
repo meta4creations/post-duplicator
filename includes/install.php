@@ -47,12 +47,12 @@ register_activation_hook( MTPHR_POST_DUPLICATOR_FILE, __NAMESPACE__ . '\install'
 function run_install() {
 
 	// Add Upgraded From Option
-	$current_version = get_option( 'mtphr_postduplicator_version' );
-	if ( $current_version ) {
-		update_option( 'mtphr_postduplicator_version_upgraded_from', $current_version );
-	}
+	// $current_version = get_option( 'mtphr_postduplicator_version' );
+	// if ( $current_version ) {
+	// 	update_option( 'mtphr_postduplicator_version_upgraded_from', $current_version );
+	// }
 
-	update_option( 'mtphr_postduplicator_version', MTPHR_POST_DUPLICATOR_VERSION );
+	// update_option( 'mtphr_postduplicator_version', MTPHR_POST_DUPLICATOR_VERSION );
 }
 
 

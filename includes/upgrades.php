@@ -11,10 +11,11 @@ add_action( 'admin_init', __NAMESPACE__ . '\run_updates' );
  * @return void
  */
 function run_updates() {
-	$current_version = get_option( 'mtphr_postduplicator_version', '0' );
+  $current_version = get_option( 'mtphr_postduplicator_version', '0' );
   if ( ! $current_version ) {
     $current_version = '0';
   }
+  
 	if ( version_compare( $current_version, '2.41', '<' ) ) {
     update_v2_41();
 	}
