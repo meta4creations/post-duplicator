@@ -6,6 +6,9 @@
 /assets/package.json export-ignore
 /assets/package-lock.json export-ignore
 /assets/webpack.config.js export-ignore
+/includes/mtphr-settings/.gitignore export-ignore
+/includes/mtphr-settings/readme.txt export-ignore
+/includes/mtphr-settings/settings-example.php export-ignore
 /includes/mtphr-settings/assets/src/ export-ignore
 /includes/mtphr-settings/assets/composer.json export-ignore
 /includes/mtphr-settings/assets/package.json export-ignore
