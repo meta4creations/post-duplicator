@@ -75,6 +75,9 @@ export default ({ settingsId, settingsTitle }) => {
         order:
           typeof sectionData.order !== "undefined" ? sectionData.order : 10,
         fields: [],
+        option: sectionData.option ? sectionData.option : null,
+        show: sectionData.show ? sectionData.show : null,
+        hide: sectionData.hide ? sectionData.hide : null,
       };
       acc.push(section);
     }
@@ -88,7 +91,11 @@ export default ({ settingsId, settingsTitle }) => {
 
   // Filter sections by enabled integrations and always-visible sections
   const enabledSections = sections.filter((section) => {
-    return true;
+    // Check if the section has 'show' or 'hide' conditions
+    if (section.show || section.hide) {
+      return shouldRenderField(section, values[section.option]);
+    }
+    return true; // Keep section if no conditions exist
   });
 
   // Prepare tabs for the TabPanel component
@@ -173,11 +180,11 @@ export default ({ settingsId, settingsTitle }) => {
         // Update the values with sanitized results
         setValues(data);
         setIsSaving(false);
-        // dispatch("core/notices").createNotice(
-        //   "success",
-        //   "Your settings have been saved!",
-        //   { type: "snackbar" }
-        // );
+        dispatch("core/notices").createNotice(
+          "success",
+          "Your settings have been saved!",
+          { type: "snackbar" }
+        );
         setNotice({
           status: "success",
           message: __("Settings saved successfully!", "mtphr-settings"),

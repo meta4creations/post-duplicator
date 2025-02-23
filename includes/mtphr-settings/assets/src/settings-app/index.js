@@ -1,8 +1,7 @@
 import { __ } from "@wordpress/i18n";
 const { createRoot, render } = wp.element; // We're using wp.element here!
 import App from "./App";
-import { exposeRegistry } from "./utils/ComponentRegistry";
-import "./utils/RegisterComponents";
+import "./utils/RegisterComponents"; // Ensure components are registered
 import "./css/app.scss";
 
 // Get the root element
@@ -14,8 +13,6 @@ if (rootElement) {
   const settingsTitle = rootElement.dataset.title
     ? rootElement.dataset.title
     : __("Settings", "mtphr-settings");
-
-  exposeRegistry(settingsId);
 
   if (createRoot) {
     createRoot(rootElement).render(

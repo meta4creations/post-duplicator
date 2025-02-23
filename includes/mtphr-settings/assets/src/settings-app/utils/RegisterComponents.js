@@ -1,4 +1,5 @@
-import { registerComponent } from "./ComponentRegistry";
+const { registerComponent } = window.mtphrSettingsRegistry || {};
+
 import ButtonInput from "../fields/ButtonInput";
 import ButtonsField from "../fields/ButtonsField";
 import CheckboxInput from "../fields/CheckboxInput";
@@ -18,20 +19,22 @@ import TextAreaInput from "../fields/TextAreaInput";
 import TextInput from "../fields/TextInput";
 
 // Register built-in components
-registerComponent("button", ButtonInput);
-registerComponent("buttons", ButtonsField);
-registerComponent("color", ColorInput);
-registerComponent("checkbox", CheckboxInput);
-registerComponent("checkboxes", CheckboxesInput);
-registerComponent("edd_license", EddLicenseInput);
-registerComponent("group", GroupField);
-registerComponent("heading", HeadingField);
-registerComponent("mapping", MappingField);
-registerComponent("number", NumberInput);
-registerComponent("radio_buttons", RadioButtonsInput);
-registerComponent("select", SelectInput);
-registerComponent("spacer", SpacerField);
-registerComponent("html", CustomHTMLInput);
-registerComponent("tabs", TabsField);
-registerComponent("text", TextInput);
-registerComponent("textarea", TextAreaInput);
+if (registerComponent) {
+  registerComponent("button", ButtonInput);
+  registerComponent("buttons", ButtonsField);
+  registerComponent("color", ColorInput);
+  registerComponent("checkbox", CheckboxInput);
+  registerComponent("checkboxes", CheckboxesInput);
+  registerComponent("edd_license", EddLicenseInput);
+  registerComponent("group", GroupField);
+  registerComponent("heading", HeadingField);
+  registerComponent("mapping", MappingField);
+  registerComponent("number", NumberInput);
+  registerComponent("radio_buttons", RadioButtonsInput);
+  registerComponent("select", SelectInput);
+  registerComponent("spacer", SpacerField);
+  registerComponent("html", CustomHTMLInput);
+  registerComponent("tabs", TabsField);
+  registerComponent("text", TextInput);
+  registerComponent("textarea", TextAreaInput);
+}

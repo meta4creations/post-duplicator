@@ -6,7 +6,7 @@ const CustomHTMLInput = ({ field }) => {
   const { baseControlProps } = useBaseControlProps(field);
 
   return (
-    <BaseControl {...baseControlProps}>
+    <BaseControl {...baseControlProps} __nextHasNoMarginBottom>
       <div dangerouslySetInnerHTML={{ __html: std }} />
     </BaseControl>
   );

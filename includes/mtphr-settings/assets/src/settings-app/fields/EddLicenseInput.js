@@ -147,7 +147,7 @@ const EddLicenseInput = ({
   const { baseControlProps, controlProps } = useBaseControlProps(field);
 
   return (
-    <BaseControl {...baseControlProps}>
+    <BaseControl {...baseControlProps} __nextHasNoMarginBottom>
       <VStack>
         <HStack alignment="left">
           <Text>{`Status: ${licenseData.license}`}</Text>

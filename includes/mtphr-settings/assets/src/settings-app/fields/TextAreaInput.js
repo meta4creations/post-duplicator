@@ -31,6 +31,7 @@ const TextAreaInput = ({ field, value, settingsOption, onChange }) => {
       rows={rows}
       suffix={suffix}
       value={value}
+      __nextHasNoMarginBottom
     />
   );
 };

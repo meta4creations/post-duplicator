@@ -3,6 +3,8 @@ import {
   BaseControl,
   CheckboxControl,
   useBaseControlProps,
+  __experimentalHStack as HStack,
+  __experimentalVStack as VStack,
 } from "@wordpress/components";
 
 const CheckboxesInput = ({ field, value, settingsOption, onChange }) => {
@@ -24,7 +26,7 @@ const CheckboxesInput = ({ field, value, settingsOption, onChange }) => {
 
   return (
     <BaseControl {...baseControlProps} __nextHasNoMarginBottom>
-      <fieldset>
+      <VStack>
         {Object.entries(choices).map(([choice, choiceLabel]) => (
           <CheckboxControl
             key={choice}
@@ -32,9 +34,10 @@ const CheckboxesInput = ({ field, value, settingsOption, onChange }) => {
             checked={value && value.includes(choice)}
             onChange={(checked) => onChangeHandler(checked, choice)}
             disabled={disabled}
+            __nextHasNoMarginBottom
           />
         ))}
-      </fieldset>
+      </VStack>
     </BaseControl>
   );
 };

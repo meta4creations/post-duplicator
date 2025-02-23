@@ -41,7 +41,7 @@ const ColorInput = ({ field, value = [], settingsOption, onChange }) => {
   // Function to remove a color from the list
   const removeColor = (index) => {
     const updatedValues = value.filter((_, i) => i !== index);
-    onChange({ id, value: updatedValues });
+    onChange({ id, value: updatedValues, settingsOption });
 
     // Adjust the colorIndex if necessary
     if (colorIndex === index) {
@@ -51,10 +51,10 @@ const ColorInput = ({ field, value = [], settingsOption, onChange }) => {
     }
   };
 
-  const { baseControlProps, controlProps } = useBaseControlProps(field);
+  const { baseControlProps } = useBaseControlProps(field);
 
   return (
-    <BaseControl {...baseControlProps}>
+    <BaseControl {...baseControlProps} __nextHasNoMarginBottom>
       {/* Display the list of color swatches */}
       <div
         style={{

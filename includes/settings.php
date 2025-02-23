@@ -4,70 +4,105 @@ namespace Mtphr\PostDuplicator;
 // Update the namespace in the index.php after every update!!!
 require_once __DIR__ . '/mtphr-settings/index.php';
 
+add_action( 'init', __NAMESPACE__ . '\init_fields' );
+
 /**
  * Get things started
  * Add a custom function name for your settings to differentiate from other settings
  */
-function MTPHR_POSTDUPLICATOR_SETTINGS() {
+function SETTINGS() {
 	return Settings::instance();
 }
-MTPHR_POSTDUPLICATOR_SETTINGS();
+SETTINGS();
+
+// Initialize the settings
+SETTINGS()->init( [
+  'id' => 'postDuplicator',
+  'textdomain' => 'post-duplicator',
+  'settings_dir' => MTPHR_POST_DUPLICATOR_DIR . 'includes/mtphr-settings',
+  'settings_url' => MTPHR_POST_DUPLICATOR_URL . 'includes/mtphr-settings',
+] );
+
+// Add an admin page for your settings page
+SETTINGS()->add_admin_page( [
+  'page_title' => esc_html__( 'Post Duplicator Settings', 'post-duplicator' ),
+  'menu_title' => esc_html__( 'Post Duplicator', 'post-duplicator' ),
+  'capability' => 'manage_options',
+  'menu_slug'  => 'mtphr_post_duplicator_settings_menu', 
+  'parent_slug' => 'tools.php',
+  'position' => 25,
+] );
+
+// Add setting sections.
+SETTINGS()->add_section( [
+  'id' => 'defaults',
+  'slug' => 'defaults',
+  'label' => __( 'Defaults', 'post-duplicator' ),
+  'option' => 'mtphr_post_duplicator_settings',
+  'menu_slug' => 'mtphr_post_duplicator_settings_menu',
+  'parent_slug' => 'tools.php',
+] );
+
+SETTINGS()->add_section( [
+  'id' => 'permissions',
+  'slug' => 'permissions',
+  'label' => __( 'Permissions', 'post-duplicator' ),
+  'option' => 'disabled',
+  'menu_slug' => 'mtphr_post_duplicator_settings_menu',
+  'parent_slug' => 'tools.php',
+] );
+
+SETTINGS()->add_section( [
+  'id' => 'advanced',
+  'slug' => 'advanced',
+  'label' => __( 'Advanced', 'post-duplicator' ),
+  'option' => 'mtphr_post_duplicator_settings',
+  'menu_slug' => 'mtphr_post_duplicator_settings_menu',
+  'parent_slug' => 'tools.php',
+] );
+
+// Add default values
+SETTINGS()->add_default_values( 'mtphr_post_duplicator_settings', [
+  'status' => 'draft',
+  'type' => 'same',
+  'post_author' => 'current_user',
+  'timestamp' => 'current',
+  'title' => esc_html__( 'Copy', 'post-duplicator' ),
+  'slug' => esc_html__( 'copy', 'post-duplicator' ),
+  'time_offset_days' => (int) 0,
+  'time_offset_hours' => (int) 0,
+  'time_offset_minutes' => (int) 0,
+  'time_offset_seconds' => (int) 0,
+  'time_offset_direction' => 'newer',
+  'duplicate_other_draft' => 'enabled',
+  'duplicate_other_pending' => 'enabled',
+  'duplicate_other_private' => 'enabled',
+  'duplicate_other_password' => 'enabled',
+  'duplicate_other_future' => 'enabled',
+] );
+SETTINGS()->add_default_values( 'disabled',
+  user_roles_and_capabilities( 'defaults' )
+);
+
+// Add sanitize settings
+SETTINGS()->add_sanitize_settings( 'mtphr_post_duplicator_settings', [
+  'time_offset' => 'boolval',
+  'time_offset_days' => 'intval',
+  'time_offset_hours' => 'intval',
+  'time_offset_minutes' => 'intval',
+  'time_offset_seconds' => 'intval',
+] );
+SETTINGS()->add_sanitize_settings( 'disabled',
+  user_roles_and_capabilities( 'sanitizers' )
+);
 
 /**
  * Initialize the settings
  */
-function init_settings() {
-
-  //delete_option( 'disabled' );
-
-  // Initialize the settings
-  MTPHR_POSTDUPLICATOR_SETTINGS()->init( [
-    'id' => 'postDuplicator',
-    'textdomain' => 'post-duplicator',
-    'settings_dir' => MTPHR_POST_DUPLICATOR_DIR . 'includes/mtphr-settings',
-    'settings_url' => MTPHR_POST_DUPLICATOR_URL . 'includes/mtphr-settings',
-  ] );
-  
-  // Add an admin page for your settings page
-  MTPHR_POSTDUPLICATOR_SETTINGS()->add_admin_page( [
-    'page_title' => esc_html__( 'Post Duplicator Settings', 'post-duplicator' ),
-    'menu_title' => esc_html__( 'Post Duplicator', 'post-duplicator' ),
-    'capability' => 'manage_options',
-    'menu_slug'  => 'mtphr_post_duplicator_settings_menu', 
-    'parent_slug' => 'tools.php',
-    'position' => 25,
-  ] );
-
-  // Add setting sections.
-  MTPHR_POSTDUPLICATOR_SETTINGS()->add_section( [
-    'id' => 'defaults',
-    'slug' => 'defaults',
-    'label' => __( 'Defaults', 'post-duplicator' ),
-    'option' => 'mtphr_post_duplicator_settings',
-    'menu_slug' => 'mtphr_post_duplicator_settings_menu',
-    'parent_slug' => 'tools.php',
-  ] );
-
-  MTPHR_POSTDUPLICATOR_SETTINGS()->add_section( [
-    'id' => 'permissions',
-    'slug' => 'permissions',
-    'label' => __( 'Permissions', 'post-duplicator' ),
-    'option' => 'disabled',
-    'menu_slug' => 'mtphr_post_duplicator_settings_menu',
-    'parent_slug' => 'tools.php',
-  ] );
-
-  MTPHR_POSTDUPLICATOR_SETTINGS()->add_section( [
-    'id' => 'advanced',
-    'slug' => 'advanced',
-    'label' => __( 'Advanced', 'post-duplicator' ),
-    'option' => 'mtphr_post_duplicator_settings',
-    'menu_slug' => 'mtphr_post_duplicator_settings_menu',
-    'parent_slug' => 'tools.php',
-  ] );
+function init_fields() {
 
   // Add some settings
-  MTPHR_POSTDUPLICATOR_SETTINGS()->add_settings( [
+  SETTINGS()->add_fields( [
     'section' => 'defaults',
     'fields' => [
       [
@@ -84,14 +119,12 @@ function init_settings() {
 			    'publish' => esc_html__( 'Published', 'post-duplicator' ),
 			    'pending' => esc_html__( 'Pending', 'post-duplicator' )	
         ],
-        'default' => 'draft',
       ],
       [
         'type'    => 'select',
         'id'      => 'type',
         'label'   => __( 'Post Type', 'post-duplicator' ),
         'choices' => duplicator_post_types(),
-        'default' => 'same',
       ],
       [
         'type'    => 'radio_buttons',
@@ -102,7 +135,6 @@ function init_settings() {
 			    'original_user' => esc_html__( 'Original Post Author', 'post-duplicator' ),
         ],
         'inline' => true,
-        'default' => 'current_user',
       ],
       [
         'type'    => 'radio_buttons',
@@ -113,21 +145,18 @@ function init_settings() {
 			    'current' => esc_html__( 'Current Time', 'post-duplicator' )
         ],
         'inline' => true,
-        'default' => 'current',
       ],
       [
         'type'    => 'text',
         'id'      => 'title',
         'label'   => __( 'Duplicate Title', 'post-duplicator' ),
         'help'    => esc_html__( "String that should be appended to the duplicate post's title", 'post-duplicator' ),
-        'default' => esc_html__( 'Copy', 'post-duplicator' ),
       ],
       [
         'type'    => 'text',
         'id'      => 'slug',
         'label'   => __( 'Duplicate Slug', 'post-duplicator' ),
         'help'    => esc_html__( "String that should be appended to the duplicate post's slug", 'post-duplicator' ),
-        'default' => esc_html__( 'copy', 'post-duplicator' ),
       ],
       [
         'type'    => 'checkbox',
@@ -144,32 +173,24 @@ function init_settings() {
             'id'      => 'time_offset_days',
             'label'   => __( 'Days', 'post-duplicator' ),
             'min'     => (int) 0,
-            'default' => (int) 0,
-            'sanitize' => 'intval',
           ],
           [
             'type'    => 'number',
             'id'      => 'time_offset_hours',
             'label'   => __( 'Hours', 'post-duplicator' ),
             'min'     => (int) 0,
-            'default' => (int) 0,
-            'sanitize' => 'intval',
           ],
           [
             'type'    => 'number',
             'id'      => 'time_offset_minutes',
             'label'   => __( 'Minutes', 'post-duplicator' ),
             'min'     => (int) 0,
-            'default' => (int) 0,
-            'sanitize' => 'intval',
           ],
           [
             'type'    => 'number',
             'id'      => 'time_offset_seconds',
             'label'   => __( 'Seconds', 'post-duplicator' ),
             'min'     => (int) 0,
-            'default' => (int) 0,
-            'sanitize' => 'intval',
           ],
         ],
         'show'    => [
@@ -186,7 +207,6 @@ function init_settings() {
           'newer' => esc_html__( 'Newer', 'post-duplicator' ),
           'older' => esc_html__( 'Older', 'post-duplicator' )
         ],
-        'default' => 'newer',
         'inline' => true,
         'show'    => [
           'id' => 'time_offset',
@@ -197,7 +217,7 @@ function init_settings() {
     ],
   ] );
 
-  MTPHR_POSTDUPLICATOR_SETTINGS()->add_settings( [
+  SETTINGS()->add_fields( [
     'section' => 'advanced',
     'fields' => [
       [
@@ -215,7 +235,6 @@ function init_settings() {
           'enabled' => esc_html__( 'Enabled', 'post-duplicator' ),
         ],
         'inline' => true,
-        'default' => 'enabled',
       ],
       [
         'type'    => 'radio_buttons',
@@ -227,7 +246,6 @@ function init_settings() {
           'enabled' => esc_html__( 'Enabled', 'post-duplicator' ),
         ],
         'inline' => true,
-        'default' => 'enabled',
       ],
       [
         'type'    => 'radio_buttons',
@@ -239,7 +257,6 @@ function init_settings() {
           'enabled' => esc_html__( 'Enabled', 'post-duplicator' ),
         ],
         'inline' => true,
-        'default' => 'enabled',
       ],
       [
         'type'    => 'radio_buttons',
@@ -251,7 +268,6 @@ function init_settings() {
           'enabled' => esc_html__( 'Enabled', 'post-duplicator' ),
         ],
         'inline' => true,
-        'default' => 'enabled',
       ],
       [
         'type'    => 'radio_buttons',
@@ -263,16 +279,14 @@ function init_settings() {
           'enabled' => esc_html__( 'Enabled', 'post-duplicator' ),
         ],
         'inline' => true,
-        'default' => 'enabled',
       ],
     ],
   ] );
 
-  MTPHR_POSTDUPLICATOR_SETTINGS()->add_settings( [
+  SETTINGS()->add_fields( [
     'section' => 'permissions',
     'fields'  => [
       [
-        'id' 		    => 'permissions',
         'label'     => esc_html__( 'Permissions', 'post-duplicator' ),
         'type'      => 'group',
         'direction' => 'column',
@@ -281,17 +295,15 @@ function init_settings() {
     ],
   ] );
 
-  $get_values = MTPHR_POSTDUPLICATOR_SETTINGS()->get_default_values();
-  //echo '<pre>';print_r($get_values);echo '</pre>';
+  $values = SETTINGS()->get_values();
 }
-add_action( 'init', __NAMESPACE__ . '\init_settings' );
 
 /**
  * Return settings
  */
 function get_option_value( $setting = false, $option = 'mtphr_post_duplicator_settings' ) {
   
-  if ( $values = MTPHR_POSTDUPLICATOR_SETTINGS()->get_option_values( $option ) ) {
+  if ( $values = SETTINGS()->get_option_values( $option ) ) {
     if ( $setting ) {
       if ( isset( $values[$setting] ) ) {
         return $values[$setting];
@@ -305,30 +317,38 @@ function get_option_value( $setting = false, $option = 'mtphr_post_duplicator_se
 /**
  * Return user roles and capabilities
  */
-function user_roles_and_capabilities() {
+function user_roles_and_capabilities( $type = '' ) {
   $wp_roles_instance = wp_roles();
   $all_roles = $wp_roles_instance->roles;
   $fields = [];
+  $defaults = [];
+  $sanitize = [];
 
   $capabilities = get_capabilities();
   $active_capabilities = get_active_capabilities();
 
   foreach ($all_roles as $role_key => $role) {
     $role_capabilities = $capabilities;
-    $role_group = [
+    $checkboxes = [
       'id' 		    => $role_key,
       'label'     => sprintf( esc_html__( '%s Permissions', 'post-duplicator' ), $role['name'] ),
       'type'      => 'checkboxes',
       'inline'    => false,
       'choices'   => $role_capabilities,
-      'default'   => $active_capabilities[$role_key],
       'noupdate'  => true,
-      'sanitize'  => __NAMESPACE__ . '\update_capabilities',
     ];
-    $fields[] = $role_group;
+    $fields[] = $checkboxes;
+    $defaults[$role_key] = $active_capabilities[$role_key];
+    $sanitize[$role_key] = __NAMESPACE__ . '\update_capabilities';
   }
 
-  return $fields;
+  if ( 'defaults' == $type ) {
+    return $defaults;
+  } elseif( 'sanitizers' == $type ) {
+    return $sanitize;
+  } else {
+    return $fields;
+  }
 }
 
 /**

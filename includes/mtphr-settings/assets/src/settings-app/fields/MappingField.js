@@ -2,6 +2,7 @@ import {
   BaseControl,
   SelectControl,
   __experimentalHStack as HStack,
+  __experimentalVStack as VStack,
 } from "@wordpress/components";
 import { useState } from "@wordpress/element";
 
@@ -51,30 +52,33 @@ const MappingField = ({ field, value = {}, settingsOption, onChange }) => {
     }));
 
   return (
-    <BaseControl label={label} help={help} id={id}>
-      {mappedValues.map((item) => (
-        <HStack
-          key={item.tag}
-          spacing="10px"
-          className="mapping-field-row"
-          alignment="left"
-        >
-          <div className="mapping-field-label" style={{ flex: 1 }}>
-            {item.label}
-          </div>
-          <div className="mapping-field-select" style={{ flex: 2 }}>
-            <SelectControl
-              value={item.value}
-              options={[
-                { value: "", label: "-- Select --", disabled: false },
-                ...availableChoices(item.value),
-              ]}
-              onChange={(value) => handleSelectChange(value, item.tag)}
-              disabled={disabled}
-            />
-          </div>
-        </HStack>
-      ))}
+    <BaseControl label={label} help={help} id={id} __nextHasNoMarginBottom>
+      <VStack>
+        {mappedValues.map((item) => (
+          <HStack
+            key={item.tag}
+            spacing="10px"
+            className="mapping-field-row"
+            alignment="left"
+          >
+            <div className="mapping-field-label" style={{ flex: 1 }}>
+              {item.label}
+            </div>
+            <div className="mapping-field-select" style={{ flex: 2 }}>
+              <SelectControl
+                value={item.value}
+                options={[
+                  { value: "", label: "-- Select --", disabled: false },
+                  ...availableChoices(item.value),
+                ]}
+                onChange={(value) => handleSelectChange(value, item.tag)}
+                disabled={disabled}
+                __nextHasNoMarginBottom
+              />
+            </div>
+          </HStack>
+        ))}
+      </VStack>
     </BaseControl>
   );
 };

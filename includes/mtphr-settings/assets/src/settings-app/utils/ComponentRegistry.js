@@ -1,3 +1,4 @@
+// Global Component Registry
 const componentRegistry = {};
 
 /**
@@ -15,17 +16,11 @@ export const registerComponent = (type, component) => {
  * @returns {React.Component} - The registered component.
  */
 export const getComponent = (type) => {
-  return componentRegistry[type];
+  return componentRegistry[type] || null;
 };
 
-/**
- * Expose the registerComponent function globally with a given namespace.
- * @param {string} namespace - The unique global namespace to use.
- */
-export const exposeRegistry = (namespace) => {
-  if (!namespace || typeof namespace !== "string") {
-    throw new Error("A valid namespace string must be provided.");
-  }
-  window[namespace] = window[namespace] || {};
-  window[namespace].registerComponent = registerComponent;
+// Expose globally
+window.mtphrSettingsRegistry = {
+  registerComponent,
+  getComponent,
 };

@@ -23,6 +23,7 @@ var customConfig = {
   ...defaultConfig,
   entry: {
     mtphrSettings: "./src/settings-app/index.js",
+    mtphrSettingsRegistry: "./src/settings-app/utils/ComponentRegistry.js",
   },
   output: {
     filename: "[name].js",

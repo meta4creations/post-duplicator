@@ -7,7 +7,8 @@ import {
   Notice,
   __experimentalHeading as Heading,
 } from "@wordpress/components";
-import { getComponent } from "../utils/ComponentRegistry";
+
+const { getComponent } = window.mtphrSettingsRegistry || {};
 
 const Field = ({
   field,
