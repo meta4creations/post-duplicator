@@ -99,7 +99,7 @@ export default ({ settingsId, settingsTitle }) => {
   });
 
   // Prepare tabs for the TabPanel component
-  const tabs = enabledSections.map((section) => ({
+  const tabs = enabledSections.map((section, index) => ({
     id: section.id,
     name: section.slug,
     title: section.label,
@@ -215,29 +215,34 @@ export default ({ settingsId, settingsTitle }) => {
         </div>
         <CardBody className={`mtphrSettings__form`}>
           <TabPanel
-            className={`mtphrSettings__tabs`}
+            className="mtphrSettings__tabs"
             activeClass="is-active"
             tabs={tabs}
             initialTabName={activeTab}
-            onSelect={(tabName) => {
-              setActiveTab(tabName);
-            }}
+            onSelect={(tabName) => setActiveTab(tabName)}
           >
             {(tab) => {
               const currentSection = enabledSections.find(
                 (section) => section.id === tab.id
               );
+
+              if (!currentSection) return null;
+
               return (
-                <div className={`mtphrSettings__section`}>
-                  {currentSection.fields.map((field) => {
+                <div
+                  className="mtphrSettings__section"
+                  key={`tab-panel-${tab.id}`}
+                >
+                  {currentSection.fields.map((field, fieldIndex) => {
                     const settingsOption = field.option;
                     const fieldId = field.id;
+
                     if (!shouldRenderField(field, values[settingsOption]))
-                      return null; // Don't render if conditions fail
+                      return null;
 
                     return (
                       <Field
-                        key={fieldId}
+                        key={`field-${fieldId}-${settingsOption}-${fieldIndex}`} // Ensure unique key
                         field={field}
                         value={values[settingsOption][fieldId] || ""}
                         onChange={handleInputChange}
