@@ -4,7 +4,7 @@ Tags: posts, post, duplicate, duplication
 Requires at least: 5.0
 Requires PHP: 7.4
 Tested up to: 6.7.2
-Stable tag: 2.43
+Stable tag: 2.44
 License: GPL2
 
 Creates functionality to duplicate any and all post types, including taxonomies & custom fields.
@@ -41,6 +41,9 @@ Check out the 'Installation' tab.
 2. View of the settings page
 
 == Changelog ==
+
+= 2.44 [2025-02-25] =
+* Minor bug cleanup
 
 = 2.43 [2025-02-23] =
 * Default setting updates
@@ -206,4 +209,4 @@ Must upgrade in order for the plugin to work. The file paths where initially wro
 
 == Upgrade Notice ==
 
-Settings and permission updates
+Minor bug cleanup
