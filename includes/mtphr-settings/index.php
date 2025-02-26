@@ -565,7 +565,7 @@ final class Settings {
   }
 
   /**
-   * Add default values
+   * Add sanitize settings
    */
   public function add_sanitize_settings( $option, $values = [] ) {
     $sanitize_settings = self::$instance->sanitize_settings;
@@ -579,6 +579,33 @@ final class Settings {
     self::$instance->sanitize_settings = $sanitize_settings;
 
     return $sanitize_settings;
+  }
+
+  /**
+   * Add encryption settings
+   */
+  public function add_encryption_settings( $option, $values = [] ) {
+    $encryption_settings = self::$instance->encryption_settings;
+    $encryption_option_settings = isset( $encryption_settings[$option] ) ? $encryption_settings[$option] : [];
+    if ( is_array( $values ) && ! empty( $values ) ) {
+      foreach ( $values as $key => $value ) {
+        if ( is_array( $value ) ) {
+          $encryption_option_settings[$key] = [
+            'key_1' => isset( $value['key_1'] ) ? esc_attr( $value['key_1'] ) : self::$instance->encryption_key_1,
+            'key_2' => isset( $value['key_2'] ) ? esc_attr( $value['key_2'] ) : self::$instance->encryption_key_2,
+          ];
+        } elseif ( $value === true || $value === 1 ) {
+          $encryption_option_settings[$key] = [
+            'key_1' => self::$instance->encryption_key_1,
+            'key_2' => self::$instance->encryption_key_2,
+          ];
+        }
+      }
+    }
+    $encryption_settings[$option] = $encryption_option_settings;
+    self::$instance->encryption_settings = $encryption_settings;
+
+    return $encryption_settings;
   }
 
   /**
