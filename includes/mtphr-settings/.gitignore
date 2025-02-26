@@ -2,6 +2,7 @@
 *node_modules*
 composer.lock
 config.codekit3
+assets/build
 /node_modules/
 /logs/
 /reports/
