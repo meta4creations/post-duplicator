@@ -4,7 +4,23 @@ use function Mtphr\PostDuplicator\user_can_duplicate;
 
 // Disable WC product review count
 add_filter( 'mtphr_post_duplicator_meta__wc_review_count_enabled', '__return_false' );
+add_filter( 'plugin_action_links_' . MTPHR_POST_DUPLICATOR_BASENAME, __NAMESPACE__ . '\add_plugin_settings_link' );
 add_action( 'post_submitbox_misc_actions', __NAMESPACE__ . '\duplicator_submitbox' );
+
+
+/**
+ * Add settings link to the plugin screen
+ */
+function add_plugin_settings_link( $links ) {
+  
+  // Define the settings page URL
+  $settings_link = '<a href="' . admin_url( 'options-general.php?page=mtphr_post_duplicator' ). '">'. __( 'Settings', 'post-duplicator' ) . '</a>';
+  
+  // Add the settings link to the beginning of the array
+  array_unshift($links, $settings_link);
+  
+  return $links;
+}
 
 /**
  * Add duplicate post option on the legacy post edit screen

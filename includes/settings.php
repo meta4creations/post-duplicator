@@ -28,8 +28,8 @@ SETTINGS()->add_admin_page( [
   'page_title' => esc_html__( 'Post Duplicator Settings', 'post-duplicator' ),
   'menu_title' => esc_html__( 'Post Duplicator', 'post-duplicator' ),
   'capability' => 'manage_options',
-  'menu_slug'  => 'mtphr_post_duplicator_settings_menu', 
-  'parent_slug' => 'tools.php',
+  'menu_slug'  => 'mtphr_post_duplicator', 
+  'parent_slug' => 'options-general.php',
   'position' => 25,
 ] );
 
@@ -39,8 +39,8 @@ SETTINGS()->add_section( [
   'slug' => 'defaults',
   'label' => __( 'Defaults', 'post-duplicator' ),
   'option' => 'mtphr_post_duplicator_settings',
-  'menu_slug' => 'mtphr_post_duplicator_settings_menu',
-  'parent_slug' => 'tools.php',
+  'menu_slug' => 'mtphr_post_duplicator',
+  'parent_slug' => 'options-general.php',
 ] );
 
 SETTINGS()->add_section( [
@@ -48,8 +48,8 @@ SETTINGS()->add_section( [
   'slug' => 'permissions',
   'label' => __( 'Permissions', 'post-duplicator' ),
   'option' => 'disabled',
-  'menu_slug' => 'mtphr_post_duplicator_settings_menu',
-  'parent_slug' => 'tools.php',
+  'menu_slug' => 'mtphr_post_duplicator',
+  'parent_slug' => 'options-general.php',
 ] );
 
 SETTINGS()->add_section( [
@@ -57,8 +57,8 @@ SETTINGS()->add_section( [
   'slug' => 'advanced',
   'label' => __( 'Advanced', 'post-duplicator' ),
   'option' => 'mtphr_post_duplicator_settings',
-  'menu_slug' => 'mtphr_post_duplicator_settings_menu',
-  'parent_slug' => 'tools.php',
+  'menu_slug' => 'mtphr_post_duplicator',
+  'parent_slug' => 'options-general.php',
 ] );
 
 // Add default values
