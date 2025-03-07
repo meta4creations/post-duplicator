@@ -1,0 +1,57 @@
+{
+    "packages": [
+        {
+            "name": "meta4creations/mtphr-settings",
+            "version": "dev-master",
+            "version_normalized": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:meta4creations/mtphr-settings.git",
+                "reference": "a9787c50b013930ec579c1d164b0d6eccd3bdf16"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/meta4creations/mtphr-settings/zipball/a9787c50b013930ec579c1d164b0d6eccd3bdf16",
+                "reference": "a9787c50b013930ec579c1d164b0d6eccd3bdf16",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.4"
+            },
+            "time": "2025-03-07T16:48:43+00:00",
+            "default-branch": true,
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "YourNamespace\\": "src/"
+                }
+            },
+            "scripts": {
+                "post-install-cmd": [
+                    "@build-assets"
+                ],
+                "post-update-cmd": [
+                    "@build-assets"
+                ],
+                "build-assets": [
+                    "npm install --prefix assets && npm run build --prefix assets"
+                ]
+            },
+            "authors": [
+                {
+                    "name": "Metaphor Creations",
+                    "email": "joe@metaphorcreations.com"
+                }
+            ],
+            "description": "Custom react settings for WordPress",
+            "support": {
+                "source": "https://github.com/meta4creations/mtphr-settings/tree/master",
+                "issues": "https://github.com/meta4creations/mtphr-settings/issues"
+            },
+            "install-path": "../meta4creations/mtphr-settings"
+        }
+    ],
+    "dev": true,
+    "dev-package-names": []
+}

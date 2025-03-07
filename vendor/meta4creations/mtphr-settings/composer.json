@@ -1,0 +1,34 @@
+{
+  "name": "meta4creations/mtphr-settings",
+  "description": "Custom react settings for WordPress",
+  "type": "library",
+  "authors": [
+    {
+      "name": "Metaphor Creations",
+      "email": "joe@metaphorcreations.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "YourNamespace\\": "src/"
+    }
+  },
+  "scripts": {
+    "post-install-cmd": [
+      "@build-assets"
+    ],
+    "post-update-cmd": [
+      "@build-assets"
+    ],
+    "build-assets": [
+      "npm install --prefix assets && npm run build --prefix assets"
+    ]
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "preferred-install": "dist"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "meta4creations/post-duplicator",
+  "description": "Creates functionality to duplicate any and all post types, including taxonomies & custom fields.",
+  "type": "wordpress-plugin",
+  "version": "2.45",
+  "require": {
+    "php": ">=7.4",
+    "meta4creations/mtphr-settings": "dev-master"
+  },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "git@github.com:meta4creations/mtphr-settings.git"
+    }
+  ]
+}

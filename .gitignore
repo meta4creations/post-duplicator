@@ -8,3 +8,4 @@ config.codekit3
 .DS_Store
 .nova
 .npmrc
+includes/mtphr-settings/
