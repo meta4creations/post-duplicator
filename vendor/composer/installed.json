@@ -7,18 +7,18 @@
             "source": {
                 "type": "git",
                 "url": "git@github.com:meta4creations/mtphr-settings.git",
-                "reference": "a9787c50b013930ec579c1d164b0d6eccd3bdf16"
+                "reference": "07de9c1c4e0454f6be12e253b04f1e0092ef5962"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/meta4creations/mtphr-settings/zipball/a9787c50b013930ec579c1d164b0d6eccd3bdf16",
-                "reference": "a9787c50b013930ec579c1d164b0d6eccd3bdf16",
+                "url": "https://api.github.com/repos/meta4creations/mtphr-settings/zipball/07de9c1c4e0454f6be12e253b04f1e0092ef5962",
+                "reference": "07de9c1c4e0454f6be12e253b04f1e0092ef5962",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.4"
             },
-            "time": "2025-03-07T16:48:43+00:00",
+            "time": "2025-03-07T17:33:48+00:00",
             "default-branch": true,
             "type": "library",
             "installation-source": "dist",

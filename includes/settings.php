@@ -24,7 +24,7 @@ function initialize_settings() {
 
   // Add setting sections.
   mtphr_settings_add_section( [
-    'id' => 'defaults',
+    'id' => 'mtphr_post_duplicator_defaults',
     'slug' => 'defaults',
     'label' => __( 'Defaults', 'post-duplicator' ),
     'option' => 'mtphr_post_duplicator_settings',
@@ -33,7 +33,7 @@ function initialize_settings() {
   ] );
 
   mtphr_settings_add_section( [
-    'id' => 'permissions',
+    'id' => 'mtphr_post_duplicator_permissions',
     'slug' => 'permissions',
     'label' => __( 'Permissions', 'post-duplicator' ),
     'option' => 'disabled',
@@ -42,7 +42,7 @@ function initialize_settings() {
   ] );
 
   mtphr_settings_add_section( [
-    'id' => 'advanced',
+    'id' => 'mtphr_post_duplicator_advanced',
     'slug' => 'advanced',
     'label' => __( 'Advanced', 'post-duplicator' ),
     'option' => 'mtphr_post_duplicator_settings',
@@ -93,7 +93,7 @@ function initialize_fields() {
 
   // Add some settings
   mtphr_settings_add_fields( [
-    'section' => 'defaults',
+    'section' => 'mtphr_post_duplicator_defaults',
     'fields' => [
       [
         'type'    => 'heading',
@@ -208,7 +208,19 @@ function initialize_fields() {
   ] );
 
   mtphr_settings_add_fields( [
-    'section' => 'advanced',
+    'section' => 'mtphr_post_duplicator_permissions',
+    'fields'  => [
+      [
+        'label'     => esc_html__( 'Permissions', 'post-duplicator' ),
+        'type'      => 'group',
+        'direction' => 'column',
+        'fields'    => user_roles_and_capabilities(),
+      ]
+    ],
+  ] );
+
+  mtphr_settings_add_fields( [
+    'section' => 'mtphr_post_duplicator_advanced',
     'fields' => [
       [
         'type'    => 'heading',
@@ -270,18 +282,6 @@ function initialize_fields() {
         ],
         'inline' => true,
       ],
-    ],
-  ] );
-
-  mtphr_settings_add_fields( [
-    'section' => 'permissions',
-    'fields'  => [
-      [
-        'label'     => esc_html__( 'Permissions', 'post-duplicator' ),
-        'type'      => 'group',
-        'direction' => 'column',
-        'fields'    => user_roles_and_capabilities(),
-      ]
     ],
   ] );
 }

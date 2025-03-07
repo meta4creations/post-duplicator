@@ -13,7 +13,7 @@
         'meta4creations/mtphr-settings' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => 'a9787c50b013930ec579c1d164b0d6eccd3bdf16',
+            'reference' => '07de9c1c4e0454f6be12e253b04f1e0092ef5962',
             'type' => 'library',
             'install_path' => __DIR__ . '/../meta4creations/mtphr-settings',
             'aliases' => array(

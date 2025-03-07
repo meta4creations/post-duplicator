@@ -24,6 +24,7 @@ final class Settings {
   private $encryption_settings = [];
   private $type_settings = [];
   private $noupdate_settings = [];
+  private $admin_notices = [];
   private $default_sanitizer = 'wp_kses_post';
   private $encryption_key_1 = '7Q@_DvLVTiHPEA';
   private $encryption_key_2 = 'YgM2iCX-BtoBpJ';
@@ -37,6 +38,7 @@ final class Settings {
       add_action( 'admin_menu', array( self::$instance, 'create_admin_pages' ) );
       add_action( 'admin_enqueue_scripts', array( self::$instance, 'enqueue_scripts' ) );
       add_action( 'rest_api_init', array( self::$instance, 'register_routes' ) );
+      add_action( 'admin_notices', array( self::$instance, 'admin_notices' ) );
 
       list( $path, $url ) = self::$instance->get_path( dirname( dirname( __FILE__ ) ) );
       self::$instance->settings_dir = $path . 'mtphr-settings/';
@@ -268,6 +270,15 @@ final class Settings {
     if ( ! isset( $section['id'] ) || ! isset( $section['slug'] ) || ! isset( $section['menu_slug'] ) ) {
       return false;
     }
+
+    // Check if a section with the same ID already exists
+    $ids = array_column( $sections, 'id' ); // Extract all existing IDs
+    if ( in_array( $section['id'], $ids ) ) {
+      $message = "<p><strong>{$section['id']}</strong> can not be added for <strong>{$section['menu_slug']}</strong>. This section id is already being used with mtphr-settings.</p>";
+      self::$instance->add_admin_notice( 'error', $message );
+      return false;
+    }
+
     if ( ! isset( $section['label'] ) ) {
       $section['label'] = ucfirst( $section['id'] );
     }
@@ -1239,5 +1250,36 @@ final class Settings {
     // Attempt to JSON-decode the result to restore arrays if originally encrypted from an array
     $decoded = json_decode( $output, true );
     return (json_last_error() === JSON_ERROR_NONE) ? $decoded : $output;
+  }
+
+  private function get_admin_notices() {
+    $admin_notices = self::$instance->admin_notices;
+    if ( ! is_array( $admin_notices ) ) {
+      return [];
+    }
+    return $admin_notices;
+  }
+
+  private function add_admin_notice( $type, $message ) {
+    $admin_notices = self::$instance->get_admin_notices();
+    $admin_notices[] = [
+      'type' => $type,
+      'message' => $message,
+    ];
+    self::$instance->admin_notices = $admin_notices;
+  }
+
+  /**
+   * Display admin notices
+   */
+  public function admin_notices() {
+    $admin_notices = self::$instance->get_admin_notices();
+    if ( is_array( $admin_notices ) && ! empty( $admin_notices ) ) {
+      foreach ( $admin_notices as $notice ) {
+        echo '<div class="' . $notice['type'] . '">';
+          echo wp_kses_post( $notice['message'] );
+        echo '</div>';
+      }
+    }
   }
 }
