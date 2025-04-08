@@ -4,9 +4,9 @@ use Mtphr\Settings;
 if ( ! function_exists( 'MTPHR_SETTINGS' ) ) {
   require_once __DIR__ . '/settings-class.php';
 
-  add_action( 'plugins_loaded', __NAMESPACE__ . 'initialize_settings' );
-  add_action( 'rest_api_init', __NAMESPACE__ . 'initialize_settings' );
-  add_action( 'init', __NAMESPACE__ . 'initialize_fields' );
+  add_action( 'plugins_loaded', 'mtphr_settings_initialize_settings', 1 );
+  add_action( 'rest_api_init', 'mtphr_settings_initialize_settings', 1 );
+  add_action( 'init', 'mtphr_settings_initialize_fields' );
 
   /**
    * Get things started
@@ -20,15 +20,28 @@ if ( ! function_exists( 'MTPHR_SETTINGS' ) ) {
   /**
    * Let other scripts know the settings are ready
    */
-  function initialize_settings() {
-    do_action( 'mtphrSettings/init_settings' );
+  function mtphr_settings_initialize_settings() {
+    if ( ! MTPHR_SETTINGS()->get_settings_ready() ) { 
+      do_action( 'mtphrSettings/init_settings' );
+      MTPHR_SETTINGS()->set_settings_ready( true );
+    }
   }
 
   /**
    * Let other scripts know they can initialize fields
    */
-  function initialize_fields() {
-    do_action( 'mtphrSettings/init_fields' );
+  function mtphr_settings_initialize_fields() {
+    if ( ! MTPHR_SETTINGS()->get_fields_ready() ) { 
+      do_action( 'mtphrSettings/init_fields' );
+      MTPHR_SETTINGS()->set_fields_ready( true );
+    }
+  }
+
+  /**
+   * Let other scripts know they can initialize fields
+   */
+  function mtphr_settings_ready() {
+    return MTPHR_SETTINGS()->get_settings_ready();
   }
 
   /**

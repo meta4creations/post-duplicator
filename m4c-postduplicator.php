@@ -2,7 +2,7 @@
 /*
 Plugin Name: Post Duplicator
 Description: Creates functionality to duplicate any and all post types, including taxonomies & custom fields
-Version: 2.45
+Version: 2.46
 Author: Metaphor Creations
 Author URI: http://www.metaphorcreations.com
 License:           GPL-2.0+
@@ -35,7 +35,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // Plugin version.
 if ( ! defined( 'MTPHR_POST_DUPLICATOR_VERSION' ) ) {
-	define( 'MTPHR_POST_DUPLICATOR_VERSION', '2.45' );
+	define( 'MTPHR_POST_DUPLICATOR_VERSION', '2.46' );
 }
 
 // Plugin Folder Path.
@@ -81,12 +81,12 @@ require_once MTPHR_POST_DUPLICATOR_DIR . 'vendor/meta4creations/mtphr-settings/i
 //require_once MTPHR_POST_DUPLICATOR_DIR . 'includes/mtphr-settings/index.php';
 
 require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/api.php' );
+require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/hooks.php' );
 require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/install.php' );
 require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/settings.php' );
 require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/helpers.php' );
 
-if ( is_admin() ) {
-  require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/hooks.php' );
+if ( is_admin() ) { 
 	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/scripts.php' );
 	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/edit.php' );
 	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/notices.php' );

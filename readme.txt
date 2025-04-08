@@ -4,7 +4,7 @@ Tags: posts, post, duplicate, duplication
 Requires at least: 5.0
 Requires PHP: 7.4
 Tested up to: 6.7.2
-Stable tag: 2.45
+Stable tag: 2.46
 License: GPL2
 
 Creates functionality to duplicate any and all post types, including taxonomies & custom fields.
@@ -41,6 +41,9 @@ Check out the 'Installation' tab.
 2. View of the settings page
 
 == Changelog ==
+
+= 2.46 [2025-04-07] =
+* Resolved issue with WPML duplication
 
 = 2.45 [2025-03-04] =
 * Moved settings page to settings menu
@@ -213,4 +216,4 @@ Must upgrade in order for the plugin to work. The file paths where initially wro
 
 == Upgrade Notice ==
 
-Settings location update
+Resolved issue with WPML duplication

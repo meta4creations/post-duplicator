@@ -1,8 +1,8 @@
 <?php return array(
     'root' => array(
         'name' => 'meta4creations/post-duplicator',
-        'pretty_version' => '2.45',
-        'version' => '2.45.0.0',
+        'pretty_version' => '2.46',
+        'version' => '2.46.0.0',
         'reference' => null,
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
@@ -11,19 +11,17 @@
     ),
     'versions' => array(
         'meta4creations/mtphr-settings' => array(
-            'pretty_version' => 'dev-master',
-            'version' => 'dev-master',
-            'reference' => '07de9c1c4e0454f6be12e253b04f1e0092ef5962',
+            'pretty_version' => '1.0.1',
+            'version' => '1.0.1.0',
+            'reference' => '222dfd410f158c609b0a439215a4a6756138448f',
             'type' => 'library',
             'install_path' => __DIR__ . '/../meta4creations/mtphr-settings',
-            'aliases' => array(
-                0 => '9999999-dev',
-            ),
+            'aliases' => array(),
             'dev_requirement' => false,
         ),
         'meta4creations/post-duplicator' => array(
-            'pretty_version' => '2.45',
-            'version' => '2.45.0.0',
+            'pretty_version' => '2.46',
+            'version' => '2.46.0.0',
             'reference' => null,
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',

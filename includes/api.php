@@ -79,7 +79,7 @@ function duplicate_post( $request ) {
 	$timestamp = ( $settings['timestamp'] == 'duplicate' ) ? strtotime($duplicate['post_date']) : current_time('timestamp',0);
 	$timestamp_gmt = ( $settings['timestamp'] == 'duplicate' ) ? strtotime($duplicate['post_date_gmt']) : current_time('timestamp',1);
 	
-	if( $settings['time_offset'] ) {
+	if( isset( $settings['time_offset'] ) && $settings['time_offset'] ) {
 		$offset = intval($settings['time_offset_seconds']+$settings['time_offset_minutes']*60+$settings['time_offset_hours']*3600+$settings['time_offset_days']*86400);
 		if( $settings['time_offset_direction'] == 'newer' ) {
 			$timestamp = intval($timestamp+$offset);

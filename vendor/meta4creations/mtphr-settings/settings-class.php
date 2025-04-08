@@ -13,6 +13,8 @@ final class Settings {
   private $textdomain = 'mtphr-settings';
   private $settings_dir = '';
   private $settings_url = '';
+  private $settings_ready = false;
+  private $fields_ready = false;
 
   private $admin_pages = [];
   private $options = [];
@@ -88,16 +90,44 @@ final class Settings {
   /**
    * Init settings
    */
-  public function init_settings( $option, $settings ) {
-    if ( ! is_array( $settings ) ) {
-      return false;
-    }
-    if ( is_array( $settings ) && ! empty( $settings ) ) {
-      foreach ( $settings as $setting ) {
-        $setting['option'] = $option;
-        self::$instance->process_setting_data( $setting );
-      }
-    }
+  // public function init_settings( $option, $settings ) {
+  //   if ( ! is_array( $settings ) ) {
+  //     return false;
+  //   }
+  //   if ( is_array( $settings ) && ! empty( $settings ) ) {
+  //     foreach ( $settings as $setting ) {
+  //       $setting['option'] = $option;
+  //       self::$instance->process_setting_data( $setting );
+  //     }
+  //   }
+  // }
+
+  /**
+   * Set the settings ready
+   */
+  public function set_settings_ready( $ready ) {
+    return self::$instance->settings_ready = boolval( $ready );
+  }
+
+  /**
+   * Get the settings ready
+   */
+  public function get_settings_ready() {
+    return self::$instance->settings_ready;
+  }
+
+  /**
+   * Set the fields ready
+   */
+  public function set_fields_ready( $ready ) {
+    return self::$instance->fields_ready = boolval( $ready );
+  }
+
+  /**
+   * Get the fields ready
+   */
+  public function get_fields_ready() {
+    return self::$instance->fields_ready;
   }
 
   /**
