@@ -4,8 +4,8 @@ use Mtphr\Settings;
 if ( ! function_exists( 'MTPHR_SETTINGS' ) ) {
   require_once __DIR__ . '/settings-class.php';
 
-  add_action( 'plugins_loaded', 'mtphr_settings_initialize_settings', 1 );
   add_action( 'rest_api_init', 'mtphr_settings_initialize_settings', 1 );
+  add_action( 'init', 'mtphr_settings_initialize_settings', 1 );
   add_action( 'init', 'mtphr_settings_initialize_fields' );
 
   /**

@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         'meta4creations/mtphr-settings' => array(
-            'pretty_version' => '1.0.1',
-            'version' => '1.0.1.0',
-            'reference' => '222dfd410f158c609b0a439215a4a6756138448f',
+            'pretty_version' => '1.0.2',
+            'version' => '1.0.2.0',
+            'reference' => '62be6284dce4f92fc42f2714d39366d9a9cfd38b',
             'type' => 'library',
             'install_path' => __DIR__ . '/../meta4creations/mtphr-settings',
             'aliases' => array(),
