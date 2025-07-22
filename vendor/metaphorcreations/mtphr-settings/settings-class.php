@@ -870,9 +870,9 @@ final class Settings {
             $admin_page['menu_title'],
             $admin_page['capability'],
             $admin_page['menu_slug'],
-            function () {
+            function () use ( $admin_page ) {
               echo '<div class="wrap">';
-                echo '<div id="mtphr-settings-app" namespace="' . self::$instance->get_id() . '">Test Page</div>'; // React App will be injected here
+                echo '<div id="mtphr-settings-app" data-id="' . self::$instance->get_id() . '" data-title="' . esc_attr( $admin_page['page_title'] ) . '"></div>'; // React App will be injected here
               echo '</div>';
             },
             isset( $admin_page['icon'] ) ? $admin_page['icon'] : null,

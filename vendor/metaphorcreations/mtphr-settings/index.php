@@ -6,7 +6,7 @@ if ( ! function_exists( 'MTPHR_SETTINGS' ) ) {
 
   add_action( 'rest_api_init', 'mtphr_settings_initialize_settings', 1 );
   add_action( 'init', 'mtphr_settings_initialize_settings', 1 );
-  add_action( 'init', 'mtphr_settings_initialize_fields' );
+  add_action( 'init', 'mtphr_settings_initialize_fields', 20 );
 
   /**
    * Get things started

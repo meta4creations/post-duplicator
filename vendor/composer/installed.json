@@ -7,18 +7,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/metaphorcreations/mtphr-settings.git",
-                "reference": "3ee456f2fd1d9f660331614dcada22dff844611c"
+                "reference": "98e3a1e6139e00d45f0fa8b20c0f358643545cc0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/metaphorcreations/mtphr-settings/zipball/3ee456f2fd1d9f660331614dcada22dff844611c",
-                "reference": "3ee456f2fd1d9f660331614dcada22dff844611c",
+                "url": "https://api.github.com/repos/metaphorcreations/mtphr-settings/zipball/98e3a1e6139e00d45f0fa8b20c0f358643545cc0",
+                "reference": "98e3a1e6139e00d45f0fa8b20c0f358643545cc0",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.4"
             },
-            "time": "2025-07-22T02:25:42+00:00",
+            "time": "2025-07-22T13:47:57+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {

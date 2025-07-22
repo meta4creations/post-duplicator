@@ -3,7 +3,7 @@
         'name' => 'meta4creations/post-duplicator',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => 'cf64105171bcb0d158e4c027158577f9554bd11b',
+        'reference' => '6e56f7d6cadc9d95551a4bfa2754a8949042c2ad',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'meta4creations/post-duplicator' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => 'cf64105171bcb0d158e4c027158577f9554bd11b',
+            'reference' => '6e56f7d6cadc9d95551a4bfa2754a8949042c2ad',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -22,7 +22,7 @@
         'metaphorcreations/mtphr-settings' => array(
             'pretty_version' => '1.0.5',
             'version' => '1.0.5.0',
-            'reference' => '3ee456f2fd1d9f660331614dcada22dff844611c',
+            'reference' => '98e3a1e6139e00d45f0fa8b20c0f358643545cc0',
             'type' => 'library',
             'install_path' => __DIR__ . '/../metaphorcreations/mtphr-settings',
             'aliases' => array(),
