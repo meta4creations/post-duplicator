@@ -909,7 +909,7 @@ final class Settings {
       self::$instance->get_id() . 'Registry',
       self::$instance->settings_url . 'assets/build/mtphrSettingsRegistry.js',
       $asset_file['dependencies'],
-      $asset_file['version'],
+      filemtime( self::$instance->settings_dir . 'assets/build/mtphrSettingsRegistry.js' ),
       true
     );
 
@@ -921,13 +921,13 @@ final class Settings {
       self::$instance->get_id(),
       self::$instance->settings_url . 'assets/build/mtphrSettings.css',
       ['wp-components'],
-      $asset_file['version']
+      filemtime( self::$instance->settings_dir . 'assets/build/mtphrSettings.css' ),
     );
     wp_enqueue_script(
       self::$instance->get_id(),
       self::$instance->settings_url . 'assets/build/mtphrSettings.js',
       array_unique( array_merge( $asset_file['dependencies'], ['wp-element', 'wp-data', 'wp-components', 'wp-notices'] ) ),
-      $asset_file['version'],
+      filemtime( self::$instance->settings_dir . 'assets/build/mtphrSettings.js' ),
       true
     ); 
     wp_add_inline_script( self::$instance->get_id(), self::$instance->get_id() . 'Vars = ' . json_encode( array(

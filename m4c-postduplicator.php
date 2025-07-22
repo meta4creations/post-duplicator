@@ -77,7 +77,7 @@ function mtphr_post_duplicator_localization() {
  * @since 2.27
  */
 require_once MTPHR_POST_DUPLICATOR_DIR . 'vendor/autoload.php';
-require_once MTPHR_POST_DUPLICATOR_DIR . 'vendor/meta4creations/mtphr-settings/index.php';
+require_once MTPHR_POST_DUPLICATOR_DIR . 'vendor/metaphorcreations/mtphr-settings/index.php';
 //require_once MTPHR_POST_DUPLICATOR_DIR . 'includes/mtphr-settings/index.php';
 
 require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/api.php' );

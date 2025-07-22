@@ -4,12 +4,12 @@
   "type": "wordpress-plugin",
   "require": {
     "php": ">=7.4",
-    "meta4creations/mtphr-settings": "v1.0.2"
+    "metaphorcreations/mtphr-settings": "v1.0.5"
   },
   "repositories": [
     {
       "type": "vcs",
-      "url": "git@github.com:meta4creations/mtphr-settings.git"
+      "url": "git@github.com:metaphorcreations/mtphr-settings.git"
     }
   ]
 }

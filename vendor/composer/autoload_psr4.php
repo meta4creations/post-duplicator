@@ -6,5 +6,5 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'YourNamespace\\' => array($vendorDir . '/meta4creations/mtphr-settings/src'),
+    'YourNamespace\\' => array($vendorDir . '/metaphorcreations/mtphr-settings/src'),
 );
