@@ -2,23 +2,23 @@
     "packages": [
         {
             "name": "metaphorcreations/mtphr-settings",
-            "version": "1.0.5",
-            "version_normalized": "1.0.5.0",
+            "version": "1.0.6",
+            "version_normalized": "1.0.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/metaphorcreations/mtphr-settings.git",
-                "reference": "98e3a1e6139e00d45f0fa8b20c0f358643545cc0"
+                "reference": "573f080977a48e5248ff8125b834ada2058f610d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/metaphorcreations/mtphr-settings/zipball/98e3a1e6139e00d45f0fa8b20c0f358643545cc0",
-                "reference": "98e3a1e6139e00d45f0fa8b20c0f358643545cc0",
+                "url": "https://api.github.com/repos/metaphorcreations/mtphr-settings/zipball/573f080977a48e5248ff8125b834ada2058f610d",
+                "reference": "573f080977a48e5248ff8125b834ada2058f610d",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.4"
             },
-            "time": "2025-07-22T13:47:57+00:00",
+            "time": "2025-07-24T23:02:28+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -45,7 +45,7 @@
             ],
             "description": "Custom react settings for WordPress",
             "support": {
-                "source": "https://github.com/metaphorcreations/mtphr-settings/tree/1.0.5",
+                "source": "https://github.com/metaphorcreations/mtphr-settings/tree/1.0.6",
                 "issues": "https://github.com/metaphorcreations/mtphr-settings/issues"
             },
             "install-path": "../metaphorcreations/mtphr-settings"

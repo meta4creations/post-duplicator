@@ -42,6 +42,9 @@ Check out the 'Installation' tab.
 
 == Changelog ==
 
+= 2.48 [2025-07-##] =
+* Mtphr Settings updates
+
 = 2.47 [2025-04-12] =
 * Resolved _load_textdomain_just_in_time warning
 

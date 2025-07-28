@@ -4,7 +4,7 @@
   "type": "wordpress-plugin",
   "require": {
     "php": ">=7.4",
-    "metaphorcreations/mtphr-settings": "v1.0.5"
+    "metaphorcreations/mtphr-settings": "v1.0.6"
   },
   "repositories": [
     {
