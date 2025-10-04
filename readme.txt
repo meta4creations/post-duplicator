@@ -3,8 +3,8 @@ Contributors: metaphorcreations
 Tags: posts, post, duplicate, duplication
 Requires at least: 5.0
 Requires PHP: 7.4
-Tested up to: 6.7.2
-Stable tag: 2.47
+Tested up to: 6.8.3
+Stable tag: 2.48
 License: GPL2
 
 Creates functionality to duplicate any and all post types, including taxonomies & custom fields.
@@ -42,8 +42,9 @@ Check out the 'Installation' tab.
 
 == Changelog ==
 
-= 2.48 [2025-07-##] =
+= 2.48 [2025-10-04] =
 * Mtphr Settings updates
+* Bug fix
 
 = 2.47 [2025-04-12] =
 * Resolved _load_textdomain_just_in_time warning
@@ -222,4 +223,4 @@ Must upgrade in order for the plugin to work. The file paths where initially wro
 
 == Upgrade Notice ==
 
-Resolved _load_textdomain_just_in_time warning
+Mtphr Settings updates and bug fix
