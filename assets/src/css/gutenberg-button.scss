@@ -1,0 +1,50 @@
+.m4c-duplicate-post-status-info {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.m4c-duplicate-post-wrapper {
+  width: 100%;
+  padding: 0;
+}
+
+.m4c-duplicate-post-gutenberg {
+  width: 100%;
+  justify-content: center;
+  background: #007cba;
+  color: #fff;
+  border-color: #007cba;
+  box-shadow: none;
+  text-shadow: none;
+  
+  &:hover,
+  &:focus {
+    background: #006ba1;
+    border-color: #006ba1;
+    color: #fff;
+  }
+
+  &:active {
+    background: #005a87;
+    border-color: #005a87;
+    color: #fff;
+  }
+
+  &:disabled,
+  &[aria-disabled="true"] {
+    background: #007cba;
+    border-color: #007cba;
+    color: #fff;
+    opacity: 0.6;
+  }
+}
+
+.m4c-duplicate-error {
+  margin-top: 8px;
+  padding: 8px;
+  background: #f0f0f0;
+  border-left: 4px solid #d94f4f;
+  color: #d94f4f;
+  font-size: 12px;
+}
+

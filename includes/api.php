@@ -50,12 +50,35 @@ function duplicate_post( $request ) {
 	// Get the post as an array
 	$duplicate = $orig = get_post( $original_id, 'ARRAY_A' );
 		
-	$settings = get_option_value();
+	// Get default settings
+	$default_settings = get_option_value();
 	
-	// Modify some of the elements
-	$appended = isset( $settings['title'] ) ? sanitize_text_field( $settings['title'] ) : esc_html__( 'Copy', 'post-duplicator' );
-	$duplicate['post_title'] = $duplicate['post_title'] . ' ' . $appended;
-	$duplicate['post_name'] = sanitize_title( $duplicate['post_name'] . '-' . $settings['slug'] );
+	// Merge with any override settings from the request
+	// Remove original_id from data to get only settings
+	$override_settings = $data;
+	unset( $override_settings['original_id'] );
+	
+	// Merge: override settings take precedence
+	$settings = array_merge( $default_settings, $override_settings );
+	
+	// Modify the title
+	// If fullTitle is provided (user edited the full title), use it
+	// Otherwise, append the suffix
+	if ( isset( $settings['fullTitle'] ) && ! empty( $settings['fullTitle'] ) ) {
+		$duplicate['post_title'] = sanitize_text_field( $settings['fullTitle'] );
+	} else {
+		$appended = isset( $settings['title'] ) ? sanitize_text_field( $settings['title'] ) : esc_html__( 'Copy', 'post-duplicator' );
+		$duplicate['post_title'] = $duplicate['post_title'] . ' ' . $appended;
+	}
+	
+	// Modify the slug
+	// If fullSlug is provided (user edited the full slug), use it
+	// Otherwise, append the suffix
+	if ( isset( $settings['fullSlug'] ) && ! empty( $settings['fullSlug'] ) ) {
+		$duplicate['post_name'] = sanitize_title( $settings['fullSlug'] );
+	} else {
+		$duplicate['post_name'] = sanitize_title( $duplicate['post_name'] . '-' . $settings['slug'] );
+	}
 	
 	// Set the status
 	if( $settings['status'] != 'same' ) {
@@ -93,7 +116,11 @@ function duplicate_post( $request ) {
 	$duplicate['post_date_gmt'] = date('Y-m-d H:i:s', $timestamp_gmt);
 	$duplicate['post_modified'] = date('Y-m-d H:i:s', current_time('timestamp',0));
 	$duplicate['post_modified_gmt'] = date('Y-m-d H:i:s', current_time('timestamp',1));
-	if ( 'current_user' == $settings['post_author'] ) {
+	
+	// Set author - check for selectedAuthorId first, then fall back to post_author setting
+	if ( isset( $settings['selectedAuthorId'] ) && ! empty( $settings['selectedAuthorId'] ) ) {
+		$duplicate['post_author'] = intval( $settings['selectedAuthorId'] );
+	} elseif ( 'current_user' == $settings['post_author'] ) {
 		$duplicate['post_author'] = get_current_user_id();
 	}
 

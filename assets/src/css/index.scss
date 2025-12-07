@@ -21,3 +21,214 @@
   background-color: #46b450; /* typical WP success color */
 }
 /* etc. for different types if desired */
+
+/* Duplicate Modal Styles */
+.duplicate-post-modal__content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.duplicate-post-modal__preview {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+.duplicate-post-modal__preview-heading {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1d2327;
+}
+
+.duplicate-post-modal__preview-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  &:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+.duplicate-post-modal__preview-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #757575;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.duplicate-post-modal__preview-value {
+  color: #2271b1;
+  font-weight: 500;
+  font-size: 14px;
+  word-break: break-word;
+
+  &.duplicate-post-modal__preview-url {
+    font-family: monospace;
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.duplicate-post-modal__settings {
+  flex: 1;
+}
+
+.duplicate-post-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid #dcdcde;
+}
+
+/* Settings Summary Styles */
+.duplicate-settings-summary {
+  background: #fff;
+  border: 1px solid #dcdcde;
+  padding: 16px;
+}
+
+.duplicate-settings-summary__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.duplicate-settings-summary__item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  &--full {
+    grid-column: 1 / -1;
+  }
+}
+
+.duplicate-settings-summary__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #757575;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.duplicate-settings-summary__value {
+  font-size: 14px;
+  color: #1d2327;
+  font-weight: 500;
+}
+
+/* Settings Fields Styles */
+.duplicate-settings-fields {
+  // Ensure select controls have proper width
+  .components-select-control__input,
+  .components-text-control__input {
+    width: 100%;
+  }
+
+  // Date field with calendar icon
+  .components-base-control {
+    position: relative;
+
+    // Add padding to date input for calendar icon
+    &:has(+ .components-dropdown) {
+      .components-text-control__input {
+        padding-right: 44px;
+      }
+    }
+  }
+
+  // Radio control styling
+  .components-radio-control {
+    .components-radio-control__option {
+      margin-bottom: 8px;
+    }
+  }
+
+  // Ensure proper spacing for help text
+  .components-base-control__help {
+    margin-top: 8px;
+    margin-bottom: 0;
+  }
+  .components-h-stack {
+    > * {
+      flex: 1;
+    }
+    @media (max-width: 600px) {
+      flex-direction: column;
+    }
+  }
+  .components-radio-control__group-wrapper {
+    flex-direction: row;
+    justify-content: flex-start;
+    flex-wrap: flex-wrap;
+    > * {
+      flex: 0 0 auto !important;
+      margin: 0 !important;
+    }
+  }
+}
+
+.duplicate-settings-fields__time-offset {
+  background: #f6f7f7;
+  border: 1px solid #dcdcde;
+  border-radius: 4px;
+  padding: 16px;
+  margin-top: 12px;
+
+  .components-h-stack {
+    flex-wrap: wrap;
+    gap: 12px !important;
+  }
+
+  .components-base-control {
+    margin-bottom: 12px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  // Radio control for direction
+  .components-radio-control {
+    margin-top: 16px;
+  }
+}
+
+.duplicate-settings-fields__custom-date {
+  background: #f6f7f7;
+  border: 1px solid #dcdcde;
+  border-radius: 4px;
+  padding: 16px;
+  margin-top: 12px;
+
+  .components-datetime {
+    border: none;
+    box-shadow: none;
+  }
+
+  // Calendar styling
+  .components-datetime__date {
+    border-right: 1px solid #dcdcde;
+  }
+}
+
+/* Ensure modal appears above WordPress admin elements */
+.components-modal__screen-overlay {
+  z-index: 100000;
+}
+
+.components-modal__frame {
+  z-index: 100001;
+  max-width: 600px;
+}

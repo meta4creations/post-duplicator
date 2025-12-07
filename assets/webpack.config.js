@@ -23,6 +23,7 @@ var customConfig = {
   ...defaultConfig,
   entry: {
     postDuplicator: "./src/index.js",
+    gutenbergButton: "./src/gutenberg-button.js",
   },
   output: {
     filename: "[name].js",
