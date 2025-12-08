@@ -131,18 +131,13 @@ const DuplicateModal = ({
     const postTypeLabel = getPreviewPostType()
     return __(`Duplicate ${postTypeLabel}`, 'post-duplicator')
   }
-
-  const getCustomizeButtonLabel = () => {
-    const postTypeLabel = getPreviewPostType()
-    return __(`Customize ${postTypeLabel}`, 'post-duplicator')
-  }
-
   if (!isOpen) return null
 
   // Header actions for the edit icon
   const headerActions = (
     <Button
-      icon={showCustomize ? check : edit}
+      icon={edit}
+      variant={showCustomize ? 'primary' : 'secondary'}
       label={
         showCustomize
           ? __('Done Customizing', 'post-duplicator')

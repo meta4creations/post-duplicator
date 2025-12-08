@@ -23,7 +23,25 @@ const DuplicateSettingsFields = ({
   statusChoices,
   originalPost,
 }) => {
-  const [localSettings, setLocalSettings] = useState(settings)
+  // Initialize settings with proper type and status values
+  // If default is "same", use original post's value, otherwise use default
+  const getInitialSettings = () => {
+    const initial = { ...settings }
+    
+    // Handle type: if "same", use original post type
+    if (settings.type === 'same' && originalPost?.type) {
+      initial.type = originalPost.type
+    }
+    
+    // Handle status: if "same", use original post status
+    if (settings.status === 'same' && originalPost?.status) {
+      initial.status = originalPost.status
+    }
+    
+    return initial
+  }
+  
+  const [localSettings, setLocalSettings] = useState(getInitialSettings())
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(false)
   const [fullTitle, setFullTitle] = useState('')
   const [fullSlug, setFullSlug] = useState('')
@@ -103,8 +121,20 @@ const DuplicateSettingsFields = ({
 
   // Update localSettings when settings prop changes (but not title/slug)
   useEffect(() => {
-    setLocalSettings(settings)
-  }, [settings])
+    const updated = { ...settings }
+    
+    // Handle type: if "same", use original post type
+    if (settings.type === 'same' && originalPost?.type) {
+      updated.type = originalPost.type
+    }
+    
+    // Handle status: if "same", use original post status
+    if (settings.status === 'same' && originalPost?.status) {
+      updated.status = originalPost.status
+    }
+    
+    setLocalSettings(updated)
+  }, [settings, originalPost])
 
   // Format date for display
   const formatDateDisplay = (dateString) => {

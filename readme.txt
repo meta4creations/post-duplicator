@@ -7,33 +7,229 @@ Tested up to: 6.8.3
 Stable tag: 2.48
 License: GPL2
 
-Creates functionality to duplicate any and all post types, including taxonomies & custom fields.
+Creates functionality to duplicate any and all post types, including taxonomies & custom fields. Perfect for developers and content creators.
 
 == Description ==
 
-This plugin was created to make an exact duplicate of a selected post. Custom post types are supported, along with custom taxonomies and custom fields.
+**Save Time. Work Smarter. Duplicate Any Post Type with Ease.**
 
-*Note: Comments are not passed to the new post.
+Post Duplicator is the ultimate WordPress plugin for quickly creating exact duplicates of any post type in your WordPress site. Whether you're working with standard posts, pages, or custom post types, this plugin makes it effortless to clone content while preserving all taxonomies, custom fields, and metadata.
 
-This plugin is simply meant to quickly and easily duplicate a post. Just hover over a post in the edit screen and select 'Duplicate {post_type}' to create a duplicate post.
+**Key Features:**
 
-I created this plugin mainly for myself when I'm develping WordPress sites. I always need dummy content to fill out the look of a website and wanted a very quick and easy way to create multiple posts.
+* **Universal Post Type Support** - Works with every post type WordPress supports, including custom post types from your favorite plugins and themes
+* **Complete Data Preservation** - Automatically copies all taxonomies, custom fields, metadata, and featured images
+* **Flexible Duplication Options** - Customize title, slug, status, author, date, and post type for each duplicate
+* **Smart Defaults** - Configure default settings that apply to all duplications (draft status, current user as author)
+* **Permission Control** - Granular control over who can duplicate posts with role-based permissions
+* **Modern Interface** - Beautiful modal interface with live preview of duplication settings
+* **Cross-Post Type Duplication** - Convert posts to different post types during duplication
+* **One-Click Operation** - Duplicate posts from the posts list, edit screen, or block editor toolbar
+
+**Perfect For:**
+
+* **Developers** - Quickly generate test content and dummy data for development
+* **Content Managers** - Create content templates and variations efficiently
+* **Bloggers** - Repurpose successful posts with different angles or formats
+* **E-commerce** - Duplicate product variations and similar listings
+* **Multilingual Sites** - Works seamlessly with WPML and Polylang
+
+**What Gets Duplicated:**
+
+* Post content and formatting
+* Title and slug (with customizable suffixes)
+* All custom fields and metadata
+* Categories, tags, and custom taxonomies
+* Featured images
+* Post format
+
+**What Doesn't Get Duplicated:**
+
+* Comments (by design - prevents duplicate comment threads)
+* Post ID and GUID (new unique identifiers assigned)
+
+**How to Use:**
+
+1. **From Posts List**: Hover over any post and click "Duplicate [Post Type]" in the row actions
+2. **From Edit Screen**: Click the "Duplicate Post" button in the Gutenberg toolbar or classic editor
+3. **Customize Settings**: Click "Customize Settings" in the modal to override defaults for individual duplications
+4. **Configure Defaults**: Go to Settings > Post Duplicator to set default status, author, date, and title/slug suffixes
+
+**Default Settings:**
+
+The plugin works immediately with sensible defaults:
+* Duplicated posts are created as **Drafts** (prevents accidental publishing)
+* Title suffix: **"Copy"**
+* Slug suffix: **"copy"**
+* Author: **Current User**
+* Date: **Current Time**
+
+All defaults can be customized in Settings > Post Duplicator.
+
+**Integration:**
+
+Post Duplicator works seamlessly with:
+* WPML and Polylang (multilingual support)
+* WooCommerce (excludes review counts automatically)
+* ACF (Advanced Custom Fields) - preserves all field data
+* WP Customer Area (special file duplication support)
+* All custom post types and taxonomies
+
+**Security:**
+
+* Users without `publish_posts` capability cannot publish duplicates (forced to Pending)
+* Non-authors cannot duplicate unpublished posts from other users
+* Granular permission system controls who can duplicate posts
+* All data is sanitized and validated before duplication
+
+**Developer-Friendly:**
+
+Includes hooks and filters for easy customization:
+* `mtphr_post_duplicator_created` action
+* `mtphr_post_duplicator_meta_{$key}_enabled` filter
+* `mtphr_post_duplicator_meta_value` filter
 
 == Installation ==
 
-1. Upload `m4c-postduplicator` directory to the `/wp-content/plugins/` directory
-2. Activate the plugin through the 'Plugins' menu in WordPress 
+**Method 1: WordPress Admin (Recommended)**
+
+1. Log in to your WordPress admin dashboard
+2. Navigate to **Plugins > Add New**
+3. Click **Upload Plugin** at the top of the page
+4. Choose the `post-duplicator.zip` file
+5. Click **Install Now**
+6. After installation, click **Activate Plugin**
+
+**Method 2: FTP/File Manager**
+
+1. Extract the `post-duplicator` folder from the zip file
+2. Upload the entire `post-duplicator` folder to `/wp-content/plugins/` on your server
+3. Log in to your WordPress admin dashboard
+4. Navigate to **Plugins**
+5. Find "Post Duplicator" in the list and click **Activate**
+
+**After Activation:**
+
+The plugin is ready to use immediately with sensible defaults. You can start duplicating posts right away, or customize settings by going to **Settings > Post Duplicator**.
+
+**Requirements:**
+
+* WordPress 5.0 or higher
+* PHP 7.4 or higher
 
 == Frequently Asked Questions ==
 
-= Are there any settings I need to configure? =
+= Do I need to configure settings before using the plugin? =
 
-No, but there are a couple settings you can adjust if you choose to do so.
-View the settings by going to 'Tools > Post Duplicator'.
+No! Post Duplicator works immediately with sensible defaults. Duplicated posts are created as drafts with the current user as the author. You can start duplicating posts right away.
 
-= How do I install the plugin? =
+However, you can customize default settings by going to **Settings > Post Duplicator** to configure:
+* Default post status (draft, published, pending, or same as original)
+* Default post type (same or convert to another type)
+* Default author (current user or original author)
+* Default date (current time or duplicate timestamp)
+* Title and slug suffixes
+* Date offset options
 
-Check out the 'Installation' tab.
+= Where can I find the duplicate option? =
+
+The duplicate option appears in three places:
+
+1. **Posts List**: Hover over any post in the All Posts (or any post type list) screen and click "Duplicate [Post Type]" in the row actions
+2. **Gutenberg Editor**: Click the "Duplicate Post" button in the top toolbar when editing a published post
+3. **Classic Editor**: Find the "Duplicate [Post Type]" button in the Publish meta box
+
+Note: The duplicate option only appears for published posts.
+
+= What information gets duplicated? =
+
+Post Duplicator creates a complete copy including:
+* All post content and formatting
+* Title and slug (with customizable suffixes)
+* All custom fields and metadata
+* Categories, tags, and all custom taxonomies
+* Featured images
+* Post format
+
+Comments are NOT duplicated (by design), and new unique IDs are assigned to the duplicate.
+
+= Can I customize settings for individual duplications? =
+
+Yes! When the duplication modal opens, click "Customize Settings" (pencil icon) to:
+* Edit the full title and slug
+* Change post status, type, author, or date
+* See a live preview of what the duplicate will look like
+
+These customizations only apply to that specific duplication and don't change your default settings.
+
+= Can I duplicate posts to a different post type? =
+
+Yes! You can convert posts to different post types during duplication:
+
+1. Open the duplication modal
+2. Click "Customize Settings"
+3. Select a different post type from the "Post Type" dropdown
+4. The duplicate will be created as the selected type
+
+You can also set a default post type conversion in Settings > Post Duplicator.
+
+= How do I control who can duplicate posts? =
+
+Go to **Settings > Post Duplicator > Permissions** to configure role-based permissions:
+
+* **Duplicate Posts**: Allows users to duplicate their own posts
+* **Duplicate Others' Posts**: Allows users to duplicate posts created by other users
+
+You can enable or disable these capabilities for each user role (Administrator, Editor, Author, etc.).
+
+= Does the plugin work with custom post types? =
+
+Yes! Post Duplicator works with all post types, including:
+* Standard posts and pages
+* Custom post types from themes
+* Custom post types from plugins (WooCommerce products, etc.)
+* Any registered post type in WordPress
+
+= Will my custom fields be preserved? =
+
+Yes! All custom fields and metadata are automatically copied to the duplicate. This includes:
+* ACF (Advanced Custom Fields) data
+* Custom meta boxes
+* Any post meta stored in the database
+
+= Does it work with multilingual plugins? =
+
+Yes! Post Duplicator integrates seamlessly with:
+* **WPML**: Automatically handles multilingual content correctly
+* **Polylang**: Excludes translation taxonomies from duplication
+
+= Can I schedule duplicates for future dates? =
+
+Yes! Enable the "Offset Date" option in Settings > Post Duplicator to automatically schedule duplicates:
+
+1. Enable "Offset Date"
+2. Set the number of days, hours, minutes, or seconds to offset
+3. Choose "Newer" (future) or "Older" (past) direction
+4. All duplicates will use this date offset
+
+You can also set a custom date for individual duplications using the date picker in the customization modal.
+
+= What if I don't want comments duplicated? =
+
+Comments are intentionally NOT duplicated. This prevents duplicate comment threads and maintains comment integrity. Each duplicate post starts with zero comments.
+
+= Is there a way to bulk duplicate posts? =
+
+Currently, Post Duplicator duplicates one post at a time. This ensures you have control over each duplication and can customize settings as needed. Bulk duplication may be added in a future version.
+
+= Where are the plugin settings located? =
+
+Go to **Settings > Post Duplicator** in your WordPress admin. You can also access it by clicking the "Settings" link on the Plugins page next to Post Duplicator.
+
+The settings page includes three tabs:
+* **Defaults**: Configure default duplication settings
+* **Permissions**: Control who can duplicate posts
+* **Advanced**: Settings for duplicating special post statuses
 
 == Screenshots ==
 

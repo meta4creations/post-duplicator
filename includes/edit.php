@@ -39,7 +39,7 @@ function add_row_action_link( $post ) {
 	}
 
 	// Return the link
-	return '<a class="m4c-duplicate-post" href="#" data-postid="'.esc_attr( $post->ID ).'">'.wp_kses_post( $label ).'</a>';
+	return '<a class="m4c-duplicate-post" href="#" data-postid="'.esc_attr( $post->ID ).'" data-posttype="'.esc_attr( $post->post_type ).'">'.wp_kses_post( $label ).'</a>';
 }
 
 // Add the duplicate link to post actions

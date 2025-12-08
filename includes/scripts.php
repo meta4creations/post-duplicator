@@ -74,12 +74,14 @@ function enqueue_scripts() {
       'time_offset_seconds' => isset( $settings['time_offset_seconds'] ) ? intval( $settings['time_offset_seconds'] ) : 0,
       'time_offset_direction' => isset( $settings['time_offset_direction'] ) ? $settings['time_offset_direction'] : 'newer',
     ],
-    'postTypes' => duplicator_post_types(),
+    'postTypes' => array_filter( duplicator_post_types(), function( $key ) {
+      return $key !== 'same';
+    }, ARRAY_FILTER_USE_KEY ),
     'statusChoices' => [
-      'same' => esc_html__( 'Same as original', 'post-duplicator' ),
       'draft' => esc_html__( 'Draft', 'post-duplicator' ),
       'publish' => esc_html__( 'Published', 'post-duplicator' ),
       'pending' => esc_html__( 'Pending', 'post-duplicator' ),
+      'private' => esc_html__( 'Private', 'post-duplicator' ),
     ],
   ] );
 
@@ -131,12 +133,14 @@ function enqueue_scripts() {
         'time_offset_seconds' => isset( $settings['time_offset_seconds'] ) ? intval( $settings['time_offset_seconds'] ) : 0,
         'time_offset_direction' => isset( $settings['time_offset_direction'] ) ? $settings['time_offset_direction'] : 'newer',
       ],
-      'postTypes' => duplicator_post_types(),
+      'postTypes' => array_filter( duplicator_post_types(), function( $key ) {
+        return $key !== 'same';
+      }, ARRAY_FILTER_USE_KEY ),
       'statusChoices' => [
-        'same' => esc_html__( 'Same as original', 'post-duplicator' ),
         'draft' => esc_html__( 'Draft', 'post-duplicator' ),
         'publish' => esc_html__( 'Published', 'post-duplicator' ),
         'pending' => esc_html__( 'Pending', 'post-duplicator' ),
+        'private' => esc_html__( 'Private', 'post-duplicator' ),
       ],
     ] );
   }

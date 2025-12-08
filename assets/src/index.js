@@ -75,20 +75,24 @@ const DuplicatePostHandler = () => {
         e.preventDefault()
 
         const postId = e.target.getAttribute('data-postid')
+        const postType = e.target.getAttribute('data-posttype') || 'post'
 
-        // Fetch post data
+        // Fetch post data - use correct endpoint based on post type
+        // WordPress REST API: posts -> /wp/v2/posts, pages -> /wp/v2/pages, custom types -> /wp/v2/{type}
         try {
-          const response = await fetch(
-            `${postDuplicatorVars.restUrl.replace(
-              'post-duplicator/v1/',
-              'wp/v2/'
-            )}posts/${postId}`,
-            {
-              headers: {
-                'X-WP-Nonce': postDuplicatorVars.nonce,
-              },
-            }
+          const baseUrl = postDuplicatorVars.restUrl.replace(
+            'post-duplicator/v1/',
+            'wp/v2/'
           )
+          // Handle special case for pages (plural) vs other post types (singular)
+          const endpointType = postType === 'page' ? 'pages' : postType === 'post' ? 'posts' : postType
+          const endpoint = `${baseUrl}${endpointType}/${postId}`
+          
+          const response = await fetch(endpoint, {
+            headers: {
+              'X-WP-Nonce': postDuplicatorVars.nonce,
+            },
+          })
 
           if (!response.ok) {
             throw new Error('Failed to fetch post data')
@@ -123,6 +127,7 @@ const DuplicatePostHandler = () => {
             slug: post.slug,
             date: post.date,
             author: authorName,
+            authorId: post.author, // Add author ID for settings component
           })
           setIsModalOpen(true)
         } catch (error) {
