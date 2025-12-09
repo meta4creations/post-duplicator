@@ -2,7 +2,7 @@ import { registerPlugin } from '@wordpress/plugins'
 import { PluginPostStatusInfo } from '@wordpress/edit-post'
 import { Button } from '@wordpress/components'
 import { useSelect } from '@wordpress/data'
-import { useState } from '@wordpress/element'
+import { useState, useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import DuplicateModal from './components/DuplicateModal'
 import './css/gutenberg-button.scss'
@@ -11,6 +11,8 @@ const DuplicatePostButton = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [taxonomies, setTaxonomies] = useState([])
+  const [customMeta, setCustomMeta] = useState([])
 
   const { postId, postType, postStatus, postTypeLabel, postTitle, postSlug, postDate, postAuthor } = useSelect(
     (select) => {
@@ -37,6 +39,35 @@ const DuplicatePostButton = () => {
     },
     []
   )
+
+  // Fetch taxonomy and custom meta data when modal opens
+  useEffect(() => {
+    if (isModalOpen && postId) {
+      const fetchPostData = async () => {
+        try {
+          const response = await fetch(
+            `${postDuplicatorVars.restUrl}post-data/${postId}`,
+            {
+              headers: {
+                'X-WP-Nonce': postDuplicatorVars.nonce,
+              },
+            }
+          )
+          
+          if (response.ok) {
+            const postData = await response.json()
+            setTaxonomies(postData.taxonomies || [])
+            setCustomMeta(postData.customMeta || [])
+          }
+        } catch (error) {
+          console.error('Error fetching post data:', error)
+          // Continue without taxonomy/meta data
+        }
+      }
+      
+      fetchPostData()
+    }
+  }, [isModalOpen, postId])
 
   // Only show for published posts
   if (postStatus !== 'publish' || !postId) {
@@ -92,6 +123,8 @@ const DuplicatePostButton = () => {
     slug: postSlug,
     date: postDate,
     author: postAuthor,
+    taxonomies: taxonomies,
+    customMeta: customMeta,
   }
 
   return (

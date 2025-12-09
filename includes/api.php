@@ -12,6 +12,160 @@ function register_routes() {
     'permission_callback' => __NAMESPACE__ . '\duplicate_post_permissions',
     'callback' => __NAMESPACE__ . '\duplicate_post',
   ) );
+  
+  register_rest_route( 'post-duplicator/v1', 'post-data/(?P<id>\d+)', array(
+    'methods' => 'GET',
+    'permission_callback' => __NAMESPACE__ . '\get_post_data_permissions',
+    'callback' => __NAMESPACE__ . '\get_post_data',
+    'args' => array(
+      'id' => array(
+        'validate_callback' => function( $param ) {
+          return is_numeric( $param );
+        },
+      ),
+    ),
+  ) );
+}
+
+/**
+ * Permission check for getting post data
+ */
+function get_post_data_permissions( $request ) {
+  $post_id = $request->get_param( 'id' );
+  
+  if ( ! $post_id ) {
+    return new \WP_Error( 'no_post_id', esc_html__( 'No post ID provided.', 'post-duplicator' ), array( 'status' => 403 ) );
+  }
+  
+  $post = get_post( $post_id );
+  if ( ! $post ) {
+    return new \WP_Error( 'post_not_found', esc_html__( 'Post not found.', 'post-duplicator' ), array( 'status' => 404 ) );
+  }
+  
+  if ( ! user_can_duplicate( $post ) ) {
+    return new \WP_Error( 'no_permission', esc_html__( 'User does not have permission to view this post.', 'post-duplicator' ), array( 'status' => 403 ) );
+  }
+  
+  return true;
+}
+
+/**
+ * Get taxonomy and custom meta data for a post
+ */
+function get_post_data( $request ) {
+  $post_id = $request->get_param( 'id' );
+  $post = get_post( $post_id );
+  
+  if ( ! $post ) {
+    return new \WP_Error( 'post_not_found', esc_html__( 'Post not found.', 'post-duplicator' ), array( 'status' => 404 ) );
+  }
+  
+  // Get taxonomies
+  $taxonomies_data = array();
+  $taxonomies = get_object_taxonomies( $post->post_type );
+  $disabled_taxonomies = array( 'post_translations' );
+  
+  foreach ( $taxonomies as $taxonomy_slug ) {
+    if ( in_array( $taxonomy_slug, $disabled_taxonomies ) ) {
+      continue;
+    }
+    
+    $taxonomy = get_taxonomy( $taxonomy_slug );
+    if ( ! $taxonomy ) {
+      continue;
+    }
+    
+    $terms = wp_get_post_terms( $post_id, $taxonomy_slug, array( 'fields' => 'all' ) );
+    
+    $terms_data = array();
+    foreach ( $terms as $term ) {
+      $terms_data[] = array(
+        'id' => $term->term_id,
+        'name' => $term->name,
+        'slug' => $term->slug,
+      );
+    }
+    
+    $taxonomies_data[] = array(
+      'slug' => $taxonomy_slug,
+      'label' => $taxonomy->labels->name,
+      'hierarchical' => $taxonomy->hierarchical,
+      'terms' => $terms_data,
+    );
+  }
+  
+  // Get custom meta fields
+  $custom_meta_data = array();
+  $custom_fields = get_post_custom( $post_id );
+  
+  foreach ( $custom_fields as $key => $values ) {
+    // Skip WordPress internal meta keys
+    if ( strpos( $key, '_' ) === 0 && ! in_array( $key, array( '_thumbnail_id', '_wp_page_template' ) ) ) {
+      // Allow some specific meta keys that start with underscore
+      if ( ! apply_filters( "mtphr_post_duplicator_meta_{$key}_enabled", false ) ) {
+        continue;
+      }
+    }
+    
+    // Check if meta is enabled via filter
+    if ( ! apply_filters( "mtphr_post_duplicator_meta_{$key}_enabled", true ) ) {
+      continue;
+    }
+    
+    foreach ( $values as $value ) {
+      // Detect data type
+      $type = 'string';
+      $is_serialized = false;
+      $original_value = $value;
+      
+      // Check if serialized
+      if ( is_serialized( $value ) ) {
+        $is_serialized = true;
+        $unserialized = maybe_unserialize( $value );
+        if ( is_array( $unserialized ) ) {
+          $type = 'array';
+          $value = wp_json_encode( $unserialized, JSON_PRETTY_PRINT );
+        } elseif ( is_object( $unserialized ) ) {
+          $type = 'object';
+          $value = wp_json_encode( $unserialized, JSON_PRETTY_PRINT );
+        } else {
+          $type = 'string';
+        }
+      } elseif ( is_numeric( $value ) ) {
+        // Check if it's a number (int or float)
+        if ( strpos( $value, '.' ) !== false ) {
+          $type = 'number';
+        } else {
+          $type = 'number';
+        }
+      } elseif ( $value === 'true' || $value === 'false' || $value === '1' || $value === '0' || $value === '' ) {
+        // Could be boolean, but WordPress stores as string
+        $type = 'string';
+      }
+      
+      // Try to detect JSON
+      if ( ! $is_serialized ) {
+        $json_decoded = json_decode( $value, true );
+        if ( json_last_error() === JSON_ERROR_NONE && ( is_array( $json_decoded ) || is_object( $json_decoded ) ) ) {
+          $type = is_array( $json_decoded ) ? 'array' : 'object';
+          $value = wp_json_encode( $json_decoded, JSON_PRETTY_PRINT );
+        }
+      }
+      
+      $custom_meta_data[] = array(
+        'key' => $key,
+        'value' => $value,
+        'type' => $type,
+        'isSerialized' => $is_serialized,
+        'originalValue' => $original_value,
+      );
+    }
+  }
+  
+  return rest_ensure_response( array(
+    'taxonomies' => $taxonomies_data,
+    'customMeta' => $custom_meta_data,
+  ) );
 }
 
 /**
@@ -137,29 +291,125 @@ function duplicate_post( $request ) {
 	// Insert the post into the database
 	$duplicate_id = wp_insert_post( $duplicate );
 	
-	// Duplicate all the taxonomies/terms
-	$taxonomies = get_object_taxonomies( $duplicate['post_type'] );
-	$disabled_taxonomies = ['post_translations'];
-	foreach( $taxonomies as $taxonomy ) {
-		if ( in_array( $taxonomy, $disabled_taxonomies ) ) {
-			continue;
+	// Handle taxonomies
+	// Default to true for backward compatibility
+	$include_taxonomies = true;
+	if ( isset( $settings['includeTaxonomies'] ) ) {
+		$tax_value = $settings['includeTaxonomies'];
+		// Handle both boolean and string boolean values from JSON
+		if ( is_bool( $tax_value ) ) {
+			$include_taxonomies = $tax_value;
+		} elseif ( is_string( $tax_value ) ) {
+			// Handle string booleans - explicitly check for false strings
+			$include_taxonomies = ! ( $tax_value === 'false' || $tax_value === '0' || $tax_value === '' );
+		} elseif ( $tax_value === 0 || $tax_value === '0' ) {
+			// Explicitly handle 0/false values
+			$include_taxonomies = false;
+		} else {
+			// For any other value, cast to bool
+			$include_taxonomies = (bool) $tax_value;
 		}
-		$terms = wp_get_post_terms( $original_id, $taxonomy, array('fields' => 'names') );
-		wp_set_object_terms( $duplicate_id, $terms, $taxonomy );
 	}
 	
-	// Duplicate all the custom fields
-	$custom_fields = get_post_custom( $original_id );
-	foreach ( $custom_fields as $key => $value ) {
-		if( is_array($value) && count($value) > 0 ) {
-			foreach( $value as $i=>$v ) {
-        if ( ! apply_filters( "mtphr_post_duplicator_meta_{$key}_enabled", true ) ) {
-          continue;
-        }
-        $meta_value = apply_filters( "mtphr_post_duplicator_meta_value", $v, $key, $duplicate_id, $duplicate['post_type'] );
+	// Only duplicate taxonomies if explicitly enabled
+	// Use strict comparison to ensure false/0 values are respected
+	if ( $include_taxonomies === true ) {
+		// Use provided taxonomy data if available, otherwise fetch from original post
+		if ( isset( $settings['taxonomyData'] ) && is_array( $settings['taxonomyData'] ) && ! empty( $settings['taxonomyData'] ) ) {
+			// Use provided taxonomy data
+			foreach ( $settings['taxonomyData'] as $taxonomy_slug => $term_ids ) {
+				if ( ! is_array( $term_ids ) ) {
+					continue;
+				}
+				// Convert term IDs to integers and filter out invalid values
+				$term_ids = array_map( 'intval', $term_ids );
+				$term_ids = array_filter( $term_ids );
+				
+				if ( ! empty( $term_ids ) ) {
+					wp_set_object_terms( $duplicate_id, $term_ids, $taxonomy_slug );
+				}
+			}
+		} elseif ( ! isset( $settings['taxonomyData'] ) ) {
+			// Only fall back to original behavior if taxonomyData was not provided at all
+			// This means the user didn't customize, so use default behavior
+			$taxonomies = get_object_taxonomies( $duplicate['post_type'] );
+			$disabled_taxonomies = ['post_translations'];
+			foreach( $taxonomies as $taxonomy ) {
+				if ( in_array( $taxonomy, $disabled_taxonomies ) ) {
+					continue;
+				}
+				$terms = wp_get_post_terms( $original_id, $taxonomy, array('fields' => 'names') );
+				wp_set_object_terms( $duplicate_id, $terms, $taxonomy );
+			}
+		}
+		// If includeTaxonomies is false, do nothing - taxonomies are not duplicated
+	}
+	
+	// Handle custom meta fields
+	// Default to true for backward compatibility
+	$include_custom_meta = true;
+	if ( isset( $settings['includeCustomMeta'] ) ) {
+		// Handle both boolean and string boolean values from JSON
+		if ( is_bool( $settings['includeCustomMeta'] ) ) {
+			$include_custom_meta = $settings['includeCustomMeta'];
+		} elseif ( is_string( $settings['includeCustomMeta'] ) ) {
+			// Handle string booleans (shouldn't happen with proper JSON, but be safe)
+			$include_custom_meta = ( $settings['includeCustomMeta'] === 'true' || $settings['includeCustomMeta'] === '1' );
+		} elseif ( $settings['includeCustomMeta'] === 0 || $settings['includeCustomMeta'] === '0' ) {
+			// Explicitly handle 0/false values
+			$include_custom_meta = false;
+		} else {
+			$include_custom_meta = (bool) $settings['includeCustomMeta'];
+		}
+	}
+	
+	// Only duplicate custom meta if explicitly enabled
+	if ( $include_custom_meta === true ) {
+		// Use provided custom meta data if available, otherwise fetch from original post
+		if ( isset( $settings['customMetaData'] ) && is_array( $settings['customMetaData'] ) ) {
+			// Use provided custom meta data
+			foreach ( $settings['customMetaData'] as $meta_item ) {
+				if ( ! isset( $meta_item['key'] ) || ! isset( $meta_item['value'] ) ) {
+					continue;
+				}
+				
+				$meta_key = sanitize_text_field( $meta_item['key'] );
+				$meta_value = $meta_item['value'];
+				
+				// Handle data type preservation
+				if ( isset( $meta_item['type'] ) && isset( $meta_item['isSerialized'] ) ) {
+					// If it was originally serialized or is array/object, serialize it
+					if ( $meta_item['isSerialized'] || in_array( $meta_item['type'], array( 'array', 'object' ) ) ) {
+						// Try to decode JSON first if it's a JSON string
+						$json_decoded = json_decode( $meta_value, true );
+						if ( json_last_error() === JSON_ERROR_NONE ) {
+							$meta_value = maybe_serialize( $json_decoded );
+						} else {
+							// Already a string, serialize it
+							$meta_value = maybe_serialize( $meta_value );
+						}
+					} elseif ( $meta_item['type'] === 'number' ) {
+						// Preserve as number (WordPress will store as string anyway, but we can validate)
+						$meta_value = is_numeric( $meta_value ) ? $meta_value : sanitize_text_field( $meta_value );
+					} else {
+						// String type
+						$meta_value = sanitize_text_field( $meta_value );
+					}
+				} else {
+					// Fallback: sanitize as text
+					$meta_value = sanitize_text_field( $meta_value );
+				}
+				
+				// Apply filters
+				if ( ! apply_filters( "mtphr_post_duplicator_meta_{$meta_key}_enabled", true ) ) {
+					continue;
+				}
+				
+				$meta_value = apply_filters( "mtphr_post_duplicator_meta_value", $meta_value, $meta_key, $duplicate_id, $duplicate['post_type'] );
+				
 				$data = array(
 					'post_id' 		=> intval( $duplicate_id ),
-					'meta_key' 		=> sanitize_text_field( $key ),
+					'meta_key' 		=> $meta_key,
 					'meta_value' 	=> $meta_value,
 				);
 				$formats = array(
@@ -168,6 +418,30 @@ function duplicate_post( $request ) {
 					'%s',
 				);
 				$result = $wpdb->insert( $wpdb->prefix.'postmeta', $data, $formats );
+			}
+		} else {
+			// Fall back to original behavior: duplicate all custom fields
+			$custom_fields = get_post_custom( $original_id );
+			foreach ( $custom_fields as $key => $value ) {
+				if( is_array($value) && count($value) > 0 ) {
+					foreach( $value as $i=>$v ) {
+						if ( ! apply_filters( "mtphr_post_duplicator_meta_{$key}_enabled", true ) ) {
+							continue;
+						}
+						$meta_value = apply_filters( "mtphr_post_duplicator_meta_value", $v, $key, $duplicate_id, $duplicate['post_type'] );
+						$data = array(
+							'post_id' 		=> intval( $duplicate_id ),
+							'meta_key' 		=> sanitize_text_field( $key ),
+							'meta_value' 	=> $meta_value,
+						);
+						$formats = array(
+							'%d',
+							'%s',
+							'%s',
+						);
+						$result = $wpdb->insert( $wpdb->prefix.'postmeta', $data, $formats );
+					}
+				}
 			}
 		}
 	}

@@ -119,6 +119,30 @@ const DuplicatePostHandler = () => {
             authorName = authorData.name
           }
           
+          // Fetch taxonomy and custom meta data
+          let taxonomies = []
+          let customMeta = []
+          
+          try {
+            const postDataResponse = await fetch(
+              `${postDuplicatorVars.restUrl}post-data/${postId}`,
+              {
+                headers: {
+                  'X-WP-Nonce': postDuplicatorVars.nonce,
+                },
+              }
+            )
+            
+            if (postDataResponse.ok) {
+              const postData = await postDataResponse.json()
+              taxonomies = postData.taxonomies || []
+              customMeta = postData.customMeta || []
+            }
+          } catch (error) {
+            console.error('Error fetching post data:', error)
+            // Continue without taxonomy/meta data
+          }
+          
           setCurrentPost({
             id: post.id,
             title: post.title.rendered,
@@ -128,6 +152,8 @@ const DuplicatePostHandler = () => {
             date: post.date,
             author: authorName,
             authorId: post.author, // Add author ID for settings component
+            taxonomies: taxonomies,
+            customMeta: customMeta,
           })
           setIsModalOpen(true)
         } catch (error) {

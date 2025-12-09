@@ -8,6 +8,8 @@ import {
 import { __ } from '@wordpress/i18n'
 import { edit, check } from '@wordpress/icons'
 import DuplicateSettingsFields from './DuplicateSettingsFields'
+import TaxonomySection from './TaxonomySection'
+import CustomMetaSection from './CustomMetaSection'
 
 const DuplicateModal = ({
   isOpen,
@@ -23,13 +25,44 @@ const DuplicateModal = ({
   const [settings, setSettings] = useState(defaultSettings)
   const [showCustomize, setShowCustomize] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [includeTaxonomies, setIncludeTaxonomies] = useState(true)
+  const [includeCustomMeta, setIncludeCustomMeta] = useState(true)
+  const [taxonomyData, setTaxonomyData] = useState({})
+  const [customMetaData, setCustomMetaData] = useState([])
 
   useEffect(() => {
     if (isOpen) {
       setSettings(defaultSettings)
       setShowCustomize(false)
+      setIncludeTaxonomies(true)
+      setIncludeCustomMeta(true)
+      
+      // Initialize taxonomy data from original post
+      if (originalPost?.taxonomies) {
+        const initialTaxonomyData = {}
+        originalPost.taxonomies.forEach((taxonomy) => {
+          initialTaxonomyData[taxonomy.slug] = taxonomy.terms.map((term) => term.id)
+        })
+        setTaxonomyData(initialTaxonomyData)
+      } else {
+        setTaxonomyData({})
+      }
+      
+      // Initialize custom meta data from original post
+      if (originalPost?.customMeta) {
+        setCustomMetaData(
+          originalPost.customMeta.map((meta) => ({
+            key: meta.key,
+            value: meta.value,
+            type: meta.type || 'string',
+            isSerialized: meta.isSerialized || false,
+          }))
+        )
+      } else {
+        setCustomMetaData([])
+      }
     }
-  }, [isOpen, defaultSettings])
+  }, [isOpen, defaultSettings, originalPost])
 
   const getPreviewTitle = () => {
     if (!originalPost?.title) return ''
@@ -116,15 +149,58 @@ const DuplicateModal = ({
     return `${siteUrl}/${slug}/`
   }
 
+  const getPreviewTaxonomies = () => {
+    if (!includeTaxonomies) {
+      return __('None (disabled)', 'post-duplicator')
+    }
+    
+    if (!originalPost?.taxonomies || originalPost.taxonomies.length === 0) {
+      return __('None', 'post-duplicator')
+    }
+    
+    // Calculate counts from current taxonomyData state
+    const taxonomyCount = Object.keys(taxonomyData).length || originalPost.taxonomies.length
+    const totalTermsCount = Object.values(taxonomyData).reduce(
+      (sum, termIds) => sum + (Array.isArray(termIds) ? termIds.length : 0),
+      0
+    ) || originalPost.taxonomies.reduce((sum, tax) => sum + tax.terms.length, 0)
+    
+    return `${taxonomyCount} ${__('taxonomies', 'post-duplicator')}, ${totalTermsCount} ${__('terms', 'post-duplicator')}`
+  }
+
+  const getPreviewCustomMeta = () => {
+    if (!includeCustomMeta) {
+      return __('None (disabled)', 'post-duplicator')
+    }
+    
+    const fieldCount = customMetaData.length || (originalPost?.customMeta?.length || 0)
+    return `${fieldCount} ${__('fields', 'post-duplicator')}`
+  }
+
   const handleDuplicate = async () => {
     setIsLoading(true)
     try {
-      await onDuplicate(settings)
+      const duplicateSettings = {
+        ...settings,
+        includeTaxonomies,
+        includeCustomMeta,
+        taxonomyData,
+        customMetaData,
+      }
+      await onDuplicate(duplicateSettings)
     } catch (error) {
       console.error('Error duplicating:', error)
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleTaxonomyChange = (selectedTerms) => {
+    setTaxonomyData(selectedTerms)
+  }
+
+  const handleCustomMetaChange = (metaFields) => {
+    setCustomMetaData(metaFields)
   }
 
   const getDuplicateButtonLabel = () => {
@@ -203,6 +279,26 @@ const DuplicateModal = ({
               {getPreviewUrl()}
             </span>
           </div>
+          {originalPost?.taxonomies && originalPost.taxonomies.length > 0 && (
+            <div className="duplicate-post-modal__preview-item">
+              <span className="duplicate-post-modal__preview-label">
+                {__('Taxonomies:', 'post-duplicator')}
+              </span>
+              <span className="duplicate-post-modal__preview-value">
+                {getPreviewTaxonomies()}
+              </span>
+            </div>
+          )}
+          {originalPost?.customMeta && originalPost.customMeta.length > 0 && (
+            <div className="duplicate-post-modal__preview-item">
+              <span className="duplicate-post-modal__preview-label">
+                {__('Custom Meta:', 'post-duplicator')}
+              </span>
+              <span className="duplicate-post-modal__preview-value">
+                {getPreviewCustomMeta()}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Settings Editor (shown when customize is clicked) */}
@@ -215,6 +311,24 @@ const DuplicateModal = ({
               statusChoices={statusChoices}
               originalPost={originalPost}
             />
+            
+            {originalPost?.taxonomies && originalPost.taxonomies.length > 0 && (
+              <TaxonomySection
+                taxonomies={originalPost.taxonomies}
+                onChange={handleTaxonomyChange}
+                enabled={includeTaxonomies}
+                onToggle={setIncludeTaxonomies}
+              />
+            )}
+            
+            {originalPost?.customMeta && originalPost.customMeta.length > 0 && (
+              <CustomMetaSection
+                customMeta={originalPost.customMeta}
+                onChange={handleCustomMetaChange}
+                enabled={includeCustomMeta}
+                onToggle={setIncludeCustomMeta}
+              />
+            )}
           </div>
         )}
       </div>
