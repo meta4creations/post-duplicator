@@ -26,10 +26,32 @@ if (is_dir($source)) {
             mkdir($target, 0755, true);
         } else {
             copy($file, $target);
+            
+            // Update namespaces in PHP files
+            if (pathinfo($target, PATHINFO_EXTENSION) === 'php') {
+                $content = file_get_contents($target);
+                $modified = false;
+                
+                // Replace namespace Mtphr; with namespace Mtphr\PostDuplicator\Settings;
+                if (preg_match('/^namespace\s+Mtphr\s*;/m', $content)) {
+                    $content = preg_replace('/^namespace\s+Mtphr\s*;/m', 'namespace Mtphr\\PostDuplicator;', $content);
+                    $modified = true;
+                }
+                
+                // Replace use Mtphr\Settings; with use Mtphr\PostDuplicator\Settings;
+                if (preg_match('/^use\s+Mtphr\\\Settings\s*;/m', $content)) {
+                    $content = preg_replace('/^use\s+Mtphr\\\Settings\s*;/m', 'use Mtphr\\PostDuplicator\\Settings;', $content);
+                    $modified = true;
+                }
+                
+                if ($modified) {
+                    file_put_contents($target, $content);
+                }
+            }
         }
     }
 
-    echo "Copied mtphr-settings to includes/mtphr-settings" . PHP_EOL;
+    echo "Copied mtphr-settings to includes/mtphr-settings and updated namespaces" . PHP_EOL;
 } else {
     echo "mtphr-settings not found in vendor/" . PHP_EOL;
 }

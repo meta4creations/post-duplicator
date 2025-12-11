@@ -1,5 +1,5 @@
 <?php
-use Mtphr\Settings;
+use Mtphr\PostDuplicator\Settings;
 
 if ( ! function_exists( 'MTPHR_SETTINGS' ) ) {
   require_once __DIR__ . '/settings-class.php';

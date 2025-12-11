@@ -1,5 +1,5 @@
 <?php
-namespace Mtphr;
+namespace Mtphr\PostDuplicator;
 
 /**
  * Create the class
