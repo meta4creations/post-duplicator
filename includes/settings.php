@@ -5,6 +5,7 @@ namespace Mtphr\PostDuplicator;
  * Initialize things
  */
 add_action( 'mtphrSettings/init_settings', __NAMESPACE__ . '\initialize_settings', 1 );
+add_action( 'mtphrSettings/init_settings', __NAMESPACE__ . '\initialize_sidebar' );
 add_action( 'mtphrSettings/init_fields', __NAMESPACE__ . '\initialize_fields' );
 
 /**
@@ -20,6 +21,9 @@ function initialize_settings() {
     'menu_slug'  => 'mtphr_post_duplicator', 
     'parent_slug' => 'options-general.php',
     'position' => 25,
+    //'header_icon' => 'dashicons-heart', // Optional
+		'header_description' => esc_html__( 'Configure default duplication settings, manage user permissions, and set advanced options for post duplication.', 'post-duplicator' ), // Optional
+    'header_version' => 'v' . MTPHR_POST_DUPLICATOR_VERSION, // Optional
   ] );
 
   // Add setting sections.
@@ -84,6 +88,54 @@ function initialize_settings() {
   mtphr_settings_add_sanitize_settings( 'disabled',
     user_roles_and_capabilities( 'sanitizers' )
   );
+}
+
+/**
+ * Initialize sidebar
+ * @return void
+ */
+function initialize_sidebar() {
+  mtphr_settings_add_sidebar([
+    'items' => [
+      [
+        'label'   => __( 'Documentation', 'post-duplicator' ),
+        'type' => 'html',
+        'std' => '<a href="#">Documentation</a>',
+        'id' => 'sidebar_docs'
+      ],
+      [
+        'type' => 'group',
+        'id' => 'sidebar_ad',
+        'direction' => 'column',
+        'alignment' => 'center',
+        'spacing' => '0',
+        'backgroundColor' => 'transparent',
+        'container' => [
+          'padding' => '0',
+          'isBorderless' => true,
+          'backgroundColor' => 'transparent'
+        ],
+        'fields' => [
+          [
+            'type' => 'ad',
+            'id' => 'sidebar_ad_content',
+            'trackingRef' => 'post-duplicator',
+            'image' => 'https://placehold.co/300x250',
+            'link' => 'https://www.metaphorcreations.com/wordpress-plugins/email-customizer/',
+          ],
+          [
+            'type' => 'ad',
+            'id' => 'sidebar_ad_content_2',
+            'trackingRef' => 'post-duplicator',
+            'image' => 'https://placehold.co/300x250',
+            'link' => 'https://placehold.co/300x250',
+          ],
+        ]
+      ]
+    ],
+    'width' => '300px',
+    'main_max_width' => '1000px'
+  ] );
 }
 
 /**

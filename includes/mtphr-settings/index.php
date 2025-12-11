@@ -87,6 +87,13 @@ if ( ! function_exists( 'MTPHR_SETTINGS' ) ) {
   }
 
   /**
+   * Add sidebar
+   */
+  function mtphr_settings_add_sidebar( $data ) {
+    MTPHR_SETTINGS()->add_sidebar( $data );
+  }
+
+  /**
    * Get an option value
    */
   function mtphr_settings_get_option_value( $option, $key = false ) {

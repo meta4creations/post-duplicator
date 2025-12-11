@@ -1,1 +1,0 @@
-(()=>{"use strict";const t={};window.mtphrSettingsRegistry={registerComponent:(e,n)=>{t[e]=n},getComponent:e=>t[e]||null}})();

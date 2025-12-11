@@ -4,7 +4,7 @@ Tags: posts, post, duplicate, duplication
 Requires at least: 5.0
 Requires PHP: 7.4
 Tested up to: 6.8.3
-Stable tag: 2.48
+Stable tag: 3.0.0
 License: GPL2
 
 Creates functionality to duplicate any and all post types, including taxonomies & custom fields. Perfect for developers and content creators.
@@ -233,10 +233,20 @@ The settings page includes three tabs:
 
 == Screenshots ==
 
-1. Sample view of the duplicate post link
-2. View of the settings page
+1. Single post duplicate button
+2. Duplicate post modal
+3. Duplicate post complete
+4. Posts list duplicate link
+5. Default settings
+6. Permission settings
+7. Advanced settings
 
 == Changelog ==
+
+= 3.0.0 [2025-12-10] =
+* Added Gutenberg single post duplication functionality
+* Added ability to modify duplicated post content before creating the post
+* Settings updates
 
 = 2.48 [2025-10-04] =
 * Mtphr Settings updates
@@ -419,4 +429,4 @@ Must upgrade in order for the plugin to work. The file paths where initially wro
 
 == Upgrade Notice ==
 
-Mtphr Settings updates and bug fix
+Added ability to modify duplicated post content before creating the post

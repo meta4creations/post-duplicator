@@ -2,10 +2,11 @@
 *node_modules*
 composer.lock
 config.codekit3
+/vendor/
 /node_modules/
 /logs/
 /reports/
 .DS_Store
 .nova
 .npmrc
-includes/mtphr-settings/
+/includes/mtphr-settings-git/

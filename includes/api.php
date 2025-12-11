@@ -63,7 +63,7 @@ function get_post_data( $request ) {
   // Get taxonomies
   $taxonomies_data = array();
   $taxonomies = get_object_taxonomies( $post->post_type );
-  $disabled_taxonomies = array( 'post_translations' );
+  $disabled_taxonomies = array( 'post_translations', 'post_format' );
   
   foreach ( $taxonomies as $taxonomy_slug ) {
     if ( in_array( $taxonomy_slug, $disabled_taxonomies ) ) {
@@ -75,15 +75,24 @@ function get_post_data( $request ) {
       continue;
     }
     
-    $terms = wp_get_post_terms( $post_id, $taxonomy_slug, array( 'fields' => 'all' ) );
+    // Get terms currently assigned to the post
+    $assigned_term_ids = wp_get_post_terms( $post_id, $taxonomy_slug, array( 'fields' => 'ids' ) );
+    
+    // Get ALL available terms for this taxonomy
+    $all_terms = get_terms( array(
+      'taxonomy' => $taxonomy_slug,
+      'hide_empty' => false,
+    ) );
     
     $terms_data = array();
-    foreach ( $terms as $term ) {
-      $terms_data[] = array(
-        'id' => $term->term_id,
-        'name' => $term->name,
-        'slug' => $term->slug,
-      );
+    if ( ! is_wp_error( $all_terms ) ) {
+      foreach ( $all_terms as $term ) {
+        $terms_data[] = array(
+          'id' => $term->term_id,
+          'name' => $term->name,
+          'slug' => $term->slug,
+        );
+      }
     }
     
     $taxonomies_data[] = array(
@@ -91,6 +100,7 @@ function get_post_data( $request ) {
       'label' => $taxonomy->labels->name,
       'hierarchical' => $taxonomy->hierarchical,
       'terms' => $terms_data,
+      'assignedTermIds' => $assigned_term_ids,
     );
   }
   
@@ -201,8 +211,12 @@ function duplicate_post( $request ) {
   // Get the original id
   $original_id = $data['original_id'];
 	
-	// Get the post as an array
-	$duplicate = $orig = get_post( $original_id, 'ARRAY_A' );
+	// Get the original post object
+	$orig = get_post( $original_id );
+	
+	if ( ! $orig ) {
+		return new \WP_Error( 'post_not_found', esc_html__( 'Original post not found.', 'post-duplicator' ), array( 'status' => 404 ) );
+	}
 		
 	// Get default settings
 	$default_settings = get_option_value();
@@ -214,6 +228,28 @@ function duplicate_post( $request ) {
 	
 	// Merge: override settings take precedence
 	$settings = array_merge( $default_settings, $override_settings );
+	
+	// Create an empty array and populate only the fields we want
+	// This ensures we don't carry over any unwanted data
+	$duplicate = array();
+	
+	// Copy basic post fields explicitly
+	$duplicate['post_author'] = $orig->post_author;
+	$duplicate['post_content'] = $orig->post_content;
+	$duplicate['post_title'] = $orig->post_title;
+	$duplicate['post_excerpt'] = $orig->post_excerpt;
+	$duplicate['post_status'] = $orig->post_status;
+	$duplicate['comment_status'] = $orig->comment_status;
+	$duplicate['ping_status'] = $orig->ping_status;
+	$duplicate['post_password'] = $orig->post_password;
+	$duplicate['post_name'] = $orig->post_name;
+	$duplicate['to_ping'] = $orig->to_ping;
+	$duplicate['pinged'] = $orig->pinged;
+	$duplicate['post_content_filtered'] = $orig->post_content_filtered;
+	$duplicate['post_parent'] = $orig->post_parent;
+	$duplicate['menu_order'] = $orig->menu_order;
+	$duplicate['post_type'] = $orig->post_type;
+	$duplicate['post_mime_type'] = $orig->post_mime_type;
 	
 	// Modify the title
 	// If fullTitle is provided (user edited the full title), use it
@@ -253,8 +289,8 @@ function duplicate_post( $request ) {
 	}
 	
 	// Set the post date
-	$timestamp = ( $settings['timestamp'] == 'duplicate' ) ? strtotime($duplicate['post_date']) : current_time('timestamp',0);
-	$timestamp_gmt = ( $settings['timestamp'] == 'duplicate' ) ? strtotime($duplicate['post_date_gmt']) : current_time('timestamp',1);
+	$timestamp = ( $settings['timestamp'] == 'duplicate' ) ? strtotime($orig->post_date) : current_time('timestamp',0);
+	$timestamp_gmt = ( $settings['timestamp'] == 'duplicate' ) ? strtotime($orig->post_date_gmt) : current_time('timestamp',1);
 	
 	if( isset( $settings['time_offset'] ) && $settings['time_offset'] ) {
 		$offset = intval($settings['time_offset_seconds']+$settings['time_offset_minutes']*60+$settings['time_offset_hours']*3600+$settings['time_offset_days']*86400);
@@ -278,23 +314,43 @@ function duplicate_post( $request ) {
 		$duplicate['post_author'] = get_current_user_id();
 	}
 
-	// Remove some of the keys
-	unset( $duplicate['ID'] );
-	unset( $duplicate['guid'] );
-	unset( $duplicate['comment_count'] );
-
-	//$duplicate['post_content'] = wp_slash( str_replace( array( '\r\n', '\r', '\n' ), '<br />', wp_kses_post( $duplicate['post_content'] ) ) ); 
+	// Sanitize post content
 	add_filter( 'wp_kses_allowed_html', __NAMESPACE__ . '\additional_kses', 10, 2 );
 	$duplicate['post_content'] = wp_slash( wp_kses_post( $duplicate['post_content'] ) ); 
 	remove_filter( 'wp_kses_allowed_html', __NAMESPACE__ . '\additional_kses', 10, 2 );
 
 	// Insert the post into the database
 	$duplicate_id = wp_insert_post( $duplicate );
+
+	// Handle featured image
+	if ( isset( $settings['featuredImageId'] ) ) {
+		// If featuredImageId is null or 0, remove the featured image
+		if ( empty( $settings['featuredImageId'] ) ) {
+			delete_post_thumbnail( $duplicate_id );
+		} else {
+			// Set the featured image
+			$thumbnail_id = intval( $settings['featuredImageId'] );
+			// Verify the attachment exists and is an image
+			$attachment = get_post( $thumbnail_id );
+			if ( $attachment && wp_attachment_is_image( $thumbnail_id ) ) {
+				set_post_thumbnail( $duplicate_id, $thumbnail_id );
+			}
+		}
+	} else {
+		// Default behavior: copy featured image from original post if it exists
+		$original_thumbnail_id = get_post_thumbnail_id( $original_id );
+		if ( $original_thumbnail_id ) {
+			set_post_thumbnail( $duplicate_id, $original_thumbnail_id );
+		}
+	}
+
+	// check which terms are connected to the duplicate post right here and now
+	$duplicate_terms = wp_get_post_terms( $duplicate_id, get_object_taxonomies( $duplicate['post_type'] ) );
 	
 	// Handle taxonomies
 	// Default to true for backward compatibility
-	$include_taxonomies = true;
-	if ( isset( $settings['includeTaxonomies'] ) ) {
+	$include_taxonomies = false;
+	if ( isset( $settings['includeTaxonomies'] ) && false !== $settings['includeTaxonomies'] ) {
 		$tax_value = $settings['includeTaxonomies'];
 		// Handle both boolean and string boolean values from JSON
 		if ( is_bool( $tax_value ) ) {
@@ -344,11 +400,12 @@ function duplicate_post( $request ) {
 		}
 		// If includeTaxonomies is false, do nothing - taxonomies are not duplicated
 	}
+
 	
 	// Handle custom meta fields
 	// Default to true for backward compatibility
-	$include_custom_meta = true;
-	if ( isset( $settings['includeCustomMeta'] ) ) {
+	$include_custom_meta = false;
+	if ( isset( $settings['includeCustomMeta'] ) && false !== $settings['includeCustomMeta'] ) {
 		// Handle both boolean and string boolean values from JSON
 		if ( is_bool( $settings['includeCustomMeta'] ) ) {
 			$include_custom_meta = $settings['includeCustomMeta'];
@@ -449,8 +506,13 @@ function duplicate_post( $request ) {
 	// Add an action for others to do custom stuff
 	do_action( 'mtphr_post_duplicator_created', $original_id, $duplicate_id, $settings );
 
+	$other_data = array(
+		'duplicate_post' => $duplicate,
+		'duplicate_terms' => $duplicate_terms,
+	);
   return rest_ensure_response( [
 		'duplicate_id' => $duplicate_id,
+		'other_data' => $other_data,
 	] , 200 );
 }
 

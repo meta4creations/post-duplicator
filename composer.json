@@ -3,13 +3,26 @@
   "description": "Creates functionality to duplicate any and all post types, including taxonomies & custom fields.",
   "type": "wordpress-plugin",
   "require": {
-    "php": ">=7.4",
-    "metaphorcreations/mtphr-settings": "v1.0.6"
+    "php": ">=7.4"
+  },
+  "require-dev": {
+    "metaphorcreations/mtphr-settings": "v1.0.10"
   },
   "repositories": [
     {
       "type": "vcs",
       "url": "git@github.com:metaphorcreations/mtphr-settings.git"
     }
-  ]
+  ],
+  "scripts": {
+    "post-install-cmd": [
+      "@copy-mtphr-settings"
+    ],
+    "post-update-cmd": [
+      "@copy-mtphr-settings"
+    ],
+    "copy-mtphr-settings": [
+      "php scripts/copy-mtphr-settings.php"
+    ]
+  }
 }

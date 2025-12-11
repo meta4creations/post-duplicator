@@ -34,17 +34,20 @@ function enqueue_scripts() {
   // Enqueue WordPress component styles
   wp_enqueue_style( 'wp-components' );
   
+  // Enqueue WordPress media scripts for featured image functionality on post list screen
+  wp_enqueue_media();
+  
   wp_enqueue_style(
     'post-duplicator',
     MTPHR_POST_DUPLICATOR_URL . 'assets/build/postDuplicator.css',
     ['wp-components'],
-    $asset_file['version']
+    filemtime( MTPHR_POST_DUPLICATOR_DIR . 'assets/build/postDuplicator.css' ),
   );
   wp_enqueue_script(
     'post-duplicator',
     MTPHR_POST_DUPLICATOR_URL . 'assets/build/postDuplicator.js',
     $asset_file['dependencies'],
-    $asset_file['version'],
+    filemtime( MTPHR_POST_DUPLICATOR_DIR . 'assets/build/postDuplicator.js' ),
     true
   ); 
   $settings = get_option_value();
@@ -97,13 +100,13 @@ function enqueue_scripts() {
       'post-duplicator-gutenberg',
       MTPHR_POST_DUPLICATOR_URL . 'assets/build/gutenbergButton.css',
       ['wp-components', 'wp-edit-post'],
-      $gutenberg_asset_file['version']
+      filemtime( MTPHR_POST_DUPLICATOR_DIR . 'assets/build/gutenbergButton.css' ),
     );
     wp_enqueue_script(
       'post-duplicator-gutenberg',
       MTPHR_POST_DUPLICATOR_URL . 'assets/build/gutenbergButton.js',
       $gutenberg_asset_file['dependencies'],
-      $gutenberg_asset_file['version'],
+      filemtime( MTPHR_POST_DUPLICATOR_DIR . 'assets/build/gutenbergButton.js' ),
       true
     );
     $settings = get_option_value();

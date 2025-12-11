@@ -51,6 +51,21 @@
   &:last-child {
     grid-column: 1 / -1;
   }
+  
+  &--thumbnail {
+    grid-column: 1 / -1;
+    
+    .duplicate-post-modal__preview-thumbnail {
+      margin-top: 8px;
+      
+      img {
+        max-width: 200px;
+        height: auto;
+        border-radius: 4px;
+        border: 1px solid #dcdcde;
+      }
+    }
+  }
 }
 
 .duplicate-post-modal__preview-label {
@@ -130,6 +145,22 @@
 
 /* Settings Fields Styles */
 .duplicate-settings-fields {
+  &__title {
+    @media (max-width: 600px) {
+      order: 1;
+    }
+  }
+  &__featured-image {
+    background: #efefef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    @media (max-width: 600px) {
+      order: 0;
+      width: 100% !important;
+    }
+  }
+
   // Ensure select controls have proper width
   .components-select-control__input,
   .components-text-control__input {
@@ -223,6 +254,144 @@
   }
 }
 
+/* Featured Image Control - Matching WordPress Editor Styles */
+.duplicate-settings-fields__featured-image {
+  margin-top: 0;
+  min-width: 200px;
+  &__container {
+    position: relative;
+  }
+  
+  &__preview {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    display: block;
+    
+    &:hover {
+      opacity: 0.9;
+    }
+    
+    &-image {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 2px;
+    }
+  }
+  
+  &__actions {
+    margin-top: 12px;
+    gap: 8px;
+  }
+  
+  &__action {
+    flex: 1;
+  }
+  
+  .hidden {
+    position: absolute;
+    clip: rect(1px, 1px, 1px, 1px);
+    -webkit-clip-path: inset(50%);
+    clip-path: inset(50%);
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    word-wrap: normal !important;
+  }
+  
+  .components-drop-zone {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 2px dashed transparent;
+    border-radius: 2px;
+    transition: border-color 0.2s ease;
+    
+    &:hover {
+      border-color: #2271b1;
+    }
+    
+    &__content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    
+    &:hover &__content {
+      opacity: 1;
+      background: rgba(255, 255, 255, 0.9);
+    }
+    
+    &__content-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 16px;
+    }
+    
+    &__content-icon {
+      fill: #2271b1;
+    }
+    
+    &__content-text {
+      font-size: 13px;
+      color: #2271b1;
+      font-weight: 500;
+    }
+  }
+  .editor-post-featured-image__container {
+    position: relative;
+    &:hover {
+      .editor-post-featured-image__actions:not(.editor-post-featured-image__actions-missing-image) {
+        opacity: 1;
+      }
+    }
+  }
+  .editor-post-featured-image__preview {
+    box-shadow: 0 0 0 0 var(--wp-admin-theme-color);
+    display: flex;
+    justify-content: center;
+    min-height: 40px;
+    outline-offset: -1px;
+    overflow: hidden;
+    padding: 0;
+    width: 100%;
+    height: auto !important;
+    outline: 1px solid #0000001a;
+    &-image {
+      aspect-ratio: 2 / 1;
+      object-fit: cover;
+      object-position: 50% 50%;
+      width: 100%;
+    }
+  }
+  .editor-post-featured-image__actions {
+    &:not(.editor-post-featured-image__actions-missing-image) {
+      bottom: 0;
+      opacity: 0;
+      padding: 8px;
+      position: absolute;
+      transition: opacity 50ms ease-out;
+    }
+    .editor-post-featured-image__action {
+      flex-grow: 1;
+      justify-content: center;
+      backdrop-filter: blur(16px) saturate(180%);
+      background: #ffffffbf;
+    }
+  }
+}
+
 /* Ensure modal appears above WordPress admin elements */
 .components-modal__screen-overlay {
   z-index: 100000;
@@ -233,10 +402,80 @@
   max-width: 600px;
 }
 
+/* Featured Image in Modal Header */
+.duplicate-post-modal--has-featured-image {
+  .components-modal__header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    
+    .components-modal__header-heading {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      
+      &::before {
+        content: '';
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        background-image: var(--featured-image-url);
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        border-radius: 4px;
+        flex-shrink: 0;
+        border: 1px solid #dcdcde;
+      }
+    }
+  }
+}
+
+/* Duplication Status UI */
+.duplicate-post-modal__status {
+  
+  &-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: #f6f7f7;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+  }
+  
+  &-thumbnail {
+    width: 35px;
+    height: 35px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #dcdcde;
+    flex-shrink: 0;
+  }
+  
+  &-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0;
+    color: #1d2327;
+    flex: 1;
+  }
+  
+  &-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+    
+    .components-spinner {
+      margin: 0;
+    }
+  }
+}
+
 /* Taxonomy and Custom Meta Section Styles */
 .duplicate-post-modal__taxonomy-section,
 .duplicate-post-modal__custom-meta-section {
-  margin-top: 20px;
   border: 1px solid #dcdcde;
   border-radius: 4px;
   background: #fff;
