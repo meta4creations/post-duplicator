@@ -1,7 +1,8 @@
 <?php
+namespace Mtphr\PostDuplicator;
 use Mtphr\PostDuplicator\Settings;
 
-if ( ! function_exists( 'MTPHR_SETTINGS' ) ) {
+if ( ! function_exists( __NAMESPACE__ . '\MTPHR_SETTINGS' ) ) {
   require_once __DIR__ . '/settings-class.php';
 
   add_action( 'rest_api_init', 'mtphr_settings_initialize_settings', 1 );
