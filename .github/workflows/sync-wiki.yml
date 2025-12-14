@@ -22,16 +22,16 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Check if help files changed
+      - name: Check if wiki files changed
         id: check-files
         run: |
           CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || echo "")
-          if echo "$CHANGED_FILES" | grep -q "HELP-.*\.md\|wiki/"; then
+          if echo "$CHANGED_FILES" | grep -q "wiki/"; then
             echo "changed=true" >> $GITHUB_OUTPUT
-            echo "Help files or wiki files were changed"
+            echo "Wiki files were changed"
           else
             echo "changed=false" >> $GITHUB_OUTPUT
-            echo "No help files changed, skipping sync"
+            echo "No wiki files changed, skipping sync"
           fi
 
       - name: Checkout wiki
@@ -45,27 +45,22 @@ jobs:
       - name: Sync wiki files
         if: steps.check-files.outputs.changed == 'true'
         run: |
-          # Copy help files to wiki directory structure
-          if [ -f "HELP-DUPLICATING-POSTS.md" ]; then
-            echo "Copying HELP-DUPLICATING-POSTS.md to wiki-repo/Duplicating-Posts.md"
-            cp HELP-DUPLICATING-POSTS.md wiki-repo/Duplicating-Posts.md
-          fi
-          
-          if [ -f "HELP-SETTINGS.md" ]; then
-            echo "Copying HELP-SETTINGS.md to wiki-repo/Settings.md"
-            cp HELP-SETTINGS.md wiki-repo/Settings.md
-          fi
-          
-          # Copy any files from wiki/ directory if it exists
+          # Copy all files from wiki/ directory to GitHub wiki
           if [ -d "wiki" ]; then
-            echo "Copying files from wiki/ directory"
+            echo "Copying all files from wiki/ directory to GitHub wiki"
             cp -r wiki/* wiki-repo/ 2>/dev/null || true
+            echo "Files synced:"
+            ls -la wiki-repo/ || echo "No files found"
+          else
+            echo "Warning: wiki/ directory not found"
           fi
 
       - name: Create Home page if it doesn't exist
         if: steps.check-files.outputs.changed == 'true'
         run: |
+          # Only create default Home.md if custom one wasn't copied from wiki/ directory
           if [ ! -f "wiki-repo/Home.md" ]; then
+            echo "Creating default Home.md"
             cat > wiki-repo/Home.md << 'EOF'
           # Post Duplicator Documentation
 
@@ -81,6 +76,8 @@ jobs:
           - [GitHub Repository](https://github.com/${{ github.repository }})
           - [Issues](https://github.com/${{ github.repository }}/issues)
           EOF
+          else
+            echo "Custom Home.md found in wiki/ directory - using that instead"
           fi
 
       - name: Commit and push wiki changes
