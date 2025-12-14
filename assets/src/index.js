@@ -260,8 +260,15 @@ const DuplicatePostHandler = () => {
 				return;
 			}
 
+			// Open modal immediately
+			setPostsToDuplicate( null );
+			setCurrentPost( null );
+			setModalMode( 'bulk' );
+			setIsLoadingPostData( true );
+			setIsModalOpen( true );
+
+			// Fetch all posts in parallel after opening modal
 			try {
-				// Fetch all posts in parallel
 				const postDataPromises = postIds.map( ( postId ) =>
 					fetchPostData( postId, postType ).catch( ( error ) => {
 						console.error( `Error fetching post ${ postId }:`, error );
@@ -275,6 +282,8 @@ const DuplicatePostHandler = () => {
 				const validPosts = postDataArray.filter( ( post ) => post !== null );
 
 				if ( validPosts.length === 0 ) {
+					setIsLoadingPostData( false );
+					setIsModalOpen( false );
 					showSnackbar(
 						'Error loading post data. Please try again.',
 						'error'
@@ -291,11 +300,11 @@ const DuplicatePostHandler = () => {
 				} ) );
 
 				setPostsToDuplicate( postsForModal );
-				setCurrentPost( null );
-				setModalMode( 'bulk' );
-				setIsModalOpen( true );
+				setIsLoadingPostData( false );
 			} catch ( error ) {
 				console.error( 'Error fetching posts:', error );
+				setIsLoadingPostData( false );
+				setIsModalOpen( false );
 				showSnackbar(
 					'Error loading post data. Please try again.',
 					'error'

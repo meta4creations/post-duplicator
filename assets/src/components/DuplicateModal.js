@@ -539,7 +539,9 @@ const DuplicateModal = ( {
 					} }>
 						<Spinner />
 						<p style={ { marginTop: '16px', color: '#646970' } }>
-							{ __( 'Loading post data...', 'post-duplicator' ) }
+							{ ( isBulkMode || ( postsToDuplicate && postsToDuplicate.length > 0 ) )
+								? __( 'Loading posts data...', 'post-duplicator' )
+								: __( 'Loading post data...', 'post-duplicator' ) }
 						</p>
 					</div>
 				) : duplicateStatus === 'idle' ? (
