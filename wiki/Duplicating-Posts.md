@@ -1,6 +1,6 @@
 # Duplicating Posts
 
-This guide explains how to duplicate posts using the Post Duplicator plugin. Crappers
+This guide explains how to duplicate posts using the Post Duplicator plugin.
 
 ## Overview
 
