@@ -188,22 +188,49 @@ If your wiki isn't updating automatically, check these common issues:
 3. This initializes the wiki repository
 4. Push your changes again - the workflow should now work
 
-### Issue 2: Workflow Not Running
+### Issue 2: Workflow Not Running Automatically
 
-**Symptoms:** No workflow appears in Actions tab after pushing changes
+**Symptoms:** No workflow appears in Actions tab after pushing changes to HELP-*.md files
 
-**Check:**
-1. Verify `.github/workflows/sync-wiki.yml` exists in your repository
-2. Ensure you're pushing to the `main` or `master` branch (workflow is configured for these)
-3. Check that you're modifying `HELP-*.md` files (workflow triggers on these paths)
-4. Go to **Actions** tab and check if workflow is listed (even if not running)
+**Common Causes:**
 
-**Solution:**
+1. **Path Filter Issue**: GitHub Actions path filters can be unreliable. The pattern `HELP-*.md` might not match if:
+   - You're pushing multiple files in one commit
+   - The file path doesn't exactly match the pattern
+   - The workflow file wasn't committed to the default branch
+
+2. **Workflow File Location**: The workflow must be in the default branch (`main` or `master`) to work
+
+3. **First Push**: If this is the first time setting up, the workflow might need to be manually triggered once
+
+**Solutions:**
+
+**Solution A: Use Alternative Workflow (Recommended)**
+1. I've created an alternative workflow: `.github/workflows/sync-wiki-always.yml`
+2. This workflow runs on every push and checks if help files changed
+3. To use it:
+   - Rename `sync-wiki.yml` to `sync-wiki-path-filter.yml` (backup)
+   - Rename `sync-wiki-always.yml` to `sync-wiki.yml`
+   - Commit and push
+4. This approach is more reliable because it doesn't rely on path filters
+
+**Solution B: Manual Trigger**
 - Manually trigger the workflow:
   1. Go to **Actions** tab
   2. Click on "Sync Wiki Documentation"
-  3. Click "Run workflow" button
+  3. Click "Run workflow" button (top right)
   4. Select your branch and click "Run workflow"
+
+**Solution C: Check Workflow Logs**
+1. Go to **Actions** tab
+2. Look for any workflow runs (even failed ones)
+3. Click on a run to see detailed logs
+4. The debug step will show what files were changed
+
+**Solution D: Verify Path Filter**
+1. Check that your files are named exactly `HELP-*.md` (case-sensitive)
+2. Ensure files are in the repository root, not in a subdirectory
+3. Try pushing ONLY the HELP file in a separate commit to test
 
 ### Issue 3: Workflow Runs But Wiki Doesn't Update
 
