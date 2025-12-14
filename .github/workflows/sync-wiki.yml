@@ -25,27 +25,13 @@ jobs:
       - name: Check if help files changed
         id: check-files
         run: |
-          echo "Checking for changed files..."
-          echo "Current commit: $(git rev-parse HEAD)"
-          echo "Previous commit: $(git rev-parse HEAD~1 2>/dev/null || echo 'N/A (first commit)')"
-          
-          # Try to get changed files - handle case where there's only one commit
-          if git rev-parse HEAD~1 >/dev/null 2>&1; then
-            CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || echo "")
-            echo "Changed files:"
-            echo "$CHANGED_FILES" || echo "Could not determine changed files"
-          else
-            # If this is the first commit or we can't determine, check all files
-            CHANGED_FILES=$(git ls-files | grep -E "HELP-.*\.md|wiki/" || echo "")
-            echo "First commit or unable to diff - checking all tracked files"
-          fi
-          
-          if echo "$CHANGED_FILES" | grep -qE "HELP-.*\.md|wiki/"; then
+          CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || echo "")
+          if echo "$CHANGED_FILES" | grep -q "HELP-.*\.md\|wiki/"; then
             echo "changed=true" >> $GITHUB_OUTPUT
-            echo "✅ Help files or wiki files were changed - will sync"
+            echo "Help files or wiki files were changed"
           else
             echo "changed=false" >> $GITHUB_OUTPUT
-            echo "ℹ️ No help files changed, skipping sync"
+            echo "No help files changed, skipping sync"
           fi
 
       - name: Checkout wiki
