@@ -1,0 +1,80 @@
+name: Sync Wiki Documentation
+
+on:
+  push:
+    paths:
+      - 'wiki/**'
+      - 'HELP-*.md'
+    branches:
+      - main
+      - master
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  sync-wiki:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Checkout wiki
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository }}.wiki
+          path: wiki-repo
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Sync wiki files
+        run: |
+          # Copy help files to wiki directory structure
+          if [ -f "HELP-DUPLICATING-POSTS.md" ]; then
+            cp HELP-DUPLICATING-POSTS.md wiki-repo/Duplicating-Posts.md
+          fi
+          
+          if [ -f "HELP-SETTINGS.md" ]; then
+            cp HELP-SETTINGS.md wiki-repo/Settings.md
+          fi
+          
+          # Copy any files from wiki/ directory if it exists
+          if [ -d "wiki" ]; then
+            cp -r wiki/* wiki-repo/ 2>/dev/null || true
+          fi
+
+      - name: Create Home page if it doesn't exist
+        run: |
+          if [ ! -f "wiki-repo/Home.md" ]; then
+            cat > wiki-repo/Home.md << 'EOF'
+          # Post Duplicator Documentation
+
+          Welcome to the Post Duplicator plugin documentation.
+
+          ## Getting Started
+
+          - [Duplicating Posts](Duplicating-Posts) - Learn how to duplicate posts using various methods
+          - [Settings](Settings) - Configure plugin settings and permissions
+
+          ## Quick Links
+
+          - [GitHub Repository](https://github.com/${{ github.repository }})
+          - [Issues](https://github.com/${{ github.repository }}/issues)
+          EOF
+          fi
+
+      - name: Commit and push wiki changes
+        run: |
+          cd wiki-repo
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          if [ -n "$(git status --porcelain)" ]; then
+            git add .
+            git commit -m "Auto-sync wiki documentation from repository"
+            git push
+          else
+            echo "No changes to commit"
+          fi

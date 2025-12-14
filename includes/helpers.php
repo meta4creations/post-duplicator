@@ -90,3 +90,21 @@ function get_post_types_author_support() {
 	
 	return $author_support;
 }
+
+/**
+ * Get hierarchical support information for all post types
+ */
+function get_post_types_hierarchical_support() {
+	$post_types = get_post_types( array(), 'objects' );
+	$hierarchical_support = array();
+	
+	foreach ( $post_types as $post_type => $post_type_obj ) {
+		// Skip system post types
+		if ( in_array( $post_type, array( 'attachment', 'revision', 'nav_menu_item', 'wooframework' ) ) ) {
+			continue;
+		}
+		$hierarchical_support[ $post_type ] = $post_type_obj->hierarchical;
+	}
+	
+	return $hierarchical_support;
+}

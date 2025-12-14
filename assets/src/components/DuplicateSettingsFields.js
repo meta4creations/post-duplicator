@@ -83,6 +83,7 @@ const DuplicateSettingsFields = ( {
 	const usersList = window.postDuplicatorVars?.users || [];
 	const currentUser = window.postDuplicatorVars?.currentUser;
 	const postTypesAuthorSupport = window.postDuplicatorVars?.postTypesAuthorSupport || {};
+	const postTypesHierarchicalSupport = window.postDuplicatorVars?.postTypesHierarchicalSupport || {};
 
 	// Check if current post type supports authors
 	const getCurrentPostType = () => {
@@ -92,6 +93,11 @@ const DuplicateSettingsFields = ( {
 	const currentPostTypeSupportsAuthor = () => {
 		const postType = getCurrentPostType();
 		return postTypesAuthorSupport[ postType ] !== false; // Default to true if not specified
+	};
+
+	const currentPostTypeIsHierarchical = () => {
+		const postType = getCurrentPostType();
+		return postTypesHierarchicalSupport[ postType ] === true; // Default to false if not specified
 	};
 
 	// Initialize selectedAuthorId with a valid default
@@ -324,6 +330,22 @@ const DuplicateSettingsFields = ( {
 			const newAuthorId = String( currentUser.id );
 			setSelectedAuthorId( newAuthorId );
 			handleChange( 'selectedAuthorId', parseInt( newAuthorId ) );
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ localSettings.type, initialized ] );
+
+	// Update parent selection when post type changes to non-hierarchical
+	useEffect( () => {
+		if ( ! initialized ) {
+			return; // Don't update during initialization
+		}
+		
+		const isHierarchical = currentPostTypeIsHierarchical();
+		
+		// If post type is not hierarchical, set parent to "No Parent"
+		if ( ! isHierarchical && selectedParentId !== '' ) {
+			setSelectedParentId( '' );
+			handleChange( 'selectedParentId', null );
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ localSettings.type, initialized ] );
@@ -693,17 +715,18 @@ const DuplicateSettingsFields = ( {
 					__nextHasNoMarginBottom
 					__next40pxDefaultSize
 				/>
-				<SelectControl
-					label={ __( 'Post Parent', 'post-duplicator' ) }
-					value={ selectedParentId || '' }
-					options={ parentPosts }
-					onChange={ ( value ) => {
-						setSelectedParentId( value );
-						handleChange( 'selectedParentId', value ? parseInt( value ) : null );
-					} }
-					__nextHasNoMarginBottom
-					__next40pxDefaultSize
-				/>
+			<SelectControl
+				label={ __( 'Post Parent', 'post-duplicator' ) }
+				value={ selectedParentId || '' }
+				options={ parentPosts }
+				onChange={ ( value ) => {
+					setSelectedParentId( value );
+					handleChange( 'selectedParentId', value ? parseInt( value ) : null );
+				} }
+				disabled={ ! currentPostTypeIsHierarchical() }
+				__nextHasNoMarginBottom
+				__next40pxDefaultSize
+			/>
       </HStack>
       <HStack spacing="16px" alignment="stretch">
 				<SelectControl

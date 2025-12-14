@@ -176,11 +176,14 @@ const DuplicatePostButton = () => {
 		return null;
 	}
 
-	const handleDuplicate = async ( settings, callbacks ) => {
+	const handleDuplicate = async ( duplicatePostId, settings, callbacks ) => {
 		setIsLoading( true );
 		setError( null );
 
-		await duplicatePost( postId, settings, {
+		// Use the postId passed or fall back to current postId
+		const targetPostId = duplicatePostId || postId;
+
+		await duplicatePost( targetPostId, settings, {
 			onSuccess: ( result ) => {
 				setIsLoading( false );
 				if ( callbacks?.onSuccess ) {

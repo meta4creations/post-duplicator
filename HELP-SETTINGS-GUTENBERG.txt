@@ -1,0 +1,457 @@
+<!-- wp:group -->
+<div class="wp-block-group"><!-- wp:heading {"level":1} -->
+<h1 class="wp-block-heading">Post Duplicator Settings</h1>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>This guide explains all the settings available in the Post Duplicator plugin. Access these settings by going to <strong>Settings &gt; Post Duplicator</strong> in your WordPress admin.</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->
+
+<!-- wp:group -->
+<div class="wp-block-group"><!-- wp:heading {"level":2} -->
+<h2 class="wp-block-heading">Overview</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>The settings page is divided into three main sections:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list {"ordered":true} -->
+<ol class="wp-block-list"><li><strong>Defaults</strong> - Configure default behavior for all duplications</li><li><strong>Permissions</strong> - Control who can duplicate posts</li><li><strong>Advanced</strong> - Fine-tune duplication behavior for special post types</li></ol>
+<!-- /wp:list --></div>
+<!-- /wp:group -->
+
+<!-- wp:group -->
+<div class="wp-block-group"><!-- wp:heading {"level":2} -->
+<h2 class="wp-block-heading">Defaults Section</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>These settings determine the default behavior when duplicating posts. You can override these defaults for individual duplications using the duplication modal.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Post Status</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p><strong>Options:</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><li><strong>Same as original</strong> - The duplicate will have the same status as the original post</li><li><strong>Draft</strong> - All duplicates will be created as drafts (recommended default)</li><li><strong>Published</strong> - All duplicates will be published immediately</li><li><strong>Pending</strong> - All duplicates will be set to pending review</li></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Recommendation:</strong> Keep this set to <strong>Draft</strong> to prevent accidentally publishing duplicates.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Post Type</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p><strong>Options:</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><li><strong>Same</strong> - Duplicate will be the same post type as the original</li><li><strong>[List of available post types]</strong> - Choose a specific post type to convert duplicates to</li></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Use Case:</strong> If you want to convert all duplicated posts to a different type (e.g., convert all duplicated Posts to a custom "Article" post type).</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Post Author</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p><strong>Options:</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><li><strong>Current User</strong> - The person duplicating the post becomes the author (recommended)</li><li><strong>Original Post Author</strong> - The duplicate keeps the original author</li></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Recommendation:</strong> Use <strong>Current User</strong> so duplicates are attributed to the person creating them.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Post Date</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p><strong>Options:</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><li><strong>Duplicate Timestamp</strong> - The duplicate will have the same publication date as the original</li><li><strong>Current Time</strong> - The duplicate will use the current date and time (recommended)</li></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Recommendation:</strong> Use <strong>Current Time</strong> so duplicates have fresh timestamps.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Duplicate Title</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p><strong>Description:</strong> Text that will be appended to the original post title.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>Default:</strong> "Copy"</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>Example:</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><li>Original: "My Blog Post"</li><li>Duplicate: "My Blog Post Copy"</li></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Tip:</strong> You can customize this per duplication in the modal, but this sets the default suffix.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Duplicate Slug</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p><strong>Description:</strong> Text that will be appended to the original post slug (URL-friendly version).</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>Default:</strong> "copy"</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>Example:</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><li>Original slug: "my-blog-post"</li><li>Duplicate slug: "my-blog-post-copy"</li></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Tip:</strong> Keep this lowercase and URL-friendly. WordPress will automatically format it.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Offset Date</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p><strong>Description:</strong> When enabled, allows you to set a time offset for duplicated post dates.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>Default:</strong> Disabled</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>How it works:</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list {"ordered":true} -->
+<ol class="wp-block-list"><li>Check the <strong>Offset Date</strong> checkbox</li><li>Set the offset amount:<ul><li><strong>Days</strong> - Number of days to offset</li><li><strong>Hours</strong> - Number of hours to offset</li><li><strong>Minutes</strong> - Number of minutes to offset</li><li><strong>Seconds</strong> - Number of seconds to offset</li></ul></li><li>Choose the direction:<ul><li><strong>Newer</strong> - The duplicate date will be in the future</li><li><strong>Older</strong> - The duplicate date will be in the past</li></ul></li></ol>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Example:</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><li>Original date: January 1, 2024</li><li>Offset: 7 days, direction: Newer</li><li>Duplicate date: January 8, 2024</li></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Use Case:</strong> Useful for scheduling duplicates at specific intervals or creating posts with historical dates.</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->
+
+<!-- wp:group -->
+<div class="wp-block-group"><!-- wp:heading {"level":2} -->
+<h2 class="wp-block-heading">Permissions Section</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Control which user roles can duplicate posts and what they can duplicate.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Role-Based Permissions</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>For each user role (Administrator, Editor, Author, Contributor, etc.), you can enable:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><li><strong>duplicate_posts</strong> - Allows users to duplicate their own posts</li><li><strong>duplicate_others_posts</strong> - Allows users to duplicate posts created by other users</li></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>How to Configure:</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list {"ordered":true} -->
+<ol class="wp-block-list"><li>Find the role you want to configure (e.g., "Author Permissions")</li><li>Check the boxes for the capabilities you want to grant</li><li>Click <strong>Save Changes</strong></li></ol>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Default Behavior:</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><li>Administrators typically have all permissions by default</li><li>Other roles may need permissions granted manually</li></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Security Note:</strong> Be careful when granting "duplicate_others_posts" to lower-level roles, as this allows them to copy content created by others.</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->
+
+<!-- wp:group -->
+<div class="wp-block-group"><!-- wp:heading {"level":2} -->
+<h2 class="wp-block-heading">Advanced Section</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>These settings control duplication behavior for special post statuses created by other users.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Draft Posts</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p><strong>Question:</strong> Should users be able to duplicate other users' draft posts?</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>Options:</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><li><strong>Disabled</strong> - Users cannot duplicate drafts created by others</li><li><strong>Enabled</strong> - Users can duplicate drafts created by others (if they have permission)</li></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Default:</strong> Enabled</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>Use Case:</strong> Disable this if you want to prevent users from seeing or copying unpublished drafts from other authors.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Pending Posts</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p><strong>Question:</strong> Should users be able to duplicate other users' pending posts?</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>Options:</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><li><strong>Disabled</strong> - Users cannot duplicate pending posts created by others</li><li><strong>Enabled</strong> - Users can duplicate pending posts created by others (if they have permission)</li></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Default:</strong> Enabled</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>Use Case:</strong> Useful in editorial workflows where pending posts are under review.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Private Posts</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p><strong>Question:</strong> Should users be able to duplicate other users' private posts?</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>Options:</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><li><strong>Disabled</strong> - Users cannot duplicate private posts created by others</li><li><strong>Enabled</strong> - Users can duplicate private posts created by others (if they have permission)</li></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Default:</strong> Enabled</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>Use Case:</strong> Private posts are typically meant to be restricted. Consider disabling this for better privacy.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Password Protected Posts</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p><strong>Question:</strong> Should users be able to duplicate other users' password protected posts?</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>Options:</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><li><strong>Disabled</strong> - Users cannot duplicate password protected posts created by others</li><li><strong>Enabled</strong> - Users can duplicate password protected posts created by others (if they have permission)</li></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Default:</strong> Enabled</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>Use Case:</strong> Password protected posts are meant to be restricted. Consider disabling this for better security.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Future Posts (Scheduled Posts)</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p><strong>Question:</strong> Should users be able to duplicate other users' scheduled/future posts?</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>Options:</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><li><strong>Disabled</strong> - Users cannot duplicate scheduled posts created by others</li><li><strong>Enabled</strong> - Users can duplicate scheduled posts created by others (if they have permission)</li></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Default:</strong> Enabled</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>Use Case:</strong> Scheduled posts are often part of content calendars. Enable this if you want to allow copying scheduled content.</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->
+
+<!-- wp:group -->
+<div class="wp-block-group"><!-- wp:heading {"level":2} -->
+<h2 class="wp-block-heading">Saving Settings</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>After making any changes:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list {"ordered":true} -->
+<ol class="wp-block-list"><li>Scroll to the bottom of the settings page</li><li>Click <strong>Save Changes</strong></li><li>Your settings will be applied immediately</li></ol>
+<!-- /wp:list --></div>
+<!-- /wp:group -->
+
+<!-- wp:group -->
+<div class="wp-block-group"><!-- wp:heading {"level":2} -->
+<h2 class="wp-block-heading">Best Practices</h2>
+<!-- /wp:heading -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Recommended Default Settings</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>For most sites, we recommend:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><li><strong>Post Status:</strong> Draft</li><li><strong>Post Type:</strong> Same</li><li><strong>Post Author:</strong> Current User</li><li><strong>Post Date:</strong> Current Time</li><li><strong>Duplicate Title:</strong> "Copy"</li><li><strong>Duplicate Slug:</strong> "copy"</li><li><strong>Offset Date:</strong> Disabled</li></ul>
+<!-- /wp:list -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Security Recommendations</h3>
+<!-- /wp:heading -->
+
+<!-- wp:list {"ordered":true} -->
+<ol class="wp-block-list"><li><strong>Limit Permissions:</strong> Only grant "duplicate_others_posts" to trusted roles (Editors, Administrators)</li><li><strong>Private Posts:</strong> Consider disabling duplication of private posts for better privacy</li><li><strong>Password Protected:</strong> Consider disabling duplication of password protected posts</li><li><strong>Review Advanced Settings:</strong> Regularly review the Advanced section to ensure it matches your site's needs</li></ol>
+<!-- /wp:list -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Workflow Tips</h3>
+<!-- /wp:heading -->
+
+<!-- wp:list {"ordered":true} -->
+<ol class="wp-block-list"><li><strong>Editorial Workflows:</strong> If you have a review process, you may want to disable duplication of pending posts</li><li><strong>Content Templates:</strong> If you use posts as templates, set default status to Draft so templates aren't accidentally published</li><li><strong>Multi-Author Sites:</strong> Use "Current User" for Post Author to ensure proper attribution</li><li><strong>Scheduled Content:</strong> Enable duplication of future posts if you want to copy scheduled content calendars</li></ol>
+<!-- /wp:list --></div>
+<!-- /wp:group -->
+
+<!-- wp:group -->
+<div class="wp-block-group"><!-- wp:heading {"level":2} -->
+<h2 class="wp-block-heading">Understanding Settings vs. Modal Overrides</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p><strong>Settings Page (Defaults):</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><li>These are the default values used when duplicating</li><li>They apply to all duplications unless overridden</li><li>Set once and use repeatedly</li></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Duplication Modal (Overrides):</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><li>These allow you to customize individual duplications</li><li>Override the defaults for that specific duplication only</li><li>Don't affect future duplications</li></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Example:</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><li>Default status is set to "Draft" in settings</li><li>You duplicate a post and change status to "Published" in the modal</li><li>The duplicate is published, but future duplications will still default to "Draft"</li></ul>
+<!-- /wp:list --></div>
+<!-- /wp:group -->
+
+<!-- wp:group -->
+<div class="wp-block-group"><!-- wp:heading {"level":2} -->
+<h2 class="wp-block-heading">Troubleshooting</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p><strong>Settings aren't saving:</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><li>Make sure you click "Save Changes" at the bottom</li><li>Check that you have "manage_options" capability (typically Administrator role)</li><li>Try refreshing the page</li></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Defaults aren't being applied:</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><li>Clear your browser cache</li><li>Check that you saved the settings</li><li>Verify you're looking at the correct settings section</li></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Permissions aren't working:</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><li>Ensure you saved the Permissions section</li><li>Check that the user role actually has the capabilities assigned</li><li>Some plugins may override WordPress capabilities</li></ul>
+<!-- /wp:list --></div>
+<!-- /wp:group -->
