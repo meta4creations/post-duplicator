@@ -3,6 +3,7 @@
 /.github/ export-ignore
 /vendor/ export-ignore
 /wiki/ export-ignore
+/scripts/ export-ignore
 /composer.json
 /assets/src/ export-ignore
 /assets/composer.json export-ignore
