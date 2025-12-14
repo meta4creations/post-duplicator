@@ -19,29 +19,38 @@ Post Duplicator is the ultimate WordPress plugin for quickly creating exact dupl
 
 * **Universal Post Type Support** - Works with every post type WordPress supports, including custom post types from your favorite plugins and themes
 * **Complete Data Preservation** - Automatically copies all taxonomies, custom fields, metadata, and featured images
-* **Flexible Duplication Options** - Customize title, slug, status, author, date, and post type for each duplicate
+* **Bulk Duplication** - Select and duplicate multiple posts at once with individual settings per post
+* **Multiple Clones** - Create multiple copies of a single post simultaneously (up to 50 clones)
+* **Flexible Duplication Options** - Customize title, slug, status, author, date, post type, and parent for each duplicate
+* **Featured Image Management** - Set, replace, or remove featured images directly in the duplication modal
 * **Smart Defaults** - Configure default settings that apply to all duplications (draft status, current user as author)
 * **Permission Control** - Granular control over who can duplicate posts with role-based permissions
-* **Modern Interface** - Beautiful modal interface with live preview of duplication settings
+* **Modern Interface** - Beautiful modal interface with live editing and expandable settings
 * **Cross-Post Type Duplication** - Convert posts to different post types during duplication
+* **Hierarchical Post Support** - Set parent posts for pages and hierarchical custom post types
 * **One-Click Operation** - Duplicate posts from the posts list, edit screen, or block editor toolbar
 
 **Perfect For:**
 
-* **Developers** - Quickly generate test content and dummy data for development
-* **Content Managers** - Create content templates and variations efficiently
-* **Bloggers** - Repurpose successful posts with different angles or formats
-* **E-commerce** - Duplicate product variations and similar listings
-* **Multilingual Sites** - Works seamlessly with WPML and Polylang
+* **Developers** - Quickly generate test content and dummy data for development using bulk or multiple clone features
+* **Content Managers** - Create content templates and variations efficiently with one-click duplication
+* **Bloggers** - Repurpose successful posts with different angles or formats using multiple clones
+* **E-commerce** - Duplicate product variations and bulk duplicate similar listings across categories
+* **Content Marketers** - Create A/B testing variations with the multiple clones feature
+* **Site Migrations** - Bulk duplicate posts when restructuring or migrating content
+* **Multilingual Sites** - Works seamlessly with WPML and Polylang for multilingual content
 
 **What Gets Duplicated:**
 
 * Post content and formatting
-* Title and slug (with customizable suffixes)
+* Title and slug (with customizable suffixes or full editing)
 * All custom fields and metadata
 * Categories, tags, and custom taxonomies
-* Featured images
-* Post format
+* Featured images (with ability to change or remove)
+* Post format and excerpt
+* Comment and ping status
+* Menu order
+* Post parent (for hierarchical post types)
 
 **What Doesn't Get Duplicated:**
 
@@ -50,10 +59,11 @@ Post Duplicator is the ultimate WordPress plugin for quickly creating exact dupl
 
 **How to Use:**
 
-1. **From Posts List**: Hover over any post and click "Duplicate [Post Type]" in the row actions
-2. **From Edit Screen**: Click the "Duplicate Post" button in the Gutenberg toolbar or classic editor
-3. **Customize Settings**: Click "Customize Settings" in the modal to override defaults for individual duplications
-4. **Configure Defaults**: Go to Settings > Post Duplicator to set default status, author, date, and title/slug suffixes
+1. **Single Duplication**: Hover over any post and click "Duplicate [Post Type]" in the row actions, or click the "Duplicate Post" button in the Gutenberg editor
+2. **Multiple Clones**: In the duplication modal, click the copy icon to create multiple copies of a single post (up to 50 clones)
+3. **Bulk Duplication**: Select multiple posts using checkboxes, choose "Duplicate" from the Bulk Actions dropdown, then configure each post individually
+4. **Customize Settings**: Edit title, slug, status, author, date, post type, featured image, and parent for each duplicate
+5. **Configure Defaults**: Go to Settings > Post Duplicator to set default status, author, date, and title/slug suffixes
 
 **Default Settings:**
 
@@ -133,34 +143,45 @@ However, you can customize default settings by going to **Settings > Post Duplic
 
 = Where can I find the duplicate option? =
 
-The duplicate option appears in three places:
+The duplicate option appears in four places:
 
-1. **Posts List**: Hover over any post in the All Posts (or any post type list) screen and click "Duplicate [Post Type]" in the row actions
-2. **Gutenberg Editor**: Click the "Duplicate Post" button in the top toolbar when editing a published post
-3. **Classic Editor**: Find the "Duplicate [Post Type]" button in the Publish meta box
+1. **Posts List (Single)**: Hover over any post in the All Posts (or any post type list) screen and click "Duplicate [Post Type]" in the row actions
+2. **Posts List (Bulk)**: Select multiple posts using checkboxes, then choose "Duplicate" from the Bulk Actions dropdown
+3. **Gutenberg Editor**: Click the "Duplicate Post" button in the top toolbar when editing a post
+4. **Classic Editor**: Find the "Duplicate [Post Type]" button in the Publish meta box
 
-Note: The duplicate option only appears for published posts.
+The duplicate option works for all post statuses (published, draft, pending, etc.).
 
 = What information gets duplicated? =
 
 Post Duplicator creates a complete copy including:
-* All post content and formatting
-* Title and slug (with customizable suffixes)
-* All custom fields and metadata
+* All post content and formatting (including Gutenberg blocks)
+* Title and slug (with customizable suffixes or full editing)
+* All custom fields and metadata (ACF, meta boxes, etc.)
 * Categories, tags, and all custom taxonomies
-* Featured images
-* Post format
+* Featured images (with ability to change before duplication)
+* Post format and excerpt
+* Comment and ping status settings
+* Menu order
+* Post parent (for hierarchical post types)
+* Post password (if applicable)
 
-Comments are NOT duplicated (by design), and new unique IDs are assigned to the duplicate.
+Comments are NOT duplicated (by design), and new unique IDs and GUIDs are assigned to each duplicate.
 
 = Can I customize settings for individual duplications? =
 
-Yes! When the duplication modal opens, click "Customize Settings" (pencil icon) to:
-* Edit the full title and slug
-* Change post status, type, author, or date
-* See a live preview of what the duplicate will look like
+Yes! When the duplication modal opens, you can customize:
+* **Full title and slug** - Edit the complete title and slug, not just suffixes
+* **Post status** - Draft, published, pending, or same as original
+* **Post type** - Convert to a different post type during duplication
+* **Post author** - Assign to any user or leave without author
+* **Post date** - Use current time, original date, or pick a custom date with the calendar picker
+* **Post parent** - Set parent for hierarchical post types (pages, etc.)
+* **Featured image** - Change, replace, or remove the featured image
+* **Taxonomies** - Select which categories, tags, and custom taxonomies to include
+* **Custom meta** - Choose which custom fields to duplicate
 
-These customizations only apply to that specific duplication and don't change your default settings.
+For bulk duplications or multiple clones, expand each post item to customize it individually. These customizations only apply to that specific duplication and don't change your default settings.
 
 = Can I duplicate posts to a different post type? =
 
@@ -220,7 +241,47 @@ Comments are intentionally NOT duplicated. This prevents duplicate comment threa
 
 = Is there a way to bulk duplicate posts? =
 
-Currently, Post Duplicator duplicates one post at a time. This ensures you have control over each duplication and can customize settings as needed. Bulk duplication may be added in a future version.
+Yes! Version 3.0.0 introduced bulk duplication:
+
+1. Navigate to the posts list (All Posts, All Pages, etc.)
+2. Select multiple posts using the checkboxes
+3. Choose "Duplicate" from the Bulk Actions dropdown
+4. Click Apply
+5. Configure each duplicate individually in the modal
+6. Click the duplicate button to create all posts
+
+You can also create multiple clones of a single post by clicking the copy icon in the duplication modal.
+
+= How do I create multiple clones of the same post? =
+
+The multiple clones feature lets you create several copies of a single post:
+
+1. Start duplicating any post (from posts list or editor)
+2. Click the copy icon button in the modal header to enable multiple clones mode
+3. Set the number of clones you want (1-50)
+4. Each clone appears as a separate item that you can expand and customize
+5. Edit the title, slug, status, author, date, featured image, and other settings for each clone
+6. Click the duplicate button to create all clones at once
+
+This is perfect for creating variations of content, A/B testing, or content series with similar structure.
+
+= What's the difference between bulk duplication and multiple clones? =
+
+Both features let you create multiple posts, but they work differently:
+
+**Multiple Clones**:
+* Creates multiple copies of a **single post**
+* All clones start from the same original content
+* Perfect for creating variations of the same post
+* Example: Create 5 different versions of a blog post for A/B testing
+
+**Bulk Duplication**:
+* Duplicates **multiple different posts** at once
+* Each duplicate is based on a different original post
+* Perfect for duplicating a batch of posts with similar settings
+* Example: Duplicate 10 different product posts from one category to another
+
+Both allow you to customize each duplicate individually before creating them.
 
 = Where are the plugin settings located? =
 
@@ -233,20 +294,30 @@ The settings page includes three tabs:
 
 == Screenshots ==
 
-1. Single post duplicate button
-2. Duplicate post modal
-3. Duplicate post complete
-4. Posts list duplicate link
-5. Default settings
-6. Permission settings
-7. Advanced settings
+1. Posts list duplicate link (row action)
+2. Bulk actions dropdown with duplicate option
+3. Gutenberg editor duplicate button
+4. Single post duplication modal with full customization
+5. Multiple clones interface with clone count selector
+6. Bulk duplication modal showing multiple posts
+7. Featured image selector in duplication modal
+8. Default settings page
+9. Permission settings page
+10. Advanced settings page
 
 == Changelog ==
 
 = 3.0.0 [2025-12-10] =
-* Added Gutenberg single post duplication functionality
-* Added ability to modify duplicated post content before creating the post
-* Settings updates
+* **New Feature**: Bulk duplication - Select and duplicate multiple posts at once
+* **New Feature**: Multiple clones - Create up to 50 copies of a single post simultaneously
+* **New Feature**: Featured image management - Set, replace, or remove featured images in the duplication modal
+* **New Feature**: Post parent selection - Set parent posts for hierarchical post types
+* **New Feature**: Interactive date picker - Calendar interface for setting custom dates
+* **Enhancement**: Full title and slug editing - Edit complete title and slug, not just suffixes
+* **Enhancement**: Enhanced modal interface - Expandable post items with individual settings
+* **Enhancement**: Improved Gutenberg editor integration
+* **Enhancement**: Real-time validation and slug sanitization
+* Settings updates and performance improvements
 
 = 2.48 [2025-10-04] =
 * Mtphr Settings updates

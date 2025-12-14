@@ -146,17 +146,15 @@ function initialize_sidebar() {
           [
             'type' => 'ad',
             'id' => 'email_customizer',
-            'trackingRef' => 'post_duplicator',
             'image' => MTPHR_POST_DUPLICATOR_URL . 'assets/img/marketing/email-customizer.png',
-            'link' => 'https://www.metaphorcreations.com/wordpress-plugins/email-customizer/',
+            'link' => 'https://www.metaphorcreations.com/wordpress-plugins/email-customizer/?campaign=post-duplicator-settings&ref=266',
             'container' => 'simple',
           ],
           [
             'type' => 'ad',
             'id' => 'ditty_everything',
-            'trackingRef' => 'post_duplicator',
             'image' => MTPHR_POST_DUPLICATOR_URL . 'assets/img/marketing/ditty-everything.png',
-            'link' => 'https://www.metaphorcreations.com/ditty/pricing/',
+            'link' => 'https://www.metaphorcreations.com/ditty/pricing/?campaign=post-duplicator-settings&ref=266',
             'container' => 'simple',
           ],
         ]

@@ -13,6 +13,7 @@ import DuplicateSettingsFields from './DuplicateSettingsFields';
 import TaxonomySection from './TaxonomySection';
 import CustomMetaSection from './CustomMetaSection';
 import PostList from './PostList';
+import MarketingBanner from './MarketingBanner';
 
 const DuplicateModal = ( {
 	isOpen,
@@ -527,6 +528,7 @@ const DuplicateModal = ( {
 				style={ { paddingBottom: duplicateStatus === 'idle' ? '77px' : '0' } }
 			>
 				{ duplicateStatus === 'idle' ? (
+					<>
 					<VStack className="duplicate-post-modal__settings" spacing="20px">
 						{/* Clone Count Input - only show for multiple-clones mode */}
 						{ isMultiple && ! isBulkMode && ( ! postsToDuplicate || postsToDuplicate.length === 0 ) && originalPost && (
@@ -596,6 +598,10 @@ const DuplicateModal = ( {
 						/>
 					) }
 					</VStack>
+
+					{/* Marketing Banner */}
+					<MarketingBanner />
+					</>
 				) : (
 					<div className="duplicate-post-modal__status">
 						{/* Single mode success */}
