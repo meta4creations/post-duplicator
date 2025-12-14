@@ -1,11 +1,10 @@
 /.gitattributes export-ignore
 /.gitignore export-ignore
 /.github/ export-ignore
-/composer.json/ export-ignore
 /vendor/ export-ignore
 /wiki/ export-ignore
 /scripts/ export-ignore
-/composer.json
+/composer.json export-ignore
 /assets/src/ export-ignore
 /assets/composer.json export-ignore
 /assets/package.json export-ignore
