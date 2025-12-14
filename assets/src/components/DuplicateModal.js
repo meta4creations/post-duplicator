@@ -27,6 +27,7 @@ const DuplicateModal = ( {
 	statusChoices,
 	siteUrl,
 	currentUser,
+	isLoadingPostData = false,
 } ) => {
 	// Determine if we're in bulk mode (separate from single/multiple toggle)
 	const isBulkMode = initialMode === 'bulk' || ( postsToDuplicate && postsToDuplicate.length > 0 );
@@ -527,7 +528,21 @@ const DuplicateModal = ( {
 				className="duplicate-post-modal__content"
 				style={ { paddingBottom: duplicateStatus === 'idle' ? '77px' : '0' } }
 			>
-				{ duplicateStatus === 'idle' ? (
+				{ isLoadingPostData ? (
+					<div style={ { 
+						display: 'flex', 
+						flexDirection: 'column', 
+						alignItems: 'center', 
+						justifyContent: 'center', 
+						padding: '60px 20px',
+						minHeight: '200px'
+					} }>
+						<Spinner />
+						<p style={ { marginTop: '16px', color: '#646970' } }>
+							{ __( 'Loading post data...', 'post-duplicator' ) }
+						</p>
+					</div>
+				) : duplicateStatus === 'idle' ? (
 					<>
 					<VStack className="duplicate-post-modal__settings" spacing="20px">
 						{/* Clone Count Input - only show for multiple-clones mode */}
@@ -738,14 +753,14 @@ const DuplicateModal = ( {
 					<Button
 						variant="tertiary"
 						onClick={ handleClose }
-						disabled={ isLoading }
+						disabled={ isLoading || isLoadingPostData }
 					>
 						{ __( 'Cancel', 'post-duplicator' ) }
 					</Button>
 					<Button
 						variant="primary"
 						onClick={ handleDuplicate }
-						disabled={ isLoading || posts.length === 0 }
+						disabled={ isLoading || isLoadingPostData || posts.length === 0 }
 						isBusy={ isLoading }
 					>
 						{ isLoading

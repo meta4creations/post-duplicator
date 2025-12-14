@@ -180,6 +180,7 @@ const DuplicatePostHandler = () => {
 	const [ postsToDuplicate, setPostsToDuplicate ] = useState( null );
 	const [ modalMode, setModalMode ] = useState( 'single' );
 	const [ wasDuplicated, setWasDuplicated ] = useState( false );
+	const [ isLoadingPostData, setIsLoadingPostData ] = useState( false );
 	
 	// Check if we're on the posts list screen
 	const isPostsListScreen = () => {
@@ -220,14 +221,22 @@ const DuplicatePostHandler = () => {
 				const postType =
 					e.target.getAttribute( 'data-posttype' ) || 'post';
 
+				// Open modal immediately
+				setCurrentPost( null );
+				setPostsToDuplicate( null );
+				setModalMode( 'single' );
+				setIsLoadingPostData( true );
+				setIsModalOpen( true );
+
+				// Fetch data asynchronously after opening modal
 				try {
 					const postData = await fetchPostData( postId, postType );
 					setCurrentPost( postData );
-					setPostsToDuplicate( null );
-					setModalMode( 'single' );
-					setIsModalOpen( true );
+					setIsLoadingPostData( false );
 				} catch ( error ) {
 					console.error( 'Error fetching post:', error );
+					setIsLoadingPostData( false );
+					setIsModalOpen( false );
 					showSnackbar(
 						'Error loading post data. Please try again.',
 						'error'
@@ -308,6 +317,7 @@ const DuplicatePostHandler = () => {
 		setCurrentPost( null );
 		setPostsToDuplicate( null );
 		setWasDuplicated( false );
+		setIsLoadingPostData( false );
 		
 		// Refresh page if on posts list screen and posts were duplicated
 		if ( shouldRefresh ) {
@@ -328,6 +338,7 @@ const DuplicatePostHandler = () => {
 			statusChoices={ postDuplicatorVars.statusChoices }
 			siteUrl={ postDuplicatorVars.siteUrl }
 			currentUser={ postDuplicatorVars.currentUser }
+			isLoadingPostData={ isLoadingPostData }
 		/>
 	);
 };
