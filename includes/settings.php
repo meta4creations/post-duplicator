@@ -1,12 +1,19 @@
 <?php
 namespace Mtphr\PostDuplicator;
 
+use Mtphr\PostDuplicator\Settings;
+
+// Initialize the Settings instance (this registers all WordPress hooks)
+Settings::instance();
+
 /**
  * Initialize things
+ * Hook names are namespace-specific: {NamespaceIdentifier}Settings/init_settings
+ * For Mtphr\PostDuplicator namespace, the hook prefix is: MtphrPostDuplicatorSettings
  */
-add_action( 'mtphrSettings/init_settings', __NAMESPACE__ . '\initialize_settings', 1 );
-add_action( 'mtphrSettings/init_settings', __NAMESPACE__ . '\initialize_sidebar' );
-add_action( 'mtphrSettings/init_fields', __NAMESPACE__ . '\initialize_fields' );
+add_action( 'MtphrPostDuplicatorSettings/init_settings', __NAMESPACE__ . '\initialize_settings', 1 );
+add_action( 'MtphrPostDuplicatorSettings/init_settings', __NAMESPACE__ . '\initialize_sidebar' );
+add_action( 'MtphrPostDuplicatorSettings/init_fields', __NAMESPACE__ . '\initialize_fields' );
 
 /**
  * Initialize the settings
@@ -14,7 +21,7 @@ add_action( 'mtphrSettings/init_fields', __NAMESPACE__ . '\initialize_fields' );
 function initialize_settings() {
 
   // Add an admin page for your settings page
-  mtphr_settings_add_admin_page( [
+  Settings::admin_page( [
     'page_title' => esc_html__( 'Post Duplicator Settings', 'post-duplicator' ),
     'menu_title' => esc_html__( 'Post Duplicator', 'post-duplicator' ),
     'capability' => 'manage_options',
@@ -27,7 +34,7 @@ function initialize_settings() {
   ] );
 
   // Add setting sections.
-  mtphr_settings_add_section( [
+  Settings::section( [
     'id' => 'mtphr_post_duplicator_defaults',
     'slug' => 'defaults',
     'label' => __( 'Defaults', 'post-duplicator' ),
@@ -36,7 +43,7 @@ function initialize_settings() {
     'parent_slug' => 'options-general.php',
   ] );
 
-  mtphr_settings_add_section( [
+  Settings::section( [
     'id' => 'mtphr_post_duplicator_permissions',
     'slug' => 'permissions',
     'label' => __( 'Permissions', 'post-duplicator' ),
@@ -45,7 +52,7 @@ function initialize_settings() {
     'parent_slug' => 'options-general.php',
   ] );
 
-  mtphr_settings_add_section( [
+  Settings::section( [
     'id' => 'mtphr_post_duplicator_advanced',
     'slug' => 'advanced',
     'label' => __( 'Advanced', 'post-duplicator' ),
@@ -55,7 +62,7 @@ function initialize_settings() {
   ] );
 
   // Add default values
-  mtphr_settings_add_default_values( 'mtphr_post_duplicator_settings', [
+  Settings::default_values( 'mtphr_post_duplicator_settings', [
     'status' => 'draft',
     'type' => 'same',
     'post_author' => 'current_user',
@@ -73,19 +80,19 @@ function initialize_settings() {
     'duplicate_other_password' => 'enabled',
     'duplicate_other_future' => 'enabled',
   ] );
-  mtphr_settings_add_default_values( 'disabled',
+  Settings::default_values( 'disabled',
     user_roles_and_capabilities( 'defaults' )
   );
 
   // Add sanitize settings
-  mtphr_settings_add_sanitize_settings( 'mtphr_post_duplicator_settings', [
+  Settings::sanitize_settings( 'mtphr_post_duplicator_settings', [
     'time_offset' => 'boolval',
     'time_offset_days' => 'intval',
     'time_offset_hours' => 'intval',
     'time_offset_minutes' => 'intval',
     'time_offset_seconds' => 'intval',
   ] );
-  mtphr_settings_add_sanitize_settings( 'disabled',
+  Settings::sanitize_settings( 'disabled',
     user_roles_and_capabilities( 'sanitizers' )
   );
 }
@@ -95,14 +102,38 @@ function initialize_settings() {
  * @return void
  */
 function initialize_sidebar() {
-  mtphr_settings_add_sidebar([
+  Settings::sidebar([
     'items' => [
       [
-        'label'   => __( 'Documentation', 'post-duplicator' ),
-        'type' => 'html',
-        'std' => '<a href="#">Documentation</a>',
-        'id' => 'sidebar_docs'
-      ],
+        'type' => 'group',
+        'id' => 'sidebar_docs',
+        'direction' => 'column',
+        'fields' => [
+          [
+            'type'    => 'heading',
+            'label'   => __( 'Documentation', 'post-duplicator' ),
+            'container' => [
+              'style' => 'simple',
+              'margin' => '0',
+            ],
+          ],
+          [
+            'type' => 'links',
+            'id' => 'sidebar_doc_links',
+            'links' => [
+              [
+                'label' => 'Duplicating Posts',
+                'url' => 'https://www.metaphorcreations.com/article/post-duplicator/general/duplicating-posts/?ref=post-duplicator'
+              ],
+              [
+                'label' => 'Settings',
+                'url' => 'https://www.metaphorcreations.com/article/post-duplicator/general/settings/?ref=post-duplicator'
+              ]
+            ],
+            'container' => 'simple',
+          ],
+        ]
+        ],
       [
         'type' => 'group',
         'id' => 'sidebar_ad',
@@ -110,25 +141,23 @@ function initialize_sidebar() {
         'alignment' => 'center',
         'spacing' => '0',
         'backgroundColor' => 'transparent',
-        'container' => [
-          'padding' => '0',
-          'isBorderless' => true,
-          'backgroundColor' => 'transparent'
-        ],
+        'container' => 'simple',
         'fields' => [
           [
             'type' => 'ad',
-            'id' => 'sidebar_ad_content',
-            'trackingRef' => 'post-duplicator',
-            'image' => 'https://placehold.co/300x250',
+            'id' => 'email_customizer',
+            'trackingRef' => 'post_duplicator',
+            'image' => MTPHR_POST_DUPLICATOR_URL . 'assets/img/marketing/email-customizer.png',
             'link' => 'https://www.metaphorcreations.com/wordpress-plugins/email-customizer/',
+            'container' => 'simple',
           ],
           [
             'type' => 'ad',
-            'id' => 'sidebar_ad_content_2',
-            'trackingRef' => 'post-duplicator',
-            'image' => 'https://placehold.co/300x250',
-            'link' => 'https://placehold.co/300x250',
+            'id' => 'ditty_everything',
+            'trackingRef' => 'post_duplicator',
+            'image' => MTPHR_POST_DUPLICATOR_URL . 'assets/img/marketing/ditty-everything.png',
+            'link' => 'https://www.metaphorcreations.com/ditty/pricing/',
+            'container' => 'simple',
           ],
         ]
       ]
@@ -144,7 +173,7 @@ function initialize_sidebar() {
 function initialize_fields() {
 
   // Add some settings
-  mtphr_settings_add_fields( [
+  Settings::fields( [
     'section' => 'mtphr_post_duplicator_defaults',
     'fields' => [
       [
@@ -259,7 +288,7 @@ function initialize_fields() {
     ],
   ] );
 
-  mtphr_settings_add_fields( [
+  Settings::fields( [
     'section' => 'mtphr_post_duplicator_permissions',
     'fields'  => [
       [
@@ -271,7 +300,7 @@ function initialize_fields() {
     ],
   ] );
 
-  mtphr_settings_add_fields( [
+  Settings::fields( [
     'section' => 'mtphr_post_duplicator_advanced',
     'fields' => [
       [
@@ -343,9 +372,7 @@ function initialize_fields() {
  */
 function get_option_value( $key = false, $option = false ) {
   $option = $option ? $option : 'mtphr_post_duplicator_settings';
-  if ( function_exists( 'mtphr_settings_get_option_value' ) ) {
-    return mtphr_settings_get_option_value( $option, $key );
-  }
+  return Settings::get_value( $option, $key );
 }
 
 /**
@@ -353,9 +380,7 @@ function get_option_value( $key = false, $option = false ) {
  */
 function set_option_value( $key, $value = false, $option = false ) {
   $option = $option ? $option : 'mtphr_post_duplicator_settings';
-  if ( function_exists( 'mtphr_settings_set_option_value' ) ) {
-    return mtphr_settings_set_option_value( $option, $key, $value );
-  }
+  return Settings::set_value( $option, $key, $value );
 }
 
 /**

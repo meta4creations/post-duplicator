@@ -15,6 +15,7 @@ const DuplicatePostButton = () => {
 	const [ taxonomies, setTaxonomies ] = useState( [] );
 	const [ customMeta, setCustomMeta ] = useState( [] );
 	const [ featuredImage, setFeaturedImage ] = useState( null );
+	const [ parentPost, setParentPost ] = useState( null );
 
 	const {
 		postId,
@@ -25,6 +26,7 @@ const DuplicatePostButton = () => {
 		postSlug,
 		postDate,
 		postAuthor,
+		postParent,
 		featuredMediaId,
 	} = useSelect( ( select ) => {
 		const editor = select( 'core/editor' );
@@ -36,6 +38,9 @@ const DuplicatePostButton = () => {
 		// Get author name
 		const author = select( 'core' ).getUser( authorId );
 		const authorName = author ? author.name : 'Unknown Author';
+
+		// Get parent post ID
+		const parentId = editor.getEditedPostAttribute( 'parent' ) || 0;
 
 		// Get featured media ID
 		const featuredMediaId =
@@ -52,6 +57,7 @@ const DuplicatePostButton = () => {
 			postSlug: editor.getEditedPostAttribute( 'slug' ),
 			postDate: editor.getEditedPostAttribute( 'date' ),
 			postAuthor: authorName,
+			postParent: parentId,
 			featuredMediaId: featuredMediaId,
 		};
 	}, [] );
@@ -74,6 +80,45 @@ const DuplicatePostButton = () => {
 						const postData = await response.json();
 						setTaxonomies( postData.taxonomies || [] );
 						setCustomMeta( postData.customMeta || [] );
+					}
+
+					// Fetch parent post if available
+					if ( postParent && postParent > 0 ) {
+						try {
+							const baseUrl = postDuplicatorVars.restUrl.replace(
+								'post-duplicator/v1/',
+								'wp/v2/'
+							);
+							const parentEndpointType =
+								postType === 'page'
+									? 'pages'
+									: postType === 'post'
+									? 'posts'
+									: postType;
+							const parentResponse = await fetch(
+								`${ baseUrl }${ parentEndpointType }/${ postParent }`,
+								{
+									headers: {
+										'X-WP-Nonce': postDuplicatorVars.nonce,
+									},
+								}
+							);
+
+							if ( parentResponse.ok ) {
+								const parentData = await parentResponse.json();
+								setParentPost( {
+									id: parentData.id,
+									title: parentData.title.rendered,
+								} );
+							} else {
+								setParentPost( null );
+							}
+						} catch ( error ) {
+							console.error( 'Error fetching parent post:', error );
+							setParentPost( null );
+						}
+					} else {
+						setParentPost( null );
 					}
 
 					// Fetch featured image if available
@@ -124,7 +169,7 @@ const DuplicatePostButton = () => {
 
 			fetchPostData();
 		}
-	}, [ isModalOpen, postId, featuredMediaId ] );
+	}, [ isModalOpen, postId, postParent, postType, featuredMediaId ] );
 
 	// Only show for published posts
 	if ( postStatus !== 'publish' || ! postId ) {
@@ -164,6 +209,8 @@ const DuplicatePostButton = () => {
 		slug: postSlug,
 		date: postDate,
 		author: postAuthor,
+		parent: postParent || 0,
+		parentPost: parentPost || null,
 		taxonomies: taxonomies,
 		customMeta: customMeta,
 		featuredImage: featuredImage,

@@ -29,6 +29,11 @@ function get_users_with_edit_caps() {
  */
 function enqueue_scripts() {
 
+  $current_screen = get_current_screen();
+  if ( 'site-editor' == $current_screen->id ) {
+    return;
+  }
+
   $asset_file = include( MTPHR_POST_DUPLICATOR_DIR . 'assets/build/postDuplicator.asset.php' );
   
   // Enqueue WordPress component styles
@@ -80,6 +85,7 @@ function enqueue_scripts() {
     'postTypes' => array_filter( duplicator_post_types(), function( $key ) {
       return $key !== 'same';
     }, ARRAY_FILTER_USE_KEY ),
+    'postTypesAuthorSupport' => get_post_types_author_support(),
     'statusChoices' => [
       'draft' => esc_html__( 'Draft', 'post-duplicator' ),
       'publish' => esc_html__( 'Published', 'post-duplicator' ),
@@ -139,6 +145,7 @@ function enqueue_scripts() {
       'postTypes' => array_filter( duplicator_post_types(), function( $key ) {
         return $key !== 'same';
       }, ARRAY_FILTER_USE_KEY ),
+      'postTypesAuthorSupport' => get_post_types_author_support(),
       'statusChoices' => [
         'draft' => esc_html__( 'Draft', 'post-duplicator' ),
         'publish' => esc_html__( 'Published', 'post-duplicator' ),

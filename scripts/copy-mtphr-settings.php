@@ -31,39 +31,10 @@ if (is_dir($source)) {
             if (pathinfo($target, PATHINFO_EXTENSION) === 'php') {
                 $content = file_get_contents($target);
                 $modified = false;
-                $isIndexFile = basename($target) === 'index.php';
                 
                 // Replace namespace Mtphr; with namespace Mtphr\PostDuplicator;
                 if (preg_match('/^namespace\s+Mtphr\s*;/m', $content)) {
                     $content = preg_replace('/^namespace\s+Mtphr\s*;/m', 'namespace Mtphr\\PostDuplicator;', $content);
-                    $modified = true;
-                }
-                
-                // For index.php, add namespace if it doesn't exist (after <?php)
-                if ($isIndexFile && !preg_match('/^namespace\s+/m', $content)) {
-                    // Insert namespace after <?php and before any use statements
-                    $content = preg_replace(
-                        '/^(<\?php)(\s*\n)/m',
-                        '$1$2namespace Mtphr\\PostDuplicator;$2',
-                        $content,
-                        1
-                    );
-                    $modified = true;
-                }
-                
-                // Replace use Mtphr\Settings; with use Mtphr\PostDuplicator\Settings;
-                if (preg_match('/^use\s+Mtphr\\\Settings\s*;/m', $content)) {
-                    $content = preg_replace('/^use\s+Mtphr\\\Settings\s*;/m', 'use Mtphr\\PostDuplicator\\Settings;', $content);
-                    $modified = true;
-                }
-                
-                // For index.php, update function_exists check to use __NAMESPACE__
-                if ($isIndexFile && preg_match("/function_exists\s*\(\s*['\"]MTPHR_SETTINGS['\"]\s*\)/", $content)) {
-                    $content = preg_replace(
-                        "/function_exists\s*\(\s*['\"]MTPHR_SETTINGS['\"]\s*\)/",
-                        "function_exists( __NAMESPACE__ . '\\MTPHR_SETTINGS' )",
-                        $content
-                    );
                     $modified = true;
                 }
                 

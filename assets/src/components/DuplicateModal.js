@@ -32,6 +32,7 @@ const DuplicateModal = ( {
 	const [ duplicateStatus, setDuplicateStatus ] = useState( 'idle' );
 	const [ duplicatedPostId, setDuplicatedPostId ] = useState( null );
 	const [ duplicatedPostTitle, setDuplicatedPostTitle ] = useState( '' );
+	const [ resetKey, setResetKey ] = useState( 0 );
 	const prevIsOpenRef = useRef( false );
 
 	// Only reset state when modal is first opened (isOpen changes from false to true)
@@ -44,6 +45,16 @@ const DuplicateModal = ( {
 			setDuplicatedPostId( null );
 			setDuplicatedPostTitle( '' );
 		}
+		// Reset component and state when modal closes
+		if ( ! isOpen && prevIsOpenRef.current ) {
+			setResetKey( ( prev ) => prev + 1 );
+			setSettings( defaultSettings );
+			setIncludeTaxonomies( true );
+			setIncludeCustomMeta( true );
+			setTaxonomyData( {} );
+			setCustomMetaData( [] );
+			setFeaturedImage( null );
+		}
 		prevIsOpenRef.current = isOpen;
 	}, [ isOpen, defaultSettings ] );
 
@@ -53,13 +64,12 @@ const DuplicateModal = ( {
 			return;
 		}
 
-		// Initialize taxonomy data from original post
+		// Initialize taxonomy data from original post - only use assigned terms
 		if ( originalPost?.taxonomies ) {
 			const initialTaxonomyData = {};
 			originalPost.taxonomies.forEach( ( taxonomy ) => {
-				initialTaxonomyData[ taxonomy.slug ] = taxonomy.terms.map(
-					( term ) => term.id
-				);
+				// Use assignedTermIds (terms currently on the post), not all terms
+				initialTaxonomyData[ taxonomy.slug ] = taxonomy.assignedTermIds || [];
 			} );
 			setTaxonomyData( initialTaxonomyData );
 		} else {
@@ -118,7 +128,8 @@ const DuplicateModal = ( {
 				...settings,
 				includeTaxonomies,
 				includeCustomMeta,
-				taxonomyData,
+				// Only send taxonomyData if taxonomies are enabled
+				...( includeTaxonomies ? { taxonomyData } : {} ),
 				customMetaData,
 				featuredImageId: featuredImage?.id || null,
 			};
@@ -205,6 +216,7 @@ const DuplicateModal = ( {
 				{ duplicateStatus === 'idle' ? (
 					<VStack className="duplicate-post-modal__settings">
 					<DuplicateSettingsFields
+						key={ `duplicate-settings-${ originalPost?.id || 0 }-${ resetKey }` }
 						settings={ settings }
 						onSettingsChange={ setSettings }
 						postTypes={ postTypes }

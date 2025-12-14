@@ -82,15 +82,39 @@ const DuplicateSettingsFields = ( {
 	// Get users list and current user from localized data
 	const usersList = window.postDuplicatorVars?.users || [];
 	const currentUser = window.postDuplicatorVars?.currentUser;
+	const postTypesAuthorSupport = window.postDuplicatorVars?.postTypesAuthorSupport || {};
 
-	// Initialize selectedAuthorId with a valid default (current user ID or first user in list)
-	const defaultAuthorId = currentUser?.id
-		? String( currentUser.id )
-		: usersList.length > 0
-		? usersList[ 0 ].value
-		: '';
+	// Check if current post type supports authors
+	const getCurrentPostType = () => {
+		return localSettings.type === 'same' ? originalPost?.type : localSettings.type;
+	};
+
+	const currentPostTypeSupportsAuthor = () => {
+		const postType = getCurrentPostType();
+		return postTypesAuthorSupport[ postType ] !== false; // Default to true if not specified
+	};
+
+	// Initialize selectedAuthorId with a valid default
+	// If post type doesn't support authors, default to "No Author" (empty string)
+	const getDefaultAuthorId = () => {
+		const postType = originalPost?.type;
+		const supportsAuthor = postTypesAuthorSupport[ postType ] !== false;
+		
+		if ( ! supportsAuthor ) {
+			return ''; // "No Author"
+		}
+		
+		return currentUser?.id
+			? String( currentUser.id )
+			: usersList.length > 0
+			? usersList[ 0 ].value
+			: '';
+	};
+
 	const [ selectedAuthorId, setSelectedAuthorId ] =
-		useState( defaultAuthorId );
+		useState( getDefaultAuthorId() );
+	const [ selectedParentId, setSelectedParentId ] = useState( '' );
+	const [ parentPosts, setParentPosts ] = useState( [] );
 	const [ postDate, setPostDate ] = useState( new Date().toISOString() );
 	const [ dateInputValue, setDateInputValue ] = useState( '' );
 	
@@ -158,11 +182,27 @@ const DuplicateSettingsFields = ( {
 				`${ originalPost.slug }-${ settings.slug || 'copy' }`;
 			setFullSlug( initialSlug );
 
-			// Set initial author based on default settings
-			const initialAuthorId =
-				settings.post_author === 'current_user'
-					? String( currentUser?.id || '' )
-					: String( originalPost.authorId || currentUser?.id || '' );
+			// Batch update: pass both initial title and slug to parent together
+			const newSettings = {
+				...settings,
+				fullTitle: initialTitle.trim(),
+				fullSlug: initialSlug,
+			};
+			setLocalSettings( newSettings );
+			onSettingsChange( newSettings );
+
+			// Set initial author based on default settings and post type author support
+			const postType = originalPost?.type;
+			const supportsAuthor = postTypesAuthorSupport[ postType ] !== false;
+			
+			let initialAuthorId = '';
+			if ( supportsAuthor ) {
+				initialAuthorId =
+					settings.post_author === 'current_user'
+						? String( currentUser?.id || '' )
+						: String( originalPost.authorId || currentUser?.id || '' );
+			}
+			// If post type doesn't support authors, initialAuthorId remains '' (No Author)
 			setSelectedAuthorId( initialAuthorId );
 
 			// Set initial date
@@ -170,9 +210,83 @@ const DuplicateSettingsFields = ( {
 			setPostDate( initialDate );
 			setDateInputValue( formatDateDisplay( initialDate ) );
 
+			// Set initial parent
+			const initialParentId = originalPost?.parent || 0;
+			setSelectedParentId( initialParentId > 0 ? String( initialParentId ) : '' );
+			handleChange( 'selectedParentId', initialParentId > 0 ? initialParentId : null );
+
 			setInitialized( true );
 		}
 	}, [ originalPost, initialized, settings, currentUser ] );
+
+	// Fetch parent posts when post type changes
+	useEffect( () => {
+		const fetchParentPosts = async () => {
+			if ( ! originalPost?.type ) {
+				setParentPosts( [] );
+				return;
+			}
+
+			const postType = localSettings.type === 'same' ? originalPost.type : localSettings.type;
+			
+			try {
+				const response = await fetch(
+					`${ window.postDuplicatorVars.restUrl }parent-posts?post_type=${ postType }&exclude_id=${ originalPost.id }`,
+					{
+						headers: {
+							'X-WP-Nonce': window.postDuplicatorVars.nonce,
+						},
+					}
+				);
+
+				if ( response.ok ) {
+					const posts = await response.json();
+					
+					// Format as options for SelectControl with hierarchical indentation
+					const formatHierarchicalLabel = ( post ) => {
+						const level = post.level || 0;
+						if ( level === 0 ) {
+							return post.title;
+						}
+						// Use dashes to show hierarchy level
+						// Each level gets 1 dash for visual indentation
+						const indent = '—'.repeat( level ) + ' ';
+						return `${ indent }${ post.title }`;
+					};
+					
+					const options = [
+						{ label: __( '— No Parent —', 'post-duplicator' ), value: '' },
+						...posts.map( ( post ) => ( {
+							label: formatHierarchicalLabel( post ),
+							value: String( post.id ),
+							level: post.level || 0,
+						} ) ),
+					];
+					setParentPosts( options );
+					
+					// If current parent is not in the list (e.g., different post type), add it
+					if ( originalPost?.parentPost && originalPost.parent > 0 ) {
+						const parentExists = posts.some( ( p ) => p.id === originalPost.parent );
+						if ( ! parentExists ) {
+							options.splice( 1, 0, {
+								label: originalPost.parentPost.title,
+								value: String( originalPost.parent ),
+								level: 0,
+							} );
+							setParentPosts( options );
+						}
+					}
+				}
+			} catch ( error ) {
+				console.error( 'Error fetching parent posts:', error );
+				setParentPosts( [
+					{ label: __( '— No Parent —', 'post-duplicator' ), value: '' },
+				] );
+			}
+		};
+
+		fetchParentPosts();
+	}, [ originalPost?.type, localSettings.type, originalPost?.id, originalPost?.parent, originalPost?.parentPost ] );
 
 	// Update localSettings when settings prop changes (but not title/slug)
 	useEffect( () => {
@@ -190,6 +304,29 @@ const DuplicateSettingsFields = ( {
 
 		setLocalSettings( updated );
 	}, [ settings, originalPost ] );
+
+	// Update author selection when post type changes
+	useEffect( () => {
+		if ( ! initialized ) {
+			return; // Don't update during initialization
+		}
+		
+		const postType = getCurrentPostType();
+		const supportsAuthor = postTypesAuthorSupport[ postType ] !== false;
+		
+		// If post type doesn't support authors, set to "No Author"
+		if ( ! supportsAuthor && selectedAuthorId !== '' ) {
+			setSelectedAuthorId( '' );
+			handleChange( 'selectedAuthorId', null );
+		}
+		// If post type supports authors and current selection is "No Author", set to current user
+		else if ( supportsAuthor && selectedAuthorId === '' && currentUser?.id ) {
+			const newAuthorId = String( currentUser.id );
+			setSelectedAuthorId( newAuthorId );
+			handleChange( 'selectedAuthorId', parseInt( newAuthorId ) );
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ localSettings.type, initialized ] );
 
 	// Format date for display
 	const formatDateDisplay = ( dateString ) => {
@@ -212,7 +349,14 @@ const DuplicateSettingsFields = ( {
 				const formattedDate = parsedDate.toISOString();
 				setPostDate( formattedDate );
 				setDateInputValue( formatDateDisplay( formattedDate ) );
-				handleChange( 'customDate', formattedDate );
+				// Set timestamp to 'custom' and update customDate
+				const newSettings = {
+					...localSettings,
+					timestamp: 'custom',
+					customDate: formattedDate,
+				};
+				setLocalSettings( newSettings );
+				onSettingsChange( newSettings );
 			} else {
 				// Invalid date - revert to previous valid date display
 				setDateInputValue( formatDateDisplay( postDate ) );
@@ -230,9 +374,18 @@ const DuplicateSettingsFields = ( {
 
 	// Handle date picker changes
 	const handleDatePickerChange = ( value ) => {
-		setPostDate( value );
-		setDateInputValue( formatDateDisplay( value ) );
-		handleChange( 'customDate', value );
+		// Ensure value is in ISO string format
+		const isoDate = value instanceof Date ? value.toISOString() : new Date( value ).toISOString();
+		setPostDate( isoDate );
+		setDateInputValue( formatDateDisplay( isoDate ) );
+		// Set timestamp to 'custom' and update customDate
+		const newSettings = {
+			...localSettings,
+			timestamp: 'custom',
+			customDate: isoDate,
+		};
+		setLocalSettings( newSettings );
+		onSettingsChange( newSettings );
 	};
 
 	const handleTitleChange = ( value ) => {
@@ -242,10 +395,18 @@ const DuplicateSettingsFields = ( {
 		if ( ! slugManuallyEdited && originalPost?.title ) {
 			const newSlug = generateSlugFromTitle( value );
 			setFullSlug( newSlug );
+			// Batch update: pass both title and slug to parent together
+			const newSettings = {
+				...localSettings,
+				fullTitle: value,
+				fullSlug: newSlug,
+			};
+			setLocalSettings( newSettings );
+			onSettingsChange( newSettings );
+		} else {
+			// Pass full title to parent
+			handleChange( 'fullTitle', value );
 		}
-
-		// Pass full title to parent
-		handleChange( 'fullTitle', value );
 	};
 
 	const handleSlugChange = ( value ) => {
@@ -532,15 +693,35 @@ const DuplicateSettingsFields = ( {
 					__nextHasNoMarginBottom
 					__next40pxDefaultSize
 				/>
+				<SelectControl
+					label={ __( 'Post Parent', 'post-duplicator' ) }
+					value={ selectedParentId || '' }
+					options={ parentPosts }
+					onChange={ ( value ) => {
+						setSelectedParentId( value );
+						handleChange( 'selectedParentId', value ? parseInt( value ) : null );
+					} }
+					__nextHasNoMarginBottom
+					__next40pxDefaultSize
+				/>
       </HStack>
       <HStack spacing="16px" alignment="stretch">
 				<SelectControl
 					label={ __( 'Post Author', 'post-duplicator' ) }
 					value={ selectedAuthorId || '' }
-					options={ usersList }
+					options={ [
+						// Always include "No Author" option at the top
+						{
+							label: __( 'No Author', 'post-duplicator' ),
+							value: '',
+						},
+						// Add user list options
+						...usersList,
+					] }
 					onChange={ ( value ) => {
 						setSelectedAuthorId( value );
-						handleChange( 'selectedAuthorId', parseInt( value ) );
+						// If "No Author" is selected (empty string), pass null or 0
+						handleChange( 'selectedAuthorId', value ? parseInt( value ) : null );
 					} }
 					__nextHasNoMarginBottom
 					__next40pxDefaultSize

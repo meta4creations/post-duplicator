@@ -25,6 +25,12 @@ function register_routes() {
       ),
     ),
   ) );
+  
+  register_rest_route( 'post-duplicator/v1', 'parent-posts', array(
+    'methods' => 'GET',
+    'permission_callback' => '__return_true',
+    'callback' => __NAMESPACE__ . '\get_parent_posts',
+  ) );
 }
 
 /**
@@ -179,6 +185,125 @@ function get_post_data( $request ) {
 }
 
 /**
+ * Get available parent posts for a post type (hierarchical)
+ */
+function get_parent_posts( $request ) {
+  $post_type = $request->get_param( 'post_type' );
+  $exclude_id = $request->get_param( 'exclude_id' );
+  
+  if ( ! $post_type ) {
+    // Default to 'page' if no post type specified
+    $post_type = 'page';
+  }
+  
+  // Get posts that can be parents (same post type, published or draft)
+  $args = array(
+    'post_type' => $post_type,
+    'post_status' => array( 'publish', 'draft', 'private' ),
+    'posts_per_page' => -1,
+    'orderby' => 'menu_order title',
+    'order' => 'ASC',
+  );
+  
+  // Exclude the current post (can't be its own parent)
+  if ( $exclude_id ) {
+    $args['post__not_in'] = array( intval( $exclude_id ) );
+  }
+  
+  $posts = get_posts( $args );
+  
+  // Build a map of posts by ID
+  $posts_map = array();
+  foreach ( $posts as $post ) {
+    $posts_map[ $post->ID ] = array(
+      'id' => $post->ID,
+      'title' => $post->post_title,
+      'parent' => $post->post_parent,
+      'children' => array(),
+    );
+  }
+  
+  // Build hierarchical structure and collect descendants of excluded post
+  $excluded_descendants = array();
+  if ( $exclude_id ) {
+    $exclude_id_int = intval( $exclude_id );
+    // Recursively find all descendants of the excluded post from the full post list
+    // We need to query all posts to find descendants, not just the ones we're showing
+    $all_posts_args = array(
+      'post_type' => $post_type,
+      'post_status' => array( 'publish', 'draft', 'private' ),
+      'posts_per_page' => -1,
+      'fields' => 'ids',
+    );
+    $all_post_ids = get_posts( $all_posts_args );
+    
+    $find_descendants = function( $parent_id ) use ( &$find_descendants, $all_post_ids, $post_type ) {
+      $descendants = array();
+      foreach ( $all_post_ids as $post_id ) {
+        $post = get_post( $post_id );
+        if ( $post && $post->post_parent == $parent_id ) {
+          $descendants[] = $post_id;
+          // Recursively get descendants of this child
+          $descendants = array_merge( $descendants, $find_descendants( $post_id ) );
+        }
+      }
+      return $descendants;
+    };
+    $excluded_descendants = $find_descendants( $exclude_id_int );
+    $excluded_descendants[] = $exclude_id_int; // Include the post itself
+  }
+  
+  $root_posts = array();
+  foreach ( $posts_map as $post_id => $post_data ) {
+    // Skip if this post is a descendant of the excluded post
+    if ( in_array( $post_id, $excluded_descendants ) ) {
+      continue;
+    }
+    
+    if ( $post_data['parent'] == 0 ) {
+      // Root level post
+      $root_posts[] = $post_id;
+    } else {
+      // Child post - add to parent's children array only if parent is not excluded
+      if ( isset( $posts_map[ $post_data['parent'] ] ) && ! in_array( $post_data['parent'], $excluded_descendants ) ) {
+        $posts_map[ $post_data['parent'] ]['children'][] = $post_id;
+      } else {
+        // Parent not in our list (different post type or excluded), treat as root
+        $root_posts[] = $post_id;
+      }
+    }
+  }
+  
+  // Recursive function to build flat list with hierarchy info
+  $hierarchical_list = array();
+  $build_list = function( $post_ids, $level = 0 ) use ( &$build_list, &$hierarchical_list, &$posts_map ) {
+    foreach ( $post_ids as $post_id ) {
+      if ( ! isset( $posts_map[ $post_id ] ) ) {
+        continue;
+      }
+      
+      $post_data = $posts_map[ $post_id ];
+      $hierarchical_list[] = array(
+        'id' => $post_data['id'],
+        'title' => $post_data['title'],
+        'level' => $level,
+        'parent' => $post_data['parent'],
+      );
+      
+      // Recursively add children
+      if ( ! empty( $post_data['children'] ) ) {
+        $build_list( $post_data['children'], $level + 1 );
+      }
+    }
+  };
+  
+  // Build the hierarchical list starting from root posts
+  $build_list( $root_posts );
+  
+  return rest_ensure_response( $hierarchical_list );
+}
+
+/**
  * Duplicate a post
  */
 function duplicate_post_permissions( $request ) {
@@ -288,9 +413,39 @@ function duplicate_post( $request ) {
 		$duplicate['post_type'] = sanitize_text_field( $settings['type'] );
 	}
 	
+	// Set the parent - check for selectedParentId first, otherwise keep original parent
+	if ( isset( $settings['selectedParentId'] ) ) {
+		$duplicate['post_parent'] = intval( $settings['selectedParentId'] );
+	}
+	
 	// Set the post date
-	$timestamp = ( $settings['timestamp'] == 'duplicate' ) ? strtotime($orig->post_date) : current_time('timestamp',0);
-	$timestamp_gmt = ( $settings['timestamp'] == 'duplicate' ) ? strtotime($orig->post_date_gmt) : current_time('timestamp',1);
+	if ( $settings['timestamp'] == 'duplicate' ) {
+		$timestamp = strtotime($orig->post_date);
+		$timestamp_gmt = strtotime($orig->post_date_gmt);
+	} elseif ( $settings['timestamp'] == 'custom' && isset( $settings['customDate'] ) && ! empty( $settings['customDate'] ) ) {
+		// Use custom date if provided
+		$custom_date = $settings['customDate'];
+		try {
+			// Parse the ISO date string (e.g., "2024-01-15T10:30:00.000Z")
+			// JavaScript's toISOString() returns UTC time
+			// Convert ISO format to WordPress date format (Y-m-d H:i:s)
+			$date_obj = new \DateTime( $custom_date, new \DateTimeZone( 'UTC' ) );
+			$gmt_date = $date_obj->format( 'Y-m-d H:i:s' );
+			
+			// Convert GMT date to local timezone using WordPress function
+			$local_date = get_date_from_gmt( $gmt_date );
+			
+			$timestamp = strtotime( $local_date );
+			$timestamp_gmt = strtotime( $gmt_date );
+		} catch ( \Exception $e ) {
+			// If date parsing fails, fall back to current time
+			$timestamp = current_time('timestamp',0);
+			$timestamp_gmt = current_time('timestamp',1);
+		}
+	} else {
+		$timestamp = current_time('timestamp',0);
+		$timestamp_gmt = current_time('timestamp',1);
+	}
 	
 	if( isset( $settings['time_offset'] ) && $settings['time_offset'] ) {
 		$offset = intval($settings['time_offset_seconds']+$settings['time_offset_minutes']*60+$settings['time_offset_hours']*3600+$settings['time_offset_days']*86400);
@@ -308,8 +463,14 @@ function duplicate_post( $request ) {
 	$duplicate['post_modified_gmt'] = date('Y-m-d H:i:s', current_time('timestamp',1));
 	
 	// Set author - check for selectedAuthorId first, then fall back to post_author setting
-	if ( isset( $settings['selectedAuthorId'] ) && ! empty( $settings['selectedAuthorId'] ) ) {
-		$duplicate['post_author'] = intval( $settings['selectedAuthorId'] );
+	// Handle "No Author" case (null or empty selectedAuthorId)
+	if ( isset( $settings['selectedAuthorId'] ) ) {
+		if ( $settings['selectedAuthorId'] === null || $settings['selectedAuthorId'] === '' || $settings['selectedAuthorId'] === 0 ) {
+			// "No Author" - set to 0 for post types that don't support authors
+			$duplicate['post_author'] = 0;
+		} else {
+			$duplicate['post_author'] = intval( $settings['selectedAuthorId'] );
+		}
 	} elseif ( 'current_user' == $settings['post_author'] ) {
 		$duplicate['post_author'] = get_current_user_id();
 	}

@@ -85,23 +85,30 @@ const DuplicatePostHandler = () => {
 
 					const post = await response.json();
 
-					// Fetch author data
-					const authorResponse = await fetch(
-						`${ postDuplicatorVars.restUrl.replace(
-							'post-duplicator/v1/',
-							'wp/v2/'
-						) }users/${ post.author }`,
-						{
-							headers: {
-								'X-WP-Nonce': postDuplicatorVars.nonce,
-							},
-						}
-					);
-
+					// Fetch author data only if author exists and is a valid number
 					let authorName = 'Unknown Author';
-					if ( authorResponse.ok ) {
-						const authorData = await authorResponse.json();
-						authorName = authorData.name;
+					if ( post.author && post.author > 0 ) {
+						try {
+							const authorResponse = await fetch(
+								`${ postDuplicatorVars.restUrl.replace(
+									'post-duplicator/v1/',
+									'wp/v2/'
+								) }users/${ post.author }`,
+								{
+									headers: {
+										'X-WP-Nonce': postDuplicatorVars.nonce,
+									},
+								}
+							);
+
+							if ( authorResponse.ok ) {
+								const authorData = await authorResponse.json();
+								authorName = authorData.name;
+							}
+						} catch ( error ) {
+							console.error( 'Error fetching author:', error );
+							// Keep default 'Unknown Author' if fetch fails
+						}
 					}
 
 					// Fetch featured image data
@@ -140,6 +147,38 @@ const DuplicatePostHandler = () => {
 						}
 					}
 
+					// Fetch parent post data if parent exists
+					let parentPost = null;
+					if ( post.parent && post.parent > 0 ) {
+						try {
+							const parentEndpointType =
+								postType === 'page'
+									? 'pages'
+									: postType === 'post'
+									? 'posts'
+									: postType;
+							const parentResponse = await fetch(
+								`${ baseUrl }${ parentEndpointType }/${ post.parent }`,
+								{
+									headers: {
+										'X-WP-Nonce': postDuplicatorVars.nonce,
+									},
+								}
+							);
+
+							if ( parentResponse.ok ) {
+								const parentData = await parentResponse.json();
+								parentPost = {
+									id: parentData.id,
+									title: parentData.title.rendered,
+								};
+							}
+						} catch ( error ) {
+							console.error( 'Error fetching parent post:', error );
+							// Continue without parent data
+						}
+					}
+
 					// Fetch taxonomy and custom meta data
 					let taxonomies = [];
 					let customMeta = [];
@@ -173,6 +212,8 @@ const DuplicatePostHandler = () => {
 						date: post.date,
 						author: authorName,
 						authorId: post.author, // Add author ID for settings component
+						parent: post.parent || 0,
+						parentPost: parentPost,
 						taxonomies: taxonomies,
 						customMeta: customMeta,
 						featuredImage: featuredImage,
