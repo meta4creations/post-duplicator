@@ -5,6 +5,7 @@
 /wiki/ export-ignore
 /scripts/ export-ignore
 /composer.json export-ignore
+/composer.lock export-ignore
 /assets/src/ export-ignore
 /assets/composer.json export-ignore
 /assets/package.json export-ignore
