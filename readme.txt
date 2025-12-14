@@ -3,7 +3,7 @@ Contributors: metaphorcreations
 Tags: posts, post, duplicate, duplication
 Requires at least: 5.0
 Requires PHP: 7.4
-Tested up to: 6.8.3
+Tested up to: 6.9
 Stable tag: 3.0.0
 License: GPL2
 
@@ -294,16 +294,15 @@ The settings page includes three tabs:
 
 == Screenshots ==
 
-1. Posts list duplicate link (row action)
-2. Bulk actions dropdown with duplicate option
-3. Gutenberg editor duplicate button
-4. Single post duplication modal with full customization
-5. Multiple clones interface with clone count selector
-6. Bulk duplication modal showing multiple posts
-7. Featured image selector in duplication modal
-8. Default settings page
-9. Permission settings page
-10. Advanced settings page
+1. Single post duplicate button
+2. Duplicate post modal
+3. Duplicate post complete
+4. Posts list duplicate link
+5. Duplicate multiple clones
+6. Bulk post duplication
+7. Default settings
+8. Permission settings
+9. Advanced settings
 
 == Changelog ==
 
