@@ -1,6 +1,6 @@
 # Duplicating Posts
 
-This guide explains how to duplicate posts using the Post Duplicator plugin. Here's another
+This guide explains how to duplicate posts using the Post Duplicator plugin. Let's try this again!
 
 ## Overview
 
