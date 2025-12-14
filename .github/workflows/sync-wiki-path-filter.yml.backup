@@ -1,14 +1,15 @@
-name: Sync Wiki Documentation (Always Run)
-
-# Alternative workflow that runs on every push to main/master
-# Use this if the path-filtered workflow isn't triggering reliably
+name: Sync Wiki Documentation
 
 on:
   push:
+    paths:
+      - 'wiki/**'
+      - 'HELP-*.md'
+      - '.github/workflows/sync-wiki.yml'
     branches:
       - main
       - master
-  workflow_dispatch:
+  workflow_dispatch: # Allows manual triggering
 
 jobs:
   sync-wiki:
@@ -22,38 +23,36 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Check if help files changed
-        id: check-files
-        run: |
-          CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || echo "")
-          if echo "$CHANGED_FILES" | grep -q "HELP-.*\.md\|wiki/"; then
-            echo "changed=true" >> $GITHUB_OUTPUT
-            echo "Help files or wiki files were changed"
-          else
-            echo "changed=false" >> $GITHUB_OUTPUT
-            echo "No help files changed, skipping sync"
-          fi
-
       - name: Checkout wiki
-        if: steps.check-files.outputs.changed == 'true'
         uses: actions/checkout@v4
         with:
           repository: ${{ github.repository }}.wiki
           path: wiki-repo
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Debug - List changed files
+        run: |
+          echo "Changed files in this push:"
+          git diff --name-only HEAD~1 HEAD || echo "Could not determine changed files"
+          echo ""
+          echo "Looking for HELP files:"
+          ls -la HELP-*.md 2>/dev/null || echo "No HELP-*.md files found in root"
+
       - name: Sync wiki files
-        if: steps.check-files.outputs.changed == 'true'
         run: |
           # Copy help files to wiki directory structure
           if [ -f "HELP-DUPLICATING-POSTS.md" ]; then
             echo "Copying HELP-DUPLICATING-POSTS.md to wiki-repo/Duplicating-Posts.md"
             cp HELP-DUPLICATING-POSTS.md wiki-repo/Duplicating-Posts.md
+          else
+            echo "HELP-DUPLICATING-POSTS.md not found"
           fi
           
           if [ -f "HELP-SETTINGS.md" ]; then
             echo "Copying HELP-SETTINGS.md to wiki-repo/Settings.md"
             cp HELP-SETTINGS.md wiki-repo/Settings.md
+          else
+            echo "HELP-SETTINGS.md not found"
           fi
           
           # Copy any files from wiki/ directory if it exists
@@ -61,9 +60,12 @@ jobs:
             echo "Copying files from wiki/ directory"
             cp -r wiki/* wiki-repo/ 2>/dev/null || true
           fi
+          
+          echo ""
+          echo "Files in wiki-repo after sync:"
+          ls -la wiki-repo/ || echo "wiki-repo directory not found"
 
       - name: Create Home page if it doesn't exist
-        if: steps.check-files.outputs.changed == 'true'
         run: |
           if [ ! -f "wiki-repo/Home.md" ]; then
             cat > wiki-repo/Home.md << 'EOF'
@@ -84,7 +86,6 @@ jobs:
           fi
 
       - name: Commit and push wiki changes
-        if: steps.check-files.outputs.changed == 'true'
         run: |
           cd wiki-repo
           git config user.name "github-actions[bot]"
