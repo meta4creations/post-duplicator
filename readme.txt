@@ -124,7 +124,7 @@ The plugin is ready to use immediately with sensible defaults. You can start dup
 
 **Requirements:**
 
-* WordPress 5.0 or higher
+* WordPress 6.4 or higher
 * PHP 7.4 or higher
 
 == Frequently Asked Questions ==
