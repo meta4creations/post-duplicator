@@ -1,13 +1,14 @@
-name: Sync Wiki Documentation (Always Run)
+name: Sync Wiki Documentation
 
-# Alternative workflow that runs on every push to main/master
-# Use this if the path-filtered workflow isn't triggering reliably
+# Workflow runs only when wiki files change or when manually triggered
 
 on:
   push:
     branches:
       - main
       - master
+    paths:
+      - 'wiki/**'
   workflow_dispatch:
 
 jobs:
@@ -22,20 +23,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Check if wiki files changed
-        id: check-files
-        run: |
-          CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || echo "")
-          if echo "$CHANGED_FILES" | grep -q "wiki/"; then
-            echo "changed=true" >> $GITHUB_OUTPUT
-            echo "Wiki files were changed"
-          else
-            echo "changed=false" >> $GITHUB_OUTPUT
-            echo "No wiki files changed, skipping sync"
-          fi
-
       - name: Checkout wiki
-        if: steps.check-files.outputs.changed == 'true'
         uses: actions/checkout@v4
         with:
           repository: ${{ github.repository }}.wiki
@@ -43,7 +31,6 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Sync wiki files
-        if: steps.check-files.outputs.changed == 'true'
         run: |
           # Copy all files from wiki/ directory to GitHub wiki
           if [ -d "wiki" ]; then
@@ -56,7 +43,6 @@ jobs:
           fi
 
       - name: Create Home page if it doesn't exist
-        if: steps.check-files.outputs.changed == 'true'
         run: |
           # Only create default Home.md if custom one wasn't copied from wiki/ directory
           if [ ! -f "wiki-repo/Home.md" ]; then
@@ -81,7 +67,6 @@ jobs:
           fi
 
       - name: Commit and push wiki changes
-        if: steps.check-files.outputs.changed == 'true'
         run: |
           cd wiki-repo
           git config user.name "github-actions[bot]"

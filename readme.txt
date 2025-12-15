@@ -499,4 +499,4 @@ Must upgrade in order for the plugin to work. The file paths where initially wro
 
 == Upgrade Notice ==
 
-Added ability to modify duplicated post content before creating the post
+Added ability to modify duplicated post content before creating the post.
