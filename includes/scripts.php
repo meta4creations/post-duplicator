@@ -95,9 +95,17 @@ function enqueue_scripts() {
     ],
   ] );
 
-  // Enqueue Gutenberg button on block editor pages
+  // Enqueue Gutenberg button on block editor pages (but not in widgets editor)
   $screen = get_current_screen();
   if ( $screen && $screen->is_block_editor() ) {
+    // Check if we're in widgets editor context (wp-edit-widgets or wp-customize-widgets)
+    $is_widgets_editor = ( $screen->id === 'widgets' || $screen->id === 'customize' );
+    
+    // Skip Gutenberg button in widgets editor - it uses post editor APIs that don't exist there
+    if ( $is_widgets_editor ) {
+      return;
+    }
+    
     $gutenberg_asset_file = include( MTPHR_POST_DUPLICATOR_DIR . 'assets/build/gutenbergButton.asset.php' );
     
     // Enqueue WordPress component styles

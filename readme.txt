@@ -4,7 +4,7 @@ Tags: posts, post, duplicate, duplication
 Requires at least: 6.6
 Requires PHP: 7.4
 Tested up to: 6.9
-Stable tag: 3.0.0
+Stable tag: 3.0.1
 License: GPL2
 
 Creates functionality to duplicate any and all post types, including taxonomies & custom fields. Perfect for developers and content creators.
@@ -306,7 +306,10 @@ The settings page includes three tabs:
 
 == Changelog ==
 
-= 3.0.0 [2025-12-10] =
+= 3.0.1 [2025-12-15] =
+* Bug fix on widgets screen
+
+= 3.0.0 [2025-12-14] =
 * **New Feature**: Bulk duplication - Select and duplicate multiple posts at once
 * **New Feature**: Multiple clones - Create up to 50 copies of a single post simultaneously
 * **New Feature**: Featured image management - Set, replace, or remove featured images in the duplication modal
@@ -499,4 +502,4 @@ Must upgrade in order for the plugin to work. The file paths where initially wro
 
 == Upgrade Notice ==
 
-Added ability to modify duplicated post content before creating the post.
+Bug fix on widgets screen

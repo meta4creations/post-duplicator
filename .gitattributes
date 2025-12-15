@@ -1,6 +1,7 @@
 /.gitattributes export-ignore
 /.gitignore export-ignore
 /.github/ export-ignore
+/.cursor/ export-ignore
 /vendor/ export-ignore
 /wiki/ export-ignore
 /scripts/ export-ignore

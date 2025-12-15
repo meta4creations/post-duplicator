@@ -9,4 +9,5 @@ config.codekit3
 .DS_Store
 .nova
 .npmrc
+.cursor/*
 /includes/mtphr-settings-git/
