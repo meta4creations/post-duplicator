@@ -87,6 +87,7 @@ function enqueue_scripts() {
     }, ARRAY_FILTER_USE_KEY ),
     'postTypesAuthorSupport' => get_post_types_author_support(),
     'postTypesHierarchicalSupport' => get_post_types_hierarchical_support(),
+    'postTypesPublicSupport' => get_post_types_public_support(),
     'statusChoices' => [
       'draft' => esc_html__( 'Draft', 'post-duplicator' ),
       'publish' => esc_html__( 'Published', 'post-duplicator' ),
@@ -156,6 +157,7 @@ function enqueue_scripts() {
       }, ARRAY_FILTER_USE_KEY ),
       'postTypesAuthorSupport' => get_post_types_author_support(),
       'postTypesHierarchicalSupport' => get_post_types_hierarchical_support(),
+      'postTypesPublicSupport' => get_post_types_public_support(),
       'statusChoices' => [
         'draft' => esc_html__( 'Draft', 'post-duplicator' ),
         'publish' => esc_html__( 'Published', 'post-duplicator' ),

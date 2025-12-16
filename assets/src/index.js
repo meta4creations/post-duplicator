@@ -20,118 +20,23 @@ function showSnackbar( message, type = 'error' ) {
 }
 
 // Helper function to fetch post data
+// Uses plugin's own REST endpoint which works for all post types (including non-REST)
 const fetchPostData = async ( postId, postType = 'post' ) => {
-	const baseUrl = postDuplicatorVars.restUrl.replace(
-		'post-duplicator/v1/',
-		'wp/v2/'
+	// Fetch full post data from plugin endpoint (works for all post types)
+	const fullDataResponse = await fetch(
+		`${ postDuplicatorVars.restUrl }post-full-data/${ postId }`,
+		{
+			headers: {
+				'X-WP-Nonce': postDuplicatorVars.nonce,
+			},
+		}
 	);
-	const endpointType =
-		postType === 'page'
-			? 'pages'
-			: postType === 'post'
-			? 'posts'
-			: postType;
-	const endpoint = `${ baseUrl }${ endpointType }/${ postId }`;
 
-	const response = await fetch( endpoint, {
-		headers: {
-			'X-WP-Nonce': postDuplicatorVars.nonce,
-		},
-	} );
-
-	if ( ! response.ok ) {
+	if ( ! fullDataResponse.ok ) {
 		throw new Error( 'Failed to fetch post data' );
 	}
 
-	const post = await response.json();
-
-	// Fetch author data
-	let authorName = 'Unknown Author';
-	if ( post.author && post.author > 0 ) {
-		try {
-			const authorResponse = await fetch(
-				`${ postDuplicatorVars.restUrl.replace(
-					'post-duplicator/v1/',
-					'wp/v2/'
-				) }users/${ post.author }`,
-				{
-					headers: {
-						'X-WP-Nonce': postDuplicatorVars.nonce,
-					},
-				}
-			);
-
-			if ( authorResponse.ok ) {
-				const authorData = await authorResponse.json();
-				authorName = authorData.name;
-			}
-		} catch ( error ) {
-			console.error( 'Error fetching author:', error );
-		}
-	}
-
-	// Fetch featured image data
-	let featuredImage = null;
-	if ( post.featured_media && post.featured_media > 0 ) {
-		try {
-			const mediaResponse = await fetch(
-				`${ postDuplicatorVars.restUrl.replace(
-					'post-duplicator/v1/',
-					'wp/v2/'
-				) }media/${ post.featured_media }`,
-				{
-					headers: {
-						'X-WP-Nonce': postDuplicatorVars.nonce,
-					},
-				}
-			);
-
-			if ( mediaResponse.ok ) {
-				const mediaData = await mediaResponse.json();
-				featuredImage = {
-					id: mediaData.id,
-					url: mediaData.source_url,
-					thumbnail:
-						mediaData.media_details?.sizes?.thumbnail?.source_url ||
-						mediaData.source_url,
-					alt: mediaData.alt_text || '',
-				};
-			}
-		} catch ( error ) {
-			console.error( 'Error fetching featured image:', error );
-		}
-	}
-
-	// Fetch parent post data
-	let parentPost = null;
-	if ( post.parent && post.parent > 0 ) {
-		try {
-			const parentEndpointType =
-				postType === 'page'
-					? 'pages'
-					: postType === 'post'
-					? 'posts'
-					: postType;
-			const parentResponse = await fetch(
-				`${ baseUrl }${ parentEndpointType }/${ post.parent }`,
-				{
-					headers: {
-						'X-WP-Nonce': postDuplicatorVars.nonce,
-					},
-				}
-			);
-
-			if ( parentResponse.ok ) {
-				const parentData = await parentResponse.json();
-				parentPost = {
-					id: parentData.id,
-					title: parentData.title.rendered,
-				};
-			}
-		} catch ( error ) {
-			console.error( 'Error fetching parent post:', error );
-		}
-	}
+	const post = await fullDataResponse.json();
 
 	// Fetch taxonomy and custom meta data
 	let taxonomies = [];
@@ -158,18 +63,18 @@ const fetchPostData = async ( postId, postType = 'post' ) => {
 
 	return {
 		id: post.id,
-		title: post.title.rendered,
+		title: post.title,
 		type: post.type,
 		status: post.status,
 		slug: post.slug,
 		date: post.date,
-		author: authorName,
-		authorId: post.author,
+		author: post.author,
+		authorId: post.authorId,
 		parent: post.parent || 0,
-		parentPost: parentPost,
+		parentPost: post.parentPost,
 		taxonomies: taxonomies,
 		customMeta: customMeta,
-		featuredImage: featuredImage,
+		featuredImage: post.featuredImage,
 	};
 };
 

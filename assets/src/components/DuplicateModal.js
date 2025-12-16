@@ -29,6 +29,8 @@ const DuplicateModal = ( {
 	currentUser,
 	isLoadingPostData = false,
 } ) => {
+	// Get post types public support from global vars
+	const postTypesPublicSupport = window.postDuplicatorVars?.postTypesPublicSupport || {};
 	// Determine if we're in bulk mode (separate from single/multiple toggle)
 	const isBulkMode = initialMode === 'bulk' || ( postsToDuplicate && postsToDuplicate.length > 0 );
 	
@@ -323,12 +325,15 @@ const DuplicateModal = ( {
 				await new Promise( ( resolve, reject ) => {
 					onDuplicate( currentPost.originalPost.id, duplicateSettings, {
 						onSuccess: ( result ) => {
+							// Determine final post type
+							const finalPostType = settings.type === 'same' ? currentPost.originalPost.type : settings.type;
 							results.push( {
 								success: true,
 								postId: result.duplicate_id,
 								title: finalTitle,
 								originalPost: currentPost.originalPost,
 								featuredImage,
+								postType: finalPostType,
 							} );
 							setDuplicationResults( results );
 							setDuplicatedPostId( result.duplicate_id );
@@ -382,12 +387,15 @@ const DuplicateModal = ( {
 					await new Promise( ( resolve, reject ) => {
 						onDuplicate( post.originalPost.id, duplicateSettings, {
 							onSuccess: ( result ) => {
+								// Determine final post type
+								const finalPostType = postSettings.type === 'same' ? post.originalPost.type : postSettings.type;
 								results.push( {
 									success: true,
 									postId: result.duplicate_id,
 									title: finalTitle,
 									originalPost: post.originalPost,
 									featuredImage: postFeaturedImage,
+									postType: finalPostType,
 								} );
 								setDuplicationResults( [ ...results ] );
 								resolve( result );
@@ -461,22 +469,37 @@ const DuplicateModal = ( {
 	};
 
 	// Set CSS variable on modal frame when featured image changes
+	// Also add class to overlay for CSS scoping (fallback for browsers without :has() support)
 	useEffect( () => {
 		const imageToUse = ! isMultiple && ! isBulkMode ? featuredImage : ( posts[0]?.featuredImage || null );
-		if ( imageToUse && isOpen ) {
+		if ( isOpen ) {
 			// Use setTimeout to ensure modal is rendered
 			const timer = setTimeout( () => {
-				const modalFrame = document.querySelector(
-					'.duplicate-post-modal--has-featured-image.components-modal__frame'
-				);
-				if ( modalFrame ) {
+				const modalFrame = document.querySelector( '.duplicate-post-modal.components-modal__frame' );
+				const modalOverlay = modalFrame?.closest( '.components-modal__screen-overlay' );
+				
+				// Add class to overlay for CSS scoping
+				if ( modalOverlay ) {
+					modalOverlay.classList.add( 'duplicate-post-modal-overlay' );
+				}
+				
+				// Set featured image CSS variable if needed
+				if ( imageToUse && modalFrame ) {
 					modalFrame.style.setProperty(
 						'--featured-image-url',
 						`url(${ imageToUse.thumbnail || imageToUse.url })`
 					);
 				}
 			}, 0 );
-			return () => clearTimeout( timer );
+			return () => {
+				clearTimeout( timer );
+				// Clean up overlay class when modal closes
+				const modalFrame = document.querySelector( '.duplicate-post-modal.components-modal__frame' );
+				const modalOverlay = modalFrame?.closest( '.components-modal__screen-overlay' );
+				if ( modalOverlay ) {
+					modalOverlay.classList.remove( 'duplicate-post-modal-overlay' );
+				}
+			};
 		}
 	}, [ featuredImage, posts, isMultiple, isBulkMode, isOpen ] );
 
@@ -639,17 +662,24 @@ const DuplicateModal = ( {
 										<Spinner />
 									) : (
 										<>
-											<Button
-												variant="secondary"
-												onClick={ () =>
-													window.open(
-														`${ siteUrl }/?p=${ duplicatedPostId }`,
-														'_blank'
-													)
-												}
-											>
-												{ __( 'View Post', 'post-duplicator' ) }
-											</Button>
+											{ ( () => {
+												// Determine final post type
+												const finalPostType = settings.type === 'same' ? originalPost?.type : settings.type;
+												const isPublic = postTypesPublicSupport[ finalPostType ] !== false;
+												return isPublic && (
+													<Button
+														variant="secondary"
+														onClick={ () =>
+															window.open(
+																`${ siteUrl }/?p=${ duplicatedPostId }`,
+																'_blank'
+															)
+														}
+													>
+														{ __( 'View Post', 'post-duplicator' ) }
+													</Button>
+												);
+											} )() }
 											<Button
 												variant="primary"
 												onClick={ () =>
@@ -698,17 +728,24 @@ const DuplicateModal = ( {
 													{ result.title }
 												</h3>
 												<div className="duplicate-post-modal__status-actions">
-													<Button
-														variant="secondary"
-														onClick={ () =>
-															window.open(
-																`${ siteUrl }/?p=${ result.postId }`,
-																'_blank'
-															)
-														}
-													>
-														{ __( 'View Post', 'post-duplicator' ) }
-													</Button>
+													{ ( () => {
+														// Check if post type is public
+														const finalPostType = result.postType || result.originalPost?.type;
+														const isPublic = postTypesPublicSupport[ finalPostType ] !== false;
+														return isPublic && (
+															<Button
+																variant="secondary"
+																onClick={ () =>
+																	window.open(
+																		`${ siteUrl }/?p=${ result.postId }`,
+																		'_blank'
+																	)
+																}
+															>
+																{ __( 'View Post', 'post-duplicator' ) }
+															</Button>
+														);
+													} )() }
 													<Button
 														variant="primary"
 														onClick={ () =>

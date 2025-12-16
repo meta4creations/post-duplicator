@@ -307,7 +307,9 @@ The settings page includes three tabs:
 == Changelog ==
 
 = 3.0.2 [2025-12-16] =
-* Resolved duplication issue with Elementor
+* Resolved duplication issue with Elementor & Divi
+* Resolved duplciation issue with non REST post types
+* Resolved component css issues
 
 = 3.0.1 [2025-12-15] =
 * Bug fix on widgets screen

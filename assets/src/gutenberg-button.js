@@ -67,6 +67,7 @@ const DuplicatePostButton = () => {
 		if ( isModalOpen && postId ) {
 			const fetchPostData = async () => {
 				try {
+					// Fetch taxonomy and custom meta data
 					const response = await fetch(
 						`${ postDuplicatorVars.restUrl }post-data/${ postId }`,
 						{
@@ -82,88 +83,62 @@ const DuplicatePostButton = () => {
 						setCustomMeta( postData.customMeta || [] );
 					}
 
-					// Fetch parent post if available
-					if ( postParent && postParent > 0 ) {
-						try {
-							const baseUrl = postDuplicatorVars.restUrl.replace(
-								'post-duplicator/v1/',
-								'wp/v2/'
-							);
-							const parentEndpointType =
-								postType === 'page'
-									? 'pages'
-									: postType === 'post'
-									? 'posts'
-									: postType;
-							const parentResponse = await fetch(
-								`${ baseUrl }${ parentEndpointType }/${ postParent }`,
-								{
-									headers: {
-										'X-WP-Nonce': postDuplicatorVars.nonce,
-									},
-								}
-							);
+					// Fetch full post data (includes featured image and parent post info)
+					const fullDataResponse = await fetch(
+						`${ postDuplicatorVars.restUrl }post-full-data/${ postId }`,
+						{
+							headers: {
+								'X-WP-Nonce': postDuplicatorVars.nonce,
+							},
+						}
+					);
 
-							if ( parentResponse.ok ) {
-								const parentData = await parentResponse.json();
-								setParentPost( {
-									id: parentData.id,
-									title: parentData.title.rendered,
-								} );
-							} else {
+					if ( fullDataResponse.ok ) {
+						const fullPostData = await fullDataResponse.json();
+						
+						// Set featured image from full post data
+						setFeaturedImage( fullPostData.featuredImage || null );
+						
+						// Set parent post from full post data
+						setParentPost( fullPostData.parentPost || null );
+					} else {
+						// Fallback: try to fetch parent post separately if full data fetch fails
+						if ( postParent && postParent > 0 ) {
+							try {
+								const parentResponse = await fetch(
+									`${ postDuplicatorVars.restUrl }post-full-data/${ postParent }`,
+									{
+										headers: {
+											'X-WP-Nonce': postDuplicatorVars.nonce,
+										},
+									}
+								);
+
+								if ( parentResponse.ok ) {
+									const parentData = await parentResponse.json();
+									setParentPost( {
+										id: parentData.id,
+										title: parentData.title,
+									} );
+								} else {
+									setParentPost( null );
+								}
+							} catch ( error ) {
+								console.error( 'Error fetching parent post:', error );
 								setParentPost( null );
 							}
-						} catch ( error ) {
-							console.error( 'Error fetching parent post:', error );
+						} else {
 							setParentPost( null );
 						}
-					} else {
-						setParentPost( null );
-					}
-
-					// Fetch featured image if available
-					if ( featuredMediaId && featuredMediaId > 0 ) {
-						try {
-							const baseUrl = postDuplicatorVars.restUrl.replace(
-								'post-duplicator/v1/',
-								'wp/v2/'
-							);
-							const mediaResponse = await fetch(
-								`${ baseUrl }media/${ featuredMediaId }`,
-								{
-									headers: {
-										'X-WP-Nonce': postDuplicatorVars.nonce,
-									},
-								}
-							);
-
-							if ( mediaResponse.ok ) {
-								const mediaData = await mediaResponse.json();
-								setFeaturedImage( {
-									id: mediaData.id,
-									url: mediaData.source_url,
-									thumbnail:
-										mediaData.media_details?.sizes
-											?.thumbnail?.source_url ||
-										mediaData.source_url,
-									alt: mediaData.alt_text || '',
-								} );
-							} else {
-								setFeaturedImage( null );
-							}
-						} catch ( error ) {
-							console.error(
-								'Error fetching featured image:',
-								error
-							);
-							setFeaturedImage( null );
-						}
-					} else {
+						
+						// Fallback for featured image if full data fetch fails
 						setFeaturedImage( null );
 					}
 				} catch ( error ) {
 					console.error( 'Error fetching post data:', error );
 					// Continue without taxonomy/meta data
+					setFeaturedImage( null );
+					setParentPost( null );
 				}
 			};
 

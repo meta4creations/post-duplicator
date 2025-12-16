@@ -26,6 +26,19 @@ function register_routes() {
     ),
   ) );
   
+  register_rest_route( 'post-duplicator/v1', 'post-full-data/(?P<id>\d+)', array(
+    'methods' => 'GET',
+    'permission_callback' => __NAMESPACE__ . '\get_post_data_permissions',
+    'callback' => __NAMESPACE__ . '\get_post_full_data',
+    'args' => array(
+      'id' => array(
+        'validate_callback' => function( $param ) {
+          return is_numeric( $param );
+        },
+      ),
+    ),
+  ) );
+  
   register_rest_route( 'post-duplicator/v1', 'parent-posts', array(
     'methods' => 'GET',
     'permission_callback' => '__return_true',
@@ -179,6 +192,73 @@ function get_post_data( $request ) {
   return rest_ensure_response( array(
     'taxonomies' => $taxonomies_data,
     'customMeta' => $custom_meta_data,
+  ) );
+}
+
+/**
+ * Get full post data including title, slug, date, author, parent, featured image
+ * Works for all post types regardless of show_in_rest setting
+ */
+function get_post_full_data( $request ) {
+  $post_id = $request->get_param( 'id' );
+  $post = get_post( $post_id );
+  
+  if ( ! $post ) {
+    return new \WP_Error( 'post_not_found', esc_html__( 'Post not found.', 'post-duplicator' ), array( 'status' => 404 ) );
+  }
+  
+  // Get author name
+  $author_name = 'Unknown Author';
+  if ( $post->post_author && $post->post_author > 0 ) {
+    $author = get_userdata( $post->post_author );
+    if ( $author ) {
+      $author_name = $author->display_name;
+    }
+  }
+  
+  // Get featured image data
+  $featured_image = null;
+  $featured_media_id = get_post_thumbnail_id( $post_id );
+  if ( $featured_media_id && $featured_media_id > 0 ) {
+    $attachment = get_post( $featured_media_id );
+    if ( $attachment && wp_attachment_is_image( $featured_media_id ) ) {
+      $image_url = wp_get_attachment_image_url( $featured_media_id, 'full' );
+      $thumbnail_url = wp_get_attachment_image_url( $featured_media_id, 'thumbnail' );
+      $alt_text = get_post_meta( $featured_media_id, '_wp_attachment_image_alt', true );
+      
+      $featured_image = array(
+        'id' => $featured_media_id,
+        'url' => $image_url ? $image_url : '',
+        'thumbnail' => $thumbnail_url ? $thumbnail_url : $image_url,
+        'alt' => $alt_text ? $alt_text : '',
+      );
+    }
+  }
+  
+  // Get parent post data if available
+  $parent_post = null;
+  if ( $post->post_parent && $post->post_parent > 0 ) {
+    $parent = get_post( $post->post_parent );
+    if ( $parent ) {
+      $parent_post = array(
+        'id' => $parent->ID,
+        'title' => $parent->post_title,
+      );
+    }
+  }
+  
+  return rest_ensure_response( array(
+    'id' => $post->ID,
+    'title' => $post->post_title,
+    'type' => $post->post_type,
+    'status' => $post->post_status,
+    'slug' => $post->post_name,
+    'date' => $post->post_date,
+    'author' => $author_name,
+    'authorId' => $post->post_author,
+    'parent' => $post->post_parent || 0,
+    'parentPost' => $parent_post,
+    'featuredImage' => $featured_image,
   ) );
 }
 

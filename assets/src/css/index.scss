@@ -392,17 +392,7 @@
   }
 }
 
-/* Ensure modal appears above WordPress admin elements */
-.components-modal__screen-overlay {
-  z-index: 100000;
-}
-
-.components-modal__frame {
-  z-index: 100001;
-  max-width: 600px;
-}
-
-.components-modal__header {
+.duplicate-post-modal.components-modal__frame .components-modal__header {
   gap: 12px;
   .components-spacer {
     display: none;

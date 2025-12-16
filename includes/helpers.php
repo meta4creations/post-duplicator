@@ -110,6 +110,25 @@ function get_post_types_hierarchical_support() {
 }
 
 /**
+ * Get public status information for all post types
+ */
+function get_post_types_public_support() {
+	$post_types = get_post_types( array(), 'objects' );
+	$public_support = array();
+	
+	foreach ( $post_types as $post_type => $post_type_obj ) {
+		// Skip system post types
+		if ( in_array( $post_type, array( 'attachment', 'revision', 'nav_menu_item', 'wooframework' ) ) ) {
+			continue;
+		}
+		// A post type is considered public if 'public' is true OR 'publicly_queryable' is true
+		$public_support[ $post_type ] = ! empty( $post_type_obj->public ) || ! empty( $post_type_obj->publicly_queryable );
+	}
+	
+	return $public_support;
+}
+
+/**
  * Get meta keys that should never be cloned to duplicated posts
  * 
  * These meta keys will be excluded from:
