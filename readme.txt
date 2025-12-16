@@ -4,7 +4,7 @@ Tags: posts, post, duplicate, duplication
 Requires at least: 6.6
 Requires PHP: 7.4
 Tested up to: 6.9
-Stable tag: 3.0.1
+Stable tag: 3.0.2
 License: GPL2
 
 Creates functionality to duplicate any and all post types, including taxonomies & custom fields. Perfect for developers and content creators.
@@ -305,6 +305,9 @@ The settings page includes three tabs:
 9. Advanced settings
 
 == Changelog ==
+
+= 3.0.2 [2025-12-16] =
+* Resolved duplication issue with Elementor
 
 = 3.0.1 [2025-12-15] =
 * Bug fix on widgets screen

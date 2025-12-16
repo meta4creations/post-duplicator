@@ -113,17 +113,15 @@ function get_post_data( $request ) {
   // Get custom meta fields
   $custom_meta_data = array();
   $custom_fields = get_post_custom( $post_id );
+  $excluded_meta_keys = get_excluded_meta_keys();
   
   foreach ( $custom_fields as $key => $values ) {
-    // Skip WordPress internal meta keys
-    if ( strpos( $key, '_' ) === 0 && ! in_array( $key, array( '_thumbnail_id', '_wp_page_template' ) ) ) {
-      // Allow some specific meta keys that start with underscore
-      if ( ! apply_filters( "mtphr_post_duplicator_meta_{$key}_enabled", false ) ) {
-        continue;
-      }
+    // Skip excluded meta keys
+    if ( in_array( $key, $excluded_meta_keys, true ) ) {
+      continue;
     }
     
-    // Check if meta is enabled via filter
+    // Check if meta is enabled via filter (defaults to true for all meta keys, including those starting with "_")
     if ( ! apply_filters( "mtphr_post_duplicator_meta_{$key}_enabled", true ) ) {
       continue;
     }
@@ -586,25 +584,45 @@ function duplicate_post( $request ) {
 		// Use provided custom meta data if available, otherwise fetch from original post
 		if ( isset( $settings['customMetaData'] ) && is_array( $settings['customMetaData'] ) ) {
 			// Use provided custom meta data
+			$excluded_meta_keys = get_excluded_meta_keys();
 			foreach ( $settings['customMetaData'] as $meta_item ) {
 				if ( ! isset( $meta_item['key'] ) || ! isset( $meta_item['value'] ) ) {
 					continue;
 				}
 				
 				$meta_key = sanitize_text_field( $meta_item['key'] );
+				
+				// Skip excluded meta keys
+				if ( in_array( $meta_key, $excluded_meta_keys, true ) ) {
+					continue;
+				}
+				
 				$meta_value = $meta_item['value'];
 				
 				// Handle data type preservation
 				if ( isset( $meta_item['type'] ) && isset( $meta_item['isSerialized'] ) ) {
-					// If it was originally serialized or is array/object, serialize it
-					if ( $meta_item['isSerialized'] || in_array( $meta_item['type'], array( 'array', 'object' ) ) ) {
-						// Try to decode JSON first if it's a JSON string
+					if ( $meta_item['isSerialized'] ) {
+						// It was originally serialized, so serialize it again
+						// Try to decode JSON first if it's a JSON string (from the modal)
 						$json_decoded = json_decode( $meta_value, true );
 						if ( json_last_error() === JSON_ERROR_NONE ) {
 							$meta_value = maybe_serialize( $json_decoded );
 						} else {
 							// Already a string, serialize it
 							$meta_value = maybe_serialize( $meta_value );
+						}
+					} elseif ( in_array( $meta_item['type'], array( 'array', 'object' ) ) ) {
+						// It was originally a JSON string (not serialized), so keep it as JSON
+						// Validate it's valid JSON - if valid, keep as-is to preserve exact format
+						// Only re-encode if necessary (e.g., if user modified it in the modal)
+						$json_decoded = json_decode( $meta_value, true );
+						if ( json_last_error() === JSON_ERROR_NONE ) {
+							// Valid JSON - re-encode to ensure it's properly formatted
+							// Use wp_json_encode which handles WordPress-specific encoding
+							$meta_value = wp_json_encode( $json_decoded );
+						} else {
+							// Invalid JSON, sanitize as text
+							$meta_value = sanitize_text_field( $meta_value );
 						}
 					} elseif ( $meta_item['type'] === 'number' ) {
 						// Preserve as number (WordPress will store as string anyway, but we can validate)
@@ -640,7 +658,13 @@ function duplicate_post( $request ) {
 		} else {
 			// Fall back to original behavior: duplicate all custom fields
 			$custom_fields = get_post_custom( $original_id );
+			$excluded_meta_keys = get_excluded_meta_keys();
 			foreach ( $custom_fields as $key => $value ) {
+				// Skip excluded meta keys
+				if ( in_array( $key, $excluded_meta_keys, true ) ) {
+					continue;
+				}
+				
 				if( is_array($value) && count($value) > 0 ) {
 					foreach( $value as $i=>$v ) {
 						if ( ! apply_filters( "mtphr_post_duplicator_meta_{$key}_enabled", true ) ) {

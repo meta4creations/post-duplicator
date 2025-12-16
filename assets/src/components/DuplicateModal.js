@@ -499,8 +499,8 @@ const DuplicateModal = ( {
 	const currentPost = posts[0]?.originalPost || originalPost;
 	const currentFeaturedImage = ! isMultiple && ! isBulkMode ? featuredImage : ( posts[0]?.featuredImage || null );
 
-	// Header actions for mode toggle (only show for single post mode, not bulk)
-	const headerActions = ( ! postsToDuplicate || postsToDuplicate.length === 0 ) && originalPost ? (
+	// Header actions for mode toggle (only show for single post mode, not bulk, and only while idle)
+	const headerActions = ( ! postsToDuplicate || postsToDuplicate.length === 0 ) && originalPost && duplicateStatus === 'idle' ? (
 		<HStack spacing="4px" style={ { flex: 0 } }>
 			<Button
 				icon={ copy }

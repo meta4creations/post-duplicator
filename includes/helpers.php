@@ -108,3 +108,26 @@ function get_post_types_hierarchical_support() {
 	
 	return $hierarchical_support;
 }
+
+/**
+ * Get meta keys that should never be cloned to duplicated posts
+ * 
+ * These meta keys will be excluded from:
+ * - The duplicate post modal display
+ * - The duplication process
+ * 
+ * @return array Array of meta keys to exclude
+ */
+function get_excluded_meta_keys() {
+	/**
+	 * Filter the list of meta keys that should never be cloned
+	 * 
+	 * @param array $excluded_keys Array of meta keys to exclude from duplication
+	 */
+	$excluded_keys = apply_filters( 'mtphr_post_duplicator_excluded_meta_keys', array(
+		'_elementor_css',
+		'_elementor_element_cache',
+	) );
+	
+	return $excluded_keys;
+}
