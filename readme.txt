@@ -310,6 +310,7 @@ The settings page includes three tabs:
 * Resolved duplication issue with Elementor & Divi
 * Resolved duplciation issue with non REST post types
 * Resolved component css issues
+* API security updates
 
 = 3.0.1 [2025-12-15] =
 * Bug fix on widgets screen
@@ -507,4 +508,4 @@ Must upgrade in order for the plugin to work. The file paths where initially wro
 
 == Upgrade Notice ==
 
-Bug fix on widgets screen
+Elementor, Divi and Classic post type duplication fixes

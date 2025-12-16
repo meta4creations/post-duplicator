@@ -41,8 +41,23 @@ function register_routes() {
   
   register_rest_route( 'post-duplicator/v1', 'parent-posts', array(
     'methods' => 'GET',
-    'permission_callback' => '__return_true',
+    'permission_callback' => __NAMESPACE__ . '\get_parent_posts_permissions',
     'callback' => __NAMESPACE__ . '\get_parent_posts',
+    'args' => array(
+      'post_type' => array(
+        'validate_callback' => function( $param ) {
+          // Validate that it's a valid post type slug
+          return post_type_exists( sanitize_key( $param ) );
+        },
+        'sanitize_callback' => 'sanitize_key',
+      ),
+      'exclude_id' => array(
+        'validate_callback' => function( $param ) {
+          return is_numeric( $param );
+        },
+        'sanitize_callback' => 'absint',
+      ),
+    ),
   ) );
 }
 
@@ -263,15 +278,40 @@ function get_post_full_data( $request ) {
 }
 
 /**
+ * Permission check for getting parent posts
+ */
+function get_parent_posts_permissions( $request ) {
+  // User must be logged in and have edit capabilities
+  if ( ! is_user_logged_in() ) {
+    return new \WP_Error( 'not_logged_in', esc_html__( 'You must be logged in to access this endpoint.', 'post-duplicator' ), array( 'status' => 401 ) );
+  }
+  
+  // Check if user has edit capabilities
+  if ( ! current_user_can( 'edit_posts' ) ) {
+    return new \WP_Error( 'no_permission', esc_html__( 'You do not have permission to access this endpoint.', 'post-duplicator' ), array( 'status' => 403 ) );
+  }
+  
+  return true;
+}
+
+/**
  * Get available parent posts for a post type (hierarchical)
  */
 function get_parent_posts( $request ) {
   $post_type = $request->get_param( 'post_type' );
   $exclude_id = $request->get_param( 'exclude_id' );
   
-  if ( ! $post_type ) {
-    // Default to 'page' if no post type specified
+  // Validate and sanitize post type
+  if ( ! $post_type || ! post_type_exists( $post_type ) ) {
+    // Default to 'page' if no valid post type specified
     $post_type = 'page';
+  } else {
+    $post_type = sanitize_key( $post_type );
+  }
+  
+  // Validate and sanitize exclude_id
+  if ( $exclude_id ) {
+    $exclude_id = absint( $exclude_id );
   }
   
   // Get posts that can be parents (same post type, published or draft)
@@ -284,8 +324,8 @@ function get_parent_posts( $request ) {
   );
   
   // Exclude the current post (can't be its own parent)
-  if ( $exclude_id ) {
-    $args['post__not_in'] = array( intval( $exclude_id ) );
+  if ( $exclude_id && $exclude_id > 0 ) {
+    $args['post__not_in'] = array( $exclude_id );
   }
   
   $posts = get_posts( $args );
@@ -303,8 +343,8 @@ function get_parent_posts( $request ) {
   
   // Build hierarchical structure and collect descendants of excluded post
   $excluded_descendants = array();
-  if ( $exclude_id ) {
-    $exclude_id_int = intval( $exclude_id );
+  if ( $exclude_id && $exclude_id > 0 ) {
+    $exclude_id_int = $exclude_id;
     // Recursively find all descendants of the excluded post from the full post list
     // We need to query all posts to find descendants, not just the ones we're showing
     $all_posts_args = array(
@@ -385,7 +425,6 @@ function get_parent_posts( $request ) {
  * Duplicate a post
  */
 function duplicate_post_permissions( $request ) {
-  $args = $request->get_params();
   $data = $request->get_json_params();
   $original_id = isset( $data['original_id'] ) ? $data['original_id'] : false;
 
@@ -393,7 +432,17 @@ function duplicate_post_permissions( $request ) {
     return new \WP_Error( 'no_original_id', esc_html__( 'No original id passed.', 'post-duplicator' ), array( 'status' => 403 ) );
   }
 
+  // Validate original_id is a positive integer
+  $original_id = absint( $original_id );
+  if ( ! $original_id || $original_id <= 0 ) {
+    return new \WP_Error( 'invalid_original_id', esc_html__( 'Invalid original id.', 'post-duplicator' ), array( 'status' => 403 ) );
+  }
+
   $post = get_post( $original_id );
+  if ( ! $post ) {
+    return new \WP_Error( 'post_not_found', esc_html__( 'Post not found.', 'post-duplicator' ), array( 'status' => 404 ) );
+  }
+
   if ( ! user_can_duplicate( $post ) ) {
 	  return new \WP_Error( 'no_permission', esc_html__( 'User does not have permission to duplicate post.', 'post-duplicator' ), array( 'status' => 403 ) );
 	}
@@ -405,14 +454,17 @@ function duplicate_post_permissions( $request ) {
  * Duplicate a post
  */
 function duplicate_post( $request ) {
-  $args = $request->get_params();
   $data = $request->get_json_params();
 
   // Get access to the database
 	global $wpdb;
 
-  // Get the original id
-  $original_id = $data['original_id'];
+  // Get and validate the original id
+  $original_id = isset( $data['original_id'] ) ? absint( $data['original_id'] ) : 0;
+  
+  if ( ! $original_id || $original_id <= 0 ) {
+    return new \WP_Error( 'invalid_original_id', esc_html__( 'Invalid original id.', 'post-duplicator' ), array( 'status' => 400 ) );
+  }
 	
 	// Get the original post object
 	$orig = get_post( $original_id );
@@ -473,9 +525,16 @@ function duplicate_post( $request ) {
 		$duplicate['post_name'] = sanitize_title( $duplicate['post_name'] . '-' . $settings['slug'] );
 	}
 	
-	// Set the status
+	// Set the status - validate against allowed statuses
 	if( $settings['status'] != 'same' ) {
-		$duplicate['post_status'] = sanitize_text_field( $settings['status'] );
+		$allowed_statuses = array( 'draft', 'publish', 'pending', 'private', 'future' );
+		$requested_status = sanitize_text_field( $settings['status'] );
+		if ( in_array( $requested_status, $allowed_statuses, true ) ) {
+			$duplicate['post_status'] = $requested_status;
+		} else {
+			// Invalid status, default to draft
+			$duplicate['post_status'] = 'draft';
+		}
 	}
 	
 	// Check if a user has publish get_post_type_capabilities. If not, make sure they can't _publish
@@ -486,9 +545,16 @@ function duplicate_post( $request ) {
 		}
 	}
 	
-	// Set the type
+	// Set the type - validate against allowed post types
 	if( $settings['type'] != 'same' ) {
-		$duplicate['post_type'] = sanitize_text_field( $settings['type'] );
+		$requested_type = sanitize_key( $settings['type'] );
+		// Validate that the post type exists and user has permission to create it
+		if ( post_type_exists( $requested_type ) && current_user_can( get_post_type_object( $requested_type )->cap->create_posts ) ) {
+			$duplicate['post_type'] = $requested_type;
+		} else {
+			// Invalid post type or no permission, keep original type
+			$duplicate['post_type'] = $orig->post_type;
+		}
 	}
 	
 	// Set the parent - check for selectedParentId first, otherwise keep original parent
@@ -616,12 +682,33 @@ function duplicate_post( $request ) {
 				if ( ! is_array( $term_ids ) ) {
 					continue;
 				}
+				
+				// Validate taxonomy slug
+				$taxonomy_slug = sanitize_key( $taxonomy_slug );
+				if ( ! taxonomy_exists( $taxonomy_slug ) ) {
+					continue; // Skip invalid taxonomy
+				}
+				
+				// Verify taxonomy is registered for this post type
+				if ( ! is_object_in_taxonomy( $duplicate['post_type'], $taxonomy_slug ) ) {
+					continue; // Skip taxonomies not registered for this post type
+				}
+				
 				// Convert term IDs to integers and filter out invalid values
-				$term_ids = array_map( 'intval', $term_ids );
+				$term_ids = array_map( 'absint', $term_ids );
 				$term_ids = array_filter( $term_ids );
 				
-				if ( ! empty( $term_ids ) ) {
-					wp_set_object_terms( $duplicate_id, $term_ids, $taxonomy_slug );
+				// Verify all term IDs exist and belong to the correct taxonomy
+				$valid_term_ids = array();
+				foreach ( $term_ids as $term_id ) {
+					$term = get_term( $term_id, $taxonomy_slug );
+					if ( $term && ! is_wp_error( $term ) ) {
+						$valid_term_ids[] = $term_id;
+					}
+				}
+				
+				if ( ! empty( $valid_term_ids ) ) {
+					wp_set_object_terms( $duplicate_id, $valid_term_ids, $taxonomy_slug );
 				}
 			}
 		} elseif ( ! isset( $settings['taxonomyData'] ) ) {
@@ -670,7 +757,12 @@ function duplicate_post( $request ) {
 					continue;
 				}
 				
-				$meta_key = sanitize_text_field( $meta_item['key'] );
+				$meta_key = sanitize_key( $meta_item['key'] );
+				
+				// Validate meta key is not empty and follows WordPress naming conventions
+				if ( empty( $meta_key ) || strlen( $meta_key ) > 255 ) {
+					continue; // Skip invalid meta keys
+				}
 				
 				// Skip excluded meta keys
 				if ( in_array( $meta_key, $excluded_meta_keys, true ) ) {
