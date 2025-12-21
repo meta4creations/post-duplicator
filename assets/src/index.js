@@ -86,12 +86,19 @@ const DuplicatePostHandler = () => {
 	const [ modalMode, setModalMode ] = useState( 'single' );
 	const [ wasDuplicated, setWasDuplicated ] = useState( false );
 	const [ isLoadingPostData, setIsLoadingPostData ] = useState( false );
+	const [ initialDuplicationResults, setInitialDuplicationResults ] = useState( null );
 	
 	// Check if we're on the posts list screen
 	const isPostsListScreen = () => {
 		// Check if we're on an edit screen (wp-admin/edit.php)
 		return window.location.href.includes( '/wp-admin/edit.php' ) || 
 		       window.location.href.includes( '/wp-admin/post.php' ) === false;
+	};
+
+	// Check if we're on a classic edit post screen
+	const isClassicEditScreen = () => {
+		return window.location.href.includes( '/wp-admin/post.php' ) && 
+		       window.location.href.includes( 'action=edit' );
 	};
 
 	const handleDuplicate = async ( postId, settings, callbacks ) => {
@@ -126,26 +133,142 @@ const DuplicatePostHandler = () => {
 				const postType =
 					e.target.getAttribute( 'data-posttype' ) || 'post';
 
-				// Open modal immediately
-				setCurrentPost( null );
-				setPostsToDuplicate( null );
-				setModalMode( 'single' );
-				setIsLoadingPostData( true );
-				setIsModalOpen( true );
+				const mode = postDuplicatorVars.mode || 'advanced';
 
-				// Fetch data asynchronously after opening modal
-				try {
-					const postData = await fetchPostData( postId, postType );
-					setCurrentPost( postData );
-					setIsLoadingPostData( false );
-				} catch ( error ) {
-					console.error( 'Error fetching post:', error );
-					setIsLoadingPostData( false );
-					setIsModalOpen( false );
-					showSnackbar(
-						'Error loading post data. Please try again.',
-						'error'
-					);
+				// Check if basic mode - auto-duplicate
+				if ( mode === 'basic' ) {
+					setIsLoadingPostData( true );
+					try {
+						// Fetch post data
+						const postData = await fetchPostData( postId, postType );
+
+						// Prepare taxonomy and custom meta data
+						let taxonomyData = {};
+						if ( postData.taxonomies ) {
+							postData.taxonomies.forEach( ( taxonomy ) => {
+								taxonomyData[ taxonomy.slug ] = taxonomy.assignedTermIds || [];
+							} );
+						}
+						const customMetaData = ( postData.customMeta || [] ).map( ( meta ) => ( {
+							key: meta.key,
+							value: meta.value,
+							type: meta.type || 'string',
+							isSerialized: meta.isSerialized || false,
+						} ) );
+
+						// Prepare settings with defaults
+						const duplicateSettings = {
+							...postDuplicatorVars.defaultSettings,
+							includeTaxonomies: true,
+							includeCustomMeta: true,
+							taxonomyData: taxonomyData,
+							customMetaData: customMetaData,
+							featuredImageId: postData.featuredImage?.id || null,
+						};
+
+						// Duplicate the post
+						await duplicatePost( postId, duplicateSettings, {
+							onSuccess: async ( result ) => {
+								setIsLoadingPostData( false );
+								// Determine which action setting to use based on screen type
+								const isClassicEdit = isClassicEditScreen();
+								const action = isClassicEdit 
+									? ( postDuplicatorVars.singleAfterDuplicationAction || 'notice' )
+									: ( postDuplicatorVars.listSingleAfterDuplicationAction || 'notice' );
+								const finalPostType = duplicateSettings.type === 'same' ? postType : duplicateSettings.type;
+								const finalTitle = `${ postData.title } ${ postDuplicatorVars.defaultSettings.title }`;
+
+								// Fetch featured image from duplicated post for notice action
+								let duplicatedFeaturedImage = null;
+								if ( action === 'notice' ) {
+									try {
+										const duplicatedPostDataResponse = await fetch(
+											`${ postDuplicatorVars.restUrl }post-full-data/${ result.duplicate_id }`,
+											{
+												headers: {
+													'X-WP-Nonce': postDuplicatorVars.nonce,
+												},
+											}
+										);
+										if ( duplicatedPostDataResponse.ok ) {
+											const duplicatedPostData = await duplicatedPostDataResponse.json();
+											duplicatedFeaturedImage = duplicatedPostData.featuredImage || null;
+										}
+									} catch ( error ) {
+										console.error( 'Error fetching duplicated post featured image:', error );
+									}
+								}
+
+								if ( action === 'notice' ) {
+									// Show success modal
+									setWasDuplicated( true );
+									setCurrentPost( postData );
+									setInitialDuplicationResults( {
+										postId: result.duplicate_id,
+										title: finalTitle,
+										featuredImage: duplicatedFeaturedImage || postData.featuredImage,
+										postType: finalPostType,
+									} );
+									setModalMode( 'single' );
+									setIsModalOpen( true );
+								} else if ( action === 'new_tab' ) {
+									// Open in new tab - use post type in URL for custom post types
+									const editUrl = finalPostType !== 'post' 
+										? `${ postDuplicatorVars.siteUrl }/wp-admin/post.php?post=${ result.duplicate_id }&action=edit&post_type=${ finalPostType }`
+										: `${ postDuplicatorVars.siteUrl }/wp-admin/post.php?post=${ result.duplicate_id }&action=edit`;
+									window.open( editUrl, '_blank' );
+								} else if ( action === 'same_tab' ) {
+									// Navigate in same tab - use post type in URL for custom post types
+									const editUrl = finalPostType !== 'post' 
+										? `${ postDuplicatorVars.siteUrl }/wp-admin/post.php?post=${ result.duplicate_id }&action=edit&post_type=${ finalPostType }`
+										: `${ postDuplicatorVars.siteUrl }/wp-admin/post.php?post=${ result.duplicate_id }&action=edit`;
+									window.location.href = editUrl;
+								} else if ( action === 'refresh' ) {
+									// Refresh the page
+									setWasDuplicated( true );
+									window.location.reload();
+								}
+							},
+							onError: ( error ) => {
+								setIsLoadingPostData( false );
+								showSnackbar(
+									`Error duplicating post: ${
+										error.message || error.data?.message || 'Unknown error'
+									}`,
+									'error'
+								);
+							},
+						} );
+					} catch ( error ) {
+						console.error( 'Error in basic mode duplication:', error );
+						setIsLoadingPostData( false );
+						showSnackbar(
+							'Failed to duplicate post. Please try again.',
+							'error'
+						);
+					}
+				} else {
+					// Advanced mode - show modal
+					setCurrentPost( null );
+					setPostsToDuplicate( null );
+					setModalMode( 'single' );
+					setIsLoadingPostData( true );
+					setIsModalOpen( true );
+
+					// Fetch data asynchronously after opening modal
+					try {
+						const postData = await fetchPostData( postId, postType );
+						setCurrentPost( postData );
+						setIsLoadingPostData( false );
+					} catch ( error ) {
+						console.error( 'Error fetching post:', error );
+						setIsLoadingPostData( false );
+						setIsModalOpen( false );
+						showSnackbar(
+							'Error loading post data. Please try again.',
+							'error'
+						);
+					}
 				}
 			}
 		};
@@ -165,55 +288,174 @@ const DuplicatePostHandler = () => {
 				return;
 			}
 
-			// Open modal immediately
-			setPostsToDuplicate( null );
-			setCurrentPost( null );
-			setModalMode( 'bulk' );
-			setIsLoadingPostData( true );
-			setIsModalOpen( true );
+			const mode = postDuplicatorVars.mode || 'advanced';
 
-			// Fetch all posts in parallel after opening modal
-			try {
-				const postDataPromises = postIds.map( ( postId ) =>
-					fetchPostData( postId, postType ).catch( ( error ) => {
-						console.error( `Error fetching post ${ postId }:`, error );
-						return null; // Return null for failed fetches
-					} )
-				);
+			// Check if basic mode - auto-duplicate all posts
+			if ( mode === 'basic' ) {
+				setIsLoadingPostData( true );
+				const action = postDuplicatorVars.listMultipleAfterDuplicationAction || 'notice';
+				// Only open modal if action is 'notice', otherwise we'll refresh
+				if ( action === 'notice' ) {
+					setModalMode( 'bulk' );
+					setIsModalOpen( true );
+				}
 
-				const postDataArray = await Promise.all( postDataPromises );
-				
-				// Filter out null values (failed fetches)
-				const validPosts = postDataArray.filter( ( post ) => post !== null );
+				try {
+					// Fetch all posts in parallel
+					const postDataPromises = postIds.map( ( postId ) =>
+						fetchPostData( postId, postType ).catch( ( error ) => {
+							console.error( `Error fetching post ${ postId }:`, error );
+							return null;
+						} )
+					);
 
-				if ( validPosts.length === 0 ) {
+					const postDataArray = await Promise.all( postDataPromises );
+					const validPosts = postDataArray.filter( ( post ) => post !== null );
+
+					if ( validPosts.length === 0 ) {
+						setIsLoadingPostData( false );
+						setIsModalOpen( false );
+						showSnackbar(
+							'Error loading post data. Please try again.',
+							'error'
+						);
+						return;
+					}
+
+					// Duplicate all posts sequentially
+					const duplicationResults = [];
+					for ( const post of validPosts ) {
+						try {
+							// Prepare taxonomy and custom meta data
+							let taxonomyData = {};
+							if ( post.taxonomies ) {
+								post.taxonomies.forEach( ( taxonomy ) => {
+									taxonomyData[ taxonomy.slug ] = taxonomy.assignedTermIds || [];
+								} );
+							}
+							const customMetaData = ( post.customMeta || [] ).map( ( meta ) => ( {
+								key: meta.key,
+								value: meta.value,
+								type: meta.type || 'string',
+								isSerialized: meta.isSerialized || false,
+							} ) );
+
+							// Prepare settings with defaults
+							const duplicateSettings = {
+								...postDuplicatorVars.defaultSettings,
+								includeTaxonomies: true,
+								includeCustomMeta: true,
+								taxonomyData: taxonomyData,
+								customMetaData: customMetaData,
+								featuredImageId: post.featuredImage?.id || null,
+							};
+
+							const finalPostType = duplicateSettings.type === 'same' ? post.type : duplicateSettings.type;
+							const finalTitle = `${ post.title } ${ postDuplicatorVars.defaultSettings.title }`;
+
+							await duplicatePost( post.id, duplicateSettings, {
+								onSuccess: ( result ) => {
+									duplicationResults.push( {
+										success: true,
+										postId: result.duplicate_id,
+										title: finalTitle,
+										originalPost: post,
+										featuredImage: post.featuredImage,
+										postType: finalPostType,
+									} );
+								},
+								onError: ( error ) => {
+									duplicationResults.push( {
+										success: false,
+										error: error.message || error.data?.message || 'Unknown error',
+										title: finalTitle,
+										originalPost: post,
+									} );
+								},
+							} );
+						} catch ( error ) {
+							console.error( `Error duplicating post ${ post.id }:`, error );
+							duplicationResults.push( {
+								success: false,
+								error: error.message || 'Unknown error',
+								title: `${ post.title } ${ postDuplicatorVars.defaultSettings.title }`,
+								originalPost: post,
+							} );
+						}
+					}
+
+					setIsLoadingPostData( false );
+					const action = postDuplicatorVars.listMultipleAfterDuplicationAction || 'notice';
+					
+					if ( action === 'notice' ) {
+						// Show results modal
+						setWasDuplicated( true );
+						setInitialDuplicationResults( duplicationResults );
+					} else if ( action === 'refresh' ) {
+						// Refresh the page
+						setWasDuplicated( true );
+						window.location.reload();
+					}
+				} catch ( error ) {
+					console.error( 'Error in bulk duplication:', error );
+					setIsLoadingPostData( false );
+					setIsModalOpen( false );
+					showSnackbar(
+						'Error duplicating posts. Please try again.',
+						'error'
+					);
+				}
+			} else {
+				// Advanced mode - show configuration modal
+				setPostsToDuplicate( null );
+				setCurrentPost( null );
+				setModalMode( 'bulk' );
+				setIsLoadingPostData( true );
+				setIsModalOpen( true );
+
+				// Fetch all posts in parallel after opening modal
+				try {
+					const postDataPromises = postIds.map( ( postId ) =>
+						fetchPostData( postId, postType ).catch( ( error ) => {
+							console.error( `Error fetching post ${ postId }:`, error );
+							return null; // Return null for failed fetches
+						} )
+					);
+
+					const postDataArray = await Promise.all( postDataPromises );
+					
+					// Filter out null values (failed fetches)
+					const validPosts = postDataArray.filter( ( post ) => post !== null );
+
+					if ( validPosts.length === 0 ) {
+						setIsLoadingPostData( false );
+						setIsModalOpen( false );
+						showSnackbar(
+							'Error loading post data. Please try again.',
+							'error'
+						);
+						return;
+					}
+
+					// Convert to postsToDuplicate format
+					const postsForModal = validPosts.map( ( post, index ) => ( {
+						id: `bulk-${ post.id }-${ index }`,
+						originalPost: post,
+						settings: { ...postDuplicatorVars.defaultSettings },
+						isDuplicate: false,
+					} ) );
+
+					setPostsToDuplicate( postsForModal );
+					setIsLoadingPostData( false );
+				} catch ( error ) {
+					console.error( 'Error fetching posts:', error );
 					setIsLoadingPostData( false );
 					setIsModalOpen( false );
 					showSnackbar(
 						'Error loading post data. Please try again.',
 						'error'
 					);
-					return;
 				}
-
-				// Convert to postsToDuplicate format
-				const postsForModal = validPosts.map( ( post, index ) => ( {
-					id: `bulk-${ post.id }-${ index }`,
-					originalPost: post,
-					settings: { ...postDuplicatorVars.defaultSettings },
-					isDuplicate: false,
-				} ) );
-
-				setPostsToDuplicate( postsForModal );
-				setIsLoadingPostData( false );
-			} catch ( error ) {
-				console.error( 'Error fetching posts:', error );
-				setIsLoadingPostData( false );
-				setIsModalOpen( false );
-				showSnackbar(
-					'Error loading post data. Please try again.',
-					'error'
-				);
 			}
 		};
 
@@ -232,6 +474,7 @@ const DuplicatePostHandler = () => {
 		setPostsToDuplicate( null );
 		setWasDuplicated( false );
 		setIsLoadingPostData( false );
+		setInitialDuplicationResults( null );
 		
 		// Refresh page if on posts list screen and posts were duplicated
 		if ( shouldRefresh ) {
@@ -253,6 +496,7 @@ const DuplicatePostHandler = () => {
 			siteUrl={ postDuplicatorVars.siteUrl }
 			currentUser={ postDuplicatorVars.currentUser }
 			isLoadingPostData={ isLoadingPostData }
+			initialDuplicationResult={ initialDuplicationResults }
 		/>
 	);
 };

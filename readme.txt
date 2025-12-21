@@ -4,7 +4,7 @@ Tags: posts, post, duplicate, duplication
 Requires at least: 6.6
 Requires PHP: 7.4
 Tested up to: 6.9
-Stable tag: 3.0.2
+Stable tag: 3.0.3
 License: GPL2
 
 Creates functionality to duplicate any and all post types, including taxonomies & custom fields. Perfect for developers and content creators.
@@ -306,6 +306,11 @@ The settings page includes three tabs:
 
 == Changelog ==
 
+= 3.0.3 [2025-12-21] =
+* Added general settings fields
+* Added basic post duplication option
+* Added after post duplication options for basic duplication
+
 = 3.0.2 [2025-12-16] =
 * Resolved duplication issue with Elementor & Divi
 * Resolved duplciation issue with non REST post types
@@ -508,4 +513,4 @@ Must upgrade in order for the plugin to work. The file paths where initially wro
 
 == Upgrade Notice ==
 
-Elementor, Divi and Classic post type duplication fixes
+Added basic post duplication option

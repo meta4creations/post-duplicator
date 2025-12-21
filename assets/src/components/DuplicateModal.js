@@ -28,11 +28,13 @@ const DuplicateModal = ( {
 	siteUrl,
 	currentUser,
 	isLoadingPostData = false,
+	initialDuplicationResult = null,
 } ) => {
 	// Get post types public support from global vars
 	const postTypesPublicSupport = window.postDuplicatorVars?.postTypesPublicSupport || {};
 	// Determine if we're in bulk mode (separate from single/multiple toggle)
-	const isBulkMode = initialMode === 'bulk' || ( postsToDuplicate && postsToDuplicate.length > 0 );
+	// Also check if initialDuplicationResult is an array (bulk results)
+	const isBulkMode = initialMode === 'bulk' || ( postsToDuplicate && postsToDuplicate.length > 0 ) || ( initialDuplicationResult && Array.isArray( initialDuplicationResult ) );
 	
 	// Use boolean for single/multiple toggle (only applies when not in bulk mode)
 	const [ isMultiple, setIsMultiple ] = useState( initialMode === 'multiple-clones' );
@@ -72,19 +74,47 @@ const DuplicateModal = ( {
 	// Only reset state when modal is first opened (isOpen changes from false to true)
 	useEffect( () => {
 		if ( isOpen && ! prevIsOpenRef.current ) {
-			setSettings( defaultSettings );
-			setIncludeTaxonomies( true );
-			setIncludeCustomMeta( true );
-			setDuplicateStatus( 'idle' );
-			setDuplicatedPostId( null );
-			setDuplicatedPostTitle( '' );
-			setDuplicationResults( [] );
-			// Reset posts array when opening
-			const initialPosts = getInitialPosts();
-			setPosts( initialPosts );
-			setIsMultiple( initialMode === 'multiple-clones' );
-			// Reset clone count to default (2) when opening
-			setCloneCount( 2 );
+			// If initialDuplicationResult is provided, show success state immediately
+			if ( initialDuplicationResult ) {
+				setSettings( defaultSettings );
+				if ( Array.isArray( initialDuplicationResult ) ) {
+					// Bulk results - ensure we're in bulk mode
+					setDuplicationResults( initialDuplicationResult );
+					setDuplicateStatus( 'complete' );
+					// Set posts to empty since we're showing results
+					setPosts( [] );
+				} else {
+					// Single result
+					if ( initialDuplicationResult.postId ) {
+						setDuplicatedPostId( initialDuplicationResult.postId );
+					}
+					if ( initialDuplicationResult.title ) {
+						setDuplicatedPostTitle( initialDuplicationResult.title );
+					}
+					setFeaturedImage( initialDuplicationResult.featuredImage || null );
+					// Update settings with the post type used for duplication
+					if ( initialDuplicationResult.postType ) {
+						setSettings( { ...defaultSettings, type: initialDuplicationResult.postType === originalPost?.type ? 'same' : initialDuplicationResult.postType } );
+					}
+					setDuplicateStatus( 'complete' );
+					// Set posts to empty since we're showing results
+					setPosts( [] );
+				}
+			} else {
+				setSettings( defaultSettings );
+				setIncludeTaxonomies( true );
+				setIncludeCustomMeta( true );
+				setDuplicateStatus( 'idle' );
+				setDuplicatedPostId( null );
+				setDuplicatedPostTitle( '' );
+				setDuplicationResults( [] );
+				// Reset posts array when opening
+				const initialPosts = getInitialPosts();
+				setPosts( initialPosts );
+				setIsMultiple( initialMode === 'multiple-clones' );
+				// Reset clone count to default (2) when opening
+				setCloneCount( 2 );
+			}
 		}
 		// Reset component and state when modal closes
 		if ( ! isOpen && prevIsOpenRef.current ) {
@@ -98,7 +128,34 @@ const DuplicateModal = ( {
 			setDuplicationResults( [] );
 		}
 		prevIsOpenRef.current = isOpen;
-	}, [ isOpen, defaultSettings, initialMode ] );
+	}, [ isOpen, defaultSettings, initialMode, initialDuplicationResult ] );
+
+	// Sync initialDuplicationResult to duplicationResults when it changes
+	useEffect( () => {
+		if ( initialDuplicationResult ) {
+			if ( Array.isArray( initialDuplicationResult ) ) {
+				// Bulk results
+				setDuplicationResults( initialDuplicationResult );
+				setDuplicateStatus( 'complete' );
+			} else {
+				// Single result
+				if ( initialDuplicationResult.postId ) {
+					setDuplicatedPostId( initialDuplicationResult.postId );
+				}
+				if ( initialDuplicationResult.title ) {
+					setDuplicatedPostTitle( initialDuplicationResult.title );
+				}
+				setFeaturedImage( initialDuplicationResult.featuredImage || null );
+				if ( initialDuplicationResult.postType ) {
+					setSettings( ( prevSettings ) => ( {
+						...prevSettings,
+						type: initialDuplicationResult.postType === originalPost?.type ? 'same' : initialDuplicationResult.postType,
+					} ) );
+				}
+				setDuplicateStatus( 'complete' );
+			}
+		}
+	}, [ initialDuplicationResult, originalPost ] );
 
 	// Update posts when originalPost or postsToDuplicate changes
 	useEffect( () => {
@@ -647,13 +704,20 @@ const DuplicateModal = ( {
 						{/* Single mode success */}
 						{ ! isMultiple && ! isBulkMode && (
 							<div className="duplicate-post-modal__status-item">
-								{ featuredImage && (
-									<img
-										src={ featuredImage.thumbnail || featuredImage.url }
-										alt=""
-										className="duplicate-post-modal__status-thumbnail"
-									/>
-								) }
+								{ ( () => {
+									// Get featured image from state or initialDuplicationResult
+									const displayFeaturedImage = featuredImage || ( initialDuplicationResult && initialDuplicationResult.featuredImage );
+									if ( displayFeaturedImage && ( displayFeaturedImage.thumbnail || displayFeaturedImage.url ) ) {
+										return (
+											<img
+												src={ displayFeaturedImage.thumbnail || displayFeaturedImage.url }
+												alt=""
+												className="duplicate-post-modal__status-thumbnail"
+											/>
+										);
+									}
+									return null;
+								} )() }
 								<h3 className="duplicate-post-modal__status-title">
 									{ duplicatedPostTitle }
 								</h3>
@@ -663,15 +727,26 @@ const DuplicateModal = ( {
 									) : (
 										<>
 											{ ( () => {
-												// Determine final post type
-												const finalPostType = settings.type === 'same' ? originalPost?.type : settings.type;
+												// Ensure we have a valid post ID
+												const postId = duplicatedPostId || ( initialDuplicationResult && initialDuplicationResult.postId );
+												if ( ! postId ) {
+													return null;
+												}
+												
+												// Determine final post type - prefer from initialDuplicationResult if available
+												let finalPostType;
+												if ( initialDuplicationResult && initialDuplicationResult.postType ) {
+													finalPostType = initialDuplicationResult.postType;
+												} else {
+													finalPostType = settings.type === 'same' ? originalPost?.type : settings.type;
+												}
 												const isPublic = postTypesPublicSupport[ finalPostType ] !== false;
 												return isPublic && (
 													<Button
 														variant="secondary"
 														onClick={ () =>
 															window.open(
-																`${ siteUrl }/?p=${ duplicatedPostId }`,
+																`${ siteUrl }/?p=${ postId }`,
 																'_blank'
 															)
 														}
@@ -680,17 +755,35 @@ const DuplicateModal = ( {
 													</Button>
 												);
 											} )() }
-											<Button
-												variant="primary"
-												onClick={ () =>
-													window.open(
-														`${ siteUrl }/wp-admin/post.php?post=${ duplicatedPostId }&action=edit`,
-														'_blank'
-													)
+											{ ( () => {
+												// Ensure we have a valid post ID
+												const postId = duplicatedPostId || ( initialDuplicationResult && initialDuplicationResult.postId );
+												if ( ! postId ) {
+													return null;
 												}
-											>
-												{ __( 'Edit Post', 'post-duplicator' ) }
-											</Button>
+												
+												// Determine final post type - prefer from initialDuplicationResult if available
+												let finalPostType;
+												if ( initialDuplicationResult && initialDuplicationResult.postType ) {
+													finalPostType = initialDuplicationResult.postType;
+												} else {
+													finalPostType = settings.type === 'same' ? originalPost?.type : settings.type;
+												}
+												// Use post type in URL for custom post types
+												const editUrl = finalPostType && finalPostType !== 'post' 
+													? `${ siteUrl }/wp-admin/post.php?post=${ postId }&action=edit&post_type=${ finalPostType }`
+													: `${ siteUrl }/wp-admin/post.php?post=${ postId }&action=edit`;
+												return (
+													<Button
+														variant="primary"
+														onClick={ () => {
+															window.open( editUrl, '_blank' );
+														} }
+													>
+														{ __( 'Edit Post', 'post-duplicator' ) }
+													</Button>
+												);
+											} )() }
 										</>
 									) }
 								</div>
@@ -708,7 +801,12 @@ const DuplicateModal = ( {
 										</p>
 									</div>
 								) }
-								{ duplicationResults.map( ( result, index ) => (
+								{ duplicateStatus === 'complete' && duplicationResults.length === 0 && (
+									<div style={ { textAlign: 'center', padding: '20px' } }>
+										<p>{ __( 'No posts were duplicated.', 'post-duplicator' ) }</p>
+									</div>
+								) }
+								{ duplicationResults.length > 0 && duplicationResults.map( ( result, index ) => (
 									<div
 										key={ index }
 										className={ `duplicate-post-modal__success-item ${
@@ -748,12 +846,15 @@ const DuplicateModal = ( {
 													} )() }
 													<Button
 														variant="primary"
-														onClick={ () =>
-															window.open(
-																`${ siteUrl }/wp-admin/post.php?post=${ result.postId }&action=edit`,
-																'_blank'
-															)
-														}
+														onClick={ () => {
+															// Determine final post type
+															const finalPostType = result.postType || result.originalPost?.type;
+															// Use post type in URL for custom post types
+															const editUrl = finalPostType && finalPostType !== 'post' 
+																? `${ siteUrl }/wp-admin/post.php?post=${ result.postId }&action=edit&post_type=${ finalPostType }`
+																: `${ siteUrl }/wp-admin/post.php?post=${ result.postId }&action=edit`;
+															window.open( editUrl, '_blank' );
+														} }
 													>
 														{ __( 'Edit Post', 'post-duplicator' ) }
 													</Button>

@@ -35,6 +35,15 @@ function initialize_settings() {
 
   // Add setting sections.
   Settings::section( [
+    'id' => 'mtphr_post_duplicator_general',
+    'slug' => 'general',
+    'label' => __( 'General', 'post-duplicator' ),
+    'option' => 'mtphr_post_duplicator_settings',
+    'menu_slug' => 'mtphr_post_duplicator',
+    'parent_slug' => 'options-general.php',
+  ] );
+
+  Settings::section( [
     'id' => 'mtphr_post_duplicator_defaults',
     'slug' => 'defaults',
     'label' => __( 'Defaults', 'post-duplicator' ),
@@ -63,6 +72,10 @@ function initialize_settings() {
 
   // Add default values
   Settings::default_values( 'mtphr_post_duplicator_settings', [
+    'mode' => 'advanced',
+    'single_after_duplication_action' => 'notice',
+    'list_single_after_duplication_action' => 'notice',
+    'list_multiple_after_duplication_action' => 'notice',
     'status' => 'draft',
     'type' => 'same',
     'post_author' => 'current_user',
@@ -170,7 +183,77 @@ function initialize_sidebar() {
  */
 function initialize_fields() {
 
-  // Add some settings
+  // Add general fields
+  Settings::fields( [
+    'section' => 'mtphr_post_duplicator_general',
+    'fields'  => [
+      [
+        'type'    => 'selection',
+        'id'      => 'mode',
+        'label'   => __( 'Mode', 'post-duplicator' ),
+        'choices' => [
+          'basic' => [
+            'heading' => esc_html__( 'Basic', 'post-duplicator' ),
+            'description' => esc_html__( 'Quickly duplicate posts based on duplication default settings.', 'post-duplicator' ),
+          ],
+			    'advanced' => [
+            'heading' => esc_html__( 'Advanced', 'post-duplicator' ),
+            'description' => esc_html__( 'Open a modal to adjust duplicated settings for each post before the post is duplicated.', 'post-duplicator' ),
+          ],
+        ],
+      ],
+      [
+        'type'    => 'radio_buttons',
+        'id'      => 'single_after_duplication_action',
+        'label'   => __( 'After Duplication - Edit Post Screen', 'post-duplicator' ),
+        'choices' => [
+			    'new_tab' => esc_html__( 'Open Duplicated Post in New Tab', 'post-duplicator' ),
+          'same_tab' => esc_html__( 'Open Duplicated Post in Same Tab', 'post-duplicator' ),
+          'notice' => esc_html__( 'Display Notice', 'post-duplicator' ),
+        ],
+        'inline' => false,
+        'hide'    => [
+          'id' => 'mode',
+          'value' => 'advanced',
+          'compare' => '='
+        ],
+      ],
+      [
+        'type'    => 'radio_buttons',
+        'id'      => 'list_single_after_duplication_action',
+        'label'   => __( 'After Duplication - Post List Screen (Single Post)', 'post-duplicator' ),
+        'choices' => [
+			    'new_tab' => esc_html__( 'Open Duplicated Post in New Tab', 'post-duplicator' ),
+          'same_tab' => esc_html__( 'Open Duplicated Post in Same Tab', 'post-duplicator' ),
+          'notice' => esc_html__( 'Display Notice', 'post-duplicator' ),
+          'refresh' => esc_html__( 'Refresh Page', 'post-duplicator' )
+        ],
+        'inline' => false,
+        'hide'    => [
+          'id' => 'mode',
+          'value' => 'advanced',
+          'compare' => '='
+        ],
+      ],
+      [
+        'type'    => 'radio_buttons',
+        'id'      => 'list_multiple_after_duplication_action',
+        'label'   => __( 'After Duplication - Post List Screen (Multiple Posts)', 'post-duplicator' ),
+        'choices' => [
+          'notice' => esc_html__( 'Display Notice', 'post-duplicator' ),
+          'refresh' => esc_html__( 'Refresh Page', 'post-duplicator' )
+        ],
+        'inline' => false,
+        'hide'    => [
+          'id' => 'mode',
+          'value' => 'advanced',
+          'compare' => '='
+        ],
+      ],
+    ],
+  ] );
+
+  // Add default fields
   Settings::fields( [
     'section' => 'mtphr_post_duplicator_defaults',
     'fields' => [

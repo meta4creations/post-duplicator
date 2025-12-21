@@ -6,7 +6,7 @@
     "php": ">=7.4"
   },
   "require-dev": {
-    "metaphorcreations/mtphr-settings": "v1.1.1"
+    "metaphorcreations/mtphr-settings": "v1.1.2"
   },
   "repositories": [
     {

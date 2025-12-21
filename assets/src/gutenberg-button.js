@@ -16,6 +16,8 @@ const DuplicatePostButton = () => {
 	const [ customMeta, setCustomMeta ] = useState( [] );
 	const [ featuredImage, setFeaturedImage ] = useState( null );
 	const [ parentPost, setParentPost ] = useState( null );
+	const [ duplicationResult, setDuplicationResult ] = useState( null );
+	const [ showSuccessModal, setShowSuccessModal ] = useState( false );
 
 	const {
 		postId,
@@ -179,6 +181,137 @@ const DuplicatePostButton = () => {
 		} );
 	};
 
+	const handleBasicModeDuplicate = async () => {
+		setIsLoading( true );
+		setError( null );
+
+		// Fetch post data first to get taxonomies and custom meta
+		try {
+			// Fetch taxonomy and custom meta data
+			const response = await fetch(
+				`${ postDuplicatorVars.restUrl }post-data/${ postId }`,
+				{
+					headers: {
+						'X-WP-Nonce': postDuplicatorVars.nonce,
+					},
+				}
+			);
+
+			let taxonomyData = {};
+			let customMetaData = [];
+
+			if ( response.ok ) {
+				const postData = await response.json();
+				const taxonomiesData = postData.taxonomies || [];
+				// Initialize taxonomy data from assigned terms
+				taxonomiesData.forEach( ( taxonomy ) => {
+					taxonomyData[ taxonomy.slug ] = taxonomy.assignedTermIds || [];
+				} );
+				customMetaData = ( postData.customMeta || [] ).map( ( meta ) => ( {
+					key: meta.key,
+					value: meta.value,
+					type: meta.type || 'string',
+					isSerialized: meta.isSerialized || false,
+				} ) );
+			}
+
+			// Fetch featured image
+			const fullDataResponse = await fetch(
+				`${ postDuplicatorVars.restUrl }post-full-data/${ postId }`,
+				{
+					headers: {
+						'X-WP-Nonce': postDuplicatorVars.nonce,
+					},
+				}
+			);
+
+			let featuredImageId = null;
+			let featuredImageData = null;
+			if ( fullDataResponse.ok ) {
+				const fullPostData = await fullDataResponse.json();
+				featuredImageId = fullPostData.featuredImage?.id || null;
+				featuredImageData = fullPostData.featuredImage || null;
+			}
+
+			// Prepare settings with defaults and include taxonomies/custom meta
+			const duplicateSettings = {
+				...postDuplicatorVars.defaultSettings,
+				includeTaxonomies: true,
+				includeCustomMeta: true,
+				taxonomyData: taxonomyData,
+				customMetaData: customMetaData,
+				featuredImageId: featuredImageId,
+			};
+
+			// Duplicate the post
+			await duplicatePost( postId, duplicateSettings, {
+				onSuccess: async ( result ) => {
+					setIsLoading( false );
+					const action = postDuplicatorVars.singleAfterDuplicationAction || 'notice';
+					const finalPostType = duplicateSettings.type === 'same' ? postType : duplicateSettings.type;
+					const finalTitle = `${ postTitle } ${ postDuplicatorVars.defaultSettings.title }`;
+					
+					// Fetch featured image from duplicated post
+					let duplicatedFeaturedImage = null;
+					try {
+						const duplicatedPostDataResponse = await fetch(
+							`${ postDuplicatorVars.restUrl }post-full-data/${ result.duplicate_id }`,
+							{
+								headers: {
+									'X-WP-Nonce': postDuplicatorVars.nonce,
+								},
+							}
+						);
+						if ( duplicatedPostDataResponse.ok ) {
+							const duplicatedPostData = await duplicatedPostDataResponse.json();
+							duplicatedFeaturedImage = duplicatedPostData.featuredImage || null;
+						}
+					} catch ( error ) {
+						console.error( 'Error fetching duplicated post featured image:', error );
+					}
+					
+					if ( action === 'notice' ) {
+						// Show success modal
+						setDuplicationResult( {
+							postId: result.duplicate_id,
+							title: finalTitle,
+							featuredImage: duplicatedFeaturedImage,
+							postType: finalPostType,
+						} );
+						setShowSuccessModal( true );
+					} else if ( action === 'new_tab' ) {
+						// Open in new tab - use post type in URL for custom post types
+						const editUrl = finalPostType !== 'post' 
+							? `${ postDuplicatorVars.siteUrl }/wp-admin/post.php?post=${ result.duplicate_id }&action=edit&post_type=${ finalPostType }`
+							: `${ postDuplicatorVars.siteUrl }/wp-admin/post.php?post=${ result.duplicate_id }&action=edit`;
+						window.open( editUrl, '_blank' );
+					} else if ( action === 'same_tab' ) {
+						// Navigate in same tab - use post type in URL for custom post types
+						const editUrl = finalPostType !== 'post' 
+							? `${ postDuplicatorVars.siteUrl }/wp-admin/post.php?post=${ result.duplicate_id }&action=edit&post_type=${ finalPostType }`
+							: `${ postDuplicatorVars.siteUrl }/wp-admin/post.php?post=${ result.duplicate_id }&action=edit`;
+						window.location.href = editUrl;
+					} else if ( action === 'refresh' ) {
+						// Refresh the page
+						window.location.reload();
+					}
+				},
+				onError: ( error ) => {
+					setError(
+						error.message ||
+							error.data?.message ||
+							'Failed to duplicate post'
+					);
+					setIsLoading( false );
+				},
+			} );
+		} catch ( error ) {
+			console.error( 'Error in basic mode duplication:', error );
+			setError( 'Failed to duplicate post. Please try again.' );
+			setIsLoading( false );
+		}
+	};
+
 	const originalPost = {
 		id: postId,
 		title: postTitle,
@@ -204,7 +337,14 @@ const DuplicatePostButton = () => {
 					<Button
 						variant="secondary"
 						className="m4c-duplicate-post-gutenberg"
-						onClick={ () => setIsModalOpen( true ) }
+						onClick={ () => {
+							const mode = postDuplicatorVars.mode || 'advanced';
+							if ( mode === 'basic' ) {
+								handleBasicModeDuplicate();
+							} else {
+								setIsModalOpen( true );
+							}
+						} }
 						disabled={ isLoading }
 					>
 						{ __(
@@ -218,8 +358,12 @@ const DuplicatePostButton = () => {
 				</div>
 			</PluginPostStatusInfo>
 			<DuplicateModal
-				isOpen={ isModalOpen }
-				onClose={ () => setIsModalOpen( false ) }
+				isOpen={ isModalOpen || showSuccessModal }
+				onClose={ () => {
+					setIsModalOpen( false );
+					setShowSuccessModal( false );
+					setDuplicationResult( null );
+				} }
 				onDuplicate={ handleDuplicate }
 				originalPost={ originalPost }
 				defaultSettings={ postDuplicatorVars.defaultSettings }
@@ -227,6 +371,12 @@ const DuplicatePostButton = () => {
 				statusChoices={ postDuplicatorVars.statusChoices }
 				siteUrl={ postDuplicatorVars.siteUrl }
 				currentUser={ postDuplicatorVars.currentUser }
+				initialDuplicationResult={ showSuccessModal && duplicationResult ? {
+					postId: duplicationResult.postId,
+					title: duplicationResult.title,
+					featuredImage: duplicationResult.featuredImage,
+					postType: duplicationResult.postType,
+				} : null }
 			/>
 		</>
 	);

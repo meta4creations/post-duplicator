@@ -94,6 +94,10 @@ function enqueue_scripts() {
       'pending' => esc_html__( 'Pending', 'post-duplicator' ),
       'private' => esc_html__( 'Private', 'post-duplicator' ),
     ],
+    'mode' => isset( $settings['mode'] ) ? $settings['mode'] : 'advanced',
+    'singleAfterDuplicationAction' => isset( $settings['single_after_duplication_action'] ) ? $settings['single_after_duplication_action'] : 'notice',
+    'listSingleAfterDuplicationAction' => isset( $settings['list_single_after_duplication_action'] ) ? $settings['list_single_after_duplication_action'] : 'notice',
+    'listMultipleAfterDuplicationAction' => isset( $settings['list_multiple_after_duplication_action'] ) ? $settings['list_multiple_after_duplication_action'] : 'notice',
   ] );
 
   // Enqueue Gutenberg button on block editor pages (but not in widgets editor)
@@ -164,6 +168,10 @@ function enqueue_scripts() {
         'pending' => esc_html__( 'Pending', 'post-duplicator' ),
         'private' => esc_html__( 'Private', 'post-duplicator' ),
       ],
+      'mode' => isset( $settings['mode'] ) ? $settings['mode'] : 'advanced',
+      'singleAfterDuplicationAction' => isset( $settings['single_after_duplication_action'] ) ? $settings['single_after_duplication_action'] : 'notice',
+      'listSingleAfterDuplicationAction' => isset( $settings['list_single_after_duplication_action'] ) ? $settings['list_single_after_duplication_action'] : 'notice',
+      'listMultipleAfterDuplicationAction' => isset( $settings['list_multiple_after_duplication_action'] ) ? $settings['list_multiple_after_duplication_action'] : 'notice',
     ] );
   }
 }
