@@ -306,10 +306,11 @@ The settings page includes three tabs:
 
 == Changelog ==
 
-= 3.0.3 [2025-12-21] =
+= 3.0.3 [2025-12-22] =
 * Added general settings fields
 * Added basic post duplication option
 * Added after post duplication options for basic duplication
+* Resolved html field duplication of ACF Pro fields
 
 = 3.0.2 [2025-12-16] =
 * Resolved duplication issue with Elementor & Divi

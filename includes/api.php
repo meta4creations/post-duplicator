@@ -422,6 +422,87 @@ function get_parent_posts( $request ) {
 }
 
 /**
+ * Check if a meta value contains HTML and should be sanitized with wp_kses_post
+ * 
+ * @param string $meta_value The meta value to check
+ * @param string $meta_key The meta key
+ * @param int $post_id The post ID (optional, for ACF field detection)
+ * @return bool True if the value contains HTML
+ */
+function meta_value_contains_html( $meta_value, $meta_key = '', $post_id = 0 ) {
+	// Check if value is empty or not a string
+	if ( empty( $meta_value ) || ! is_string( $meta_value ) ) {
+		return false;
+	}
+	
+	// First, check if value contains HTML tags (most reliable method)
+	// Use trim to handle whitespace-only differences
+	$stripped = strip_tags( trim( $meta_value ) );
+	$trimmed_original = trim( $meta_value );
+	if ( $stripped !== $trimmed_original && strlen( $trimmed_original ) > strlen( $stripped ) ) {
+		// Contains HTML tags - the stripped version is shorter, meaning tags were removed
+		return true;
+	}
+	
+	// Check if ACF is active and this might be an ACF WYSIWYG field
+	if ( function_exists( 'acf_get_field' ) && $post_id > 0 && ! empty( $meta_key ) ) {
+		// For ACF flexible content fields, check if there's a corresponding field key
+		// Pattern: fieldname_0_subfieldname -> _fieldname_0_subfieldname contains field key
+		$field_key_meta = '_' . $meta_key;
+		$field_key = get_post_meta( $post_id, $field_key_meta, true );
+		
+		if ( ! empty( $field_key ) && strpos( $field_key, 'field_' ) === 0 ) {
+			// This is an ACF field, check its type
+			$field = acf_get_field( $field_key );
+			if ( $field && isset( $field['type'] ) ) {
+				// Check for WYSIWYG and other HTML-capable field types
+				$html_field_types = array( 'wysiwyg', 'textarea', 'oembed', 'url' );
+				if ( in_array( $field['type'], $html_field_types, true ) ) {
+					return true;
+				}
+			}
+		}
+		
+		// Also check for common ACF field name patterns that indicate HTML content
+		// Patterns like: *_editor_*, *_wysiwyg_*, *_html_*, *_content_*
+		$html_patterns = array( 'editor', 'wysiwyg', 'html', 'content', 'description', 'text' );
+		foreach ( $html_patterns as $pattern ) {
+			if ( stripos( $meta_key, $pattern ) !== false ) {
+				// Check if this is actually an ACF field by looking for the field key
+				$field_key_meta = '_' . $meta_key;
+				$field_key = get_post_meta( $post_id, $field_key_meta, true );
+				if ( ! empty( $field_key ) && strpos( $field_key, 'field_' ) === 0 ) {
+					return true;
+				}
+			}
+		}
+	}
+	
+	return false;
+}
+
+/**
+ * Sanitize meta value appropriately based on content type
+ * 
+ * @param string $meta_value The meta value to sanitize
+ * @param string $meta_key The meta key
+ * @param int $post_id The post ID (optional, for ACF field detection)
+ * @return string Sanitized meta value
+ */
+function sanitize_meta_value( $meta_value, $meta_key = '', $post_id = 0 ) {
+	// Check if value contains HTML
+	if ( meta_value_contains_html( $meta_value, $meta_key, $post_id ) ) {
+		// Use wp_kses_post to preserve HTML but sanitize it
+		// wp_kses_post sanitizes HTML while preserving allowed tags
+		// $wpdb->insert() handles escaping automatically via prepared statements
+		return wp_kses_post( $meta_value );
+	}
+	
+	// Default to sanitize_text_field for plain text
+	return sanitize_text_field( $meta_value );
+}
+
+/**
  * Duplicate a post
  */
 function duplicate_post_permissions( $request ) {
@@ -769,7 +850,34 @@ function duplicate_post( $request ) {
 					continue;
 				}
 				
+				// Prefer originalValue if available - it contains the raw value from the database
+				// This ensures we preserve HTML that might have been processed/stripped in the frontend
 				$meta_value = $meta_item['value'];
+				$use_original = false;
+				
+				if ( isset( $meta_item['originalValue'] ) && ! empty( $meta_item['originalValue'] ) && is_string( $meta_item['originalValue'] ) ) {
+					// Check if this is an ACF WYSIWYG field - if so, always use originalValue
+					if ( function_exists( 'acf_get_field' ) && $original_id > 0 ) {
+						$field_key_meta = '_' . $meta_key;
+						$field_key = get_post_meta( $original_id, $field_key_meta, true );
+						if ( ! empty( $field_key ) && strpos( $field_key, 'field_' ) === 0 ) {
+							$field = acf_get_field( $field_key );
+							if ( $field && isset( $field['type'] ) && $field['type'] === 'wysiwyg' ) {
+								// This is a WYSIWYG field, always use originalValue
+								$use_original = true;
+							}
+						}
+					}
+					
+					// Also check if originalValue contains HTML
+					if ( ! $use_original && meta_value_contains_html( $meta_item['originalValue'], $meta_key, $original_id ) ) {
+						$use_original = true;
+					}
+					
+					if ( $use_original ) {
+						$meta_value = $meta_item['originalValue'];
+					}
+				}
 				
 				// Handle data type preservation
 				if ( isset( $meta_item['type'] ) && isset( $meta_item['isSerialized'] ) ) {
@@ -793,19 +901,19 @@ function duplicate_post( $request ) {
 							// Use wp_json_encode which handles WordPress-specific encoding
 							$meta_value = wp_json_encode( $json_decoded );
 						} else {
-							// Invalid JSON, sanitize as text
-							$meta_value = sanitize_text_field( $meta_value );
+							// Invalid JSON, sanitize appropriately (may contain HTML)
+							$meta_value = sanitize_meta_value( $meta_value, $meta_key, $original_id );
 						}
 					} elseif ( $meta_item['type'] === 'number' ) {
 						// Preserve as number (WordPress will store as string anyway, but we can validate)
 						$meta_value = is_numeric( $meta_value ) ? $meta_value : sanitize_text_field( $meta_value );
 					} else {
-						// String type
-						$meta_value = sanitize_text_field( $meta_value );
+						// String type - check if it contains HTML (e.g., ACF WYSIWYG fields)
+						$meta_value = sanitize_meta_value( $meta_value, $meta_key, $original_id );
 					}
 				} else {
-					// Fallback: sanitize as text
-					$meta_value = sanitize_text_field( $meta_value );
+					// Fallback: sanitize appropriately (may contain HTML)
+					$meta_value = sanitize_meta_value( $meta_value, $meta_key, $original_id );
 				}
 				
 				// Apply filters
@@ -842,7 +950,9 @@ function duplicate_post( $request ) {
 						if ( ! apply_filters( "mtphr_post_duplicator_meta_{$key}_enabled", true ) ) {
 							continue;
 						}
-						$meta_value = apply_filters( "mtphr_post_duplicator_meta_value", $v, $key, $duplicate_id, $duplicate['post_type'] );
+						// Sanitize meta value appropriately (may contain HTML for ACF WYSIWYG fields)
+						$meta_value = sanitize_meta_value( $v, $key, $original_id );
+						$meta_value = apply_filters( "mtphr_post_duplicator_meta_value", $meta_value, $key, $duplicate_id, $duplicate['post_type'] );
 						$data = array(
 							'post_id' 		=> intval( $duplicate_id ),
 							'meta_key' 		=> sanitize_text_field( $key ),

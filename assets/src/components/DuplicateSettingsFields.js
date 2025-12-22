@@ -5,6 +5,7 @@ import {
 	CheckboxControl,
 	DateTimePicker,
 	Dropdown,
+	Popover,
 	Button,
 	Flex,
 	FlexBlock,
@@ -123,6 +124,9 @@ const DuplicateSettingsFields = ( {
 	const [ parentPosts, setParentPosts ] = useState( [] );
 	const [ postDate, setPostDate ] = useState( new Date().toISOString() );
 	const [ dateInputValue, setDateInputValue ] = useState( '' );
+	const [ isDatePickerOpen, setIsDatePickerOpen ] = useState( false );
+	const dateInputRef = useRef( null );
+	const dateButtonRef = useRef( null );
 	
 	// Check if MediaUpload is available at runtime
 	const { MediaUpload, MediaUploadCheck } = getMediaUploadComponents();
@@ -749,7 +753,7 @@ const DuplicateSettingsFields = ( {
 					__nextHasNoMarginBottom
 					__next40pxDefaultSize
 				/>
-        <div style={ { flex: 1, position: 'relative' } }>
+        <div ref={ dateInputRef } style={ { flex: 1, position: 'relative' } }>
 					<TextControl
 						label={ __( 'Post Date', 'post-duplicator' ) }
 						value={ dateInputValue }
@@ -758,37 +762,40 @@ const DuplicateSettingsFields = ( {
 						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 					/>
-					<Dropdown
-						popoverProps={ {
-							placement: 'bottom-end',
-							offset: 8,
+					<Button
+						ref={ dateButtonRef }
+						onClick={ () => setIsDatePickerOpen( ! isDatePickerOpen ) }
+						aria-expanded={ isDatePickerOpen }
+						icon={ calendar }
+						style={ {
+							position: 'absolute',
+							right: '2px',
+							top: '26px',
+							minWidth: '36px',
+							height: '36px',
+							padding: '0',
 						} }
-						renderToggle={ ( { isOpen, onToggle } ) => (
-							<Button
-								onClick={ onToggle }
-								aria-expanded={ isOpen }
-								icon={ calendar }
-								style={ {
-									position: 'absolute',
-									right: '2px',
-									top: '26px',
-									minWidth: '36px',
-									height: '36px',
-									padding: '0',
-								} }
-								variant="tertiary"
-							/>
-						) }
-						renderContent={ ( { onClose } ) => (
+						variant="tertiary"
+					/>
+					{ isDatePickerOpen && (
+						<Popover
+							anchorRef={ dateInputRef }
+							placement="bottom-start"
+							offset={ 8 }
+							onClose={ () => setIsDatePickerOpen( false ) }
+						>
 							<div style={ { padding: '16px' } }>
 								<DateTimePicker
 									currentDate={ postDate }
-									onChange={ handleDatePickerChange }
+									onChange={ ( value ) => {
+										handleDatePickerChange( value );
+										setIsDatePickerOpen( false );
+									} }
 									is12Hour={ false }
 								/>
 							</div>
-						) }
-					/>
+						</Popover>
+					) }
 				</div>
 			</HStack>
 		</VStack>
