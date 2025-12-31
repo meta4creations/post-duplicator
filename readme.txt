@@ -4,7 +4,7 @@ Tags: posts, post, duplicate, duplication
 Requires at least: 6.6
 Requires PHP: 7.4
 Tested up to: 6.9
-Stable tag: 3.0.3
+Stable tag: 3.0.4
 License: GPL2
 
 Creates functionality to duplicate any and all post types, including taxonomies & custom fields. Perfect for developers and content creators.
@@ -24,6 +24,7 @@ Post Duplicator is the ultimate WordPress plugin for quickly creating exact dupl
 * **Flexible Duplication Options** - Customize title, slug, status, author, date, post type, and parent for each duplicate
 * **Featured Image Management** - Set, replace, or remove featured images directly in the duplication modal
 * **Smart Defaults** - Configure default settings that apply to all duplications (draft status, current user as author)
+* **Post Types Configuration** - Control which post types can be duplicated and which appear in the "Post Type" dropdown menu
 * **Permission Control** - Granular control over who can duplicate posts with role-based permissions
 * **Modern Interface** - Beautiful modal interface with live editing and expandable settings
 * **Cross-Post Type Duplication** - Convert posts to different post types during duplication
@@ -64,6 +65,7 @@ Post Duplicator is the ultimate WordPress plugin for quickly creating exact dupl
 3. **Bulk Duplication**: Select multiple posts using checkboxes, choose "Duplicate" from the Bulk Actions dropdown, then configure each post individually
 4. **Customize Settings**: Edit title, slug, status, author, date, post type, featured image, and parent for each duplicate
 5. **Configure Defaults**: Go to Settings > Post Duplicator to set default status, author, date, and title/slug suffixes
+6. **Configure Post Types**: Go to Settings > Post Duplicator > Post Types to control which post types can be duplicated and which appear in the "Post Type" dropdown menu
 
 **Default Settings:**
 
@@ -287,8 +289,10 @@ Both allow you to customize each duplicate individually before creating them.
 
 Go to **Settings > Post Duplicator** in your WordPress admin. You can also access it by clicking the "Settings" link on the Plugins page next to Post Duplicator.
 
-The settings page includes three tabs:
+The settings page includes four tabs:
+* **General**: Configure duplication mode and post-duplication actions
 * **Defaults**: Configure default duplication settings
+* **Post Types**: Configure which post types can be duplicated and which appear in the "Post Type" dropdown menu
 * **Permissions**: Control who can duplicate posts
 * **Advanced**: Settings for duplicating special post statuses
 
@@ -305,6 +309,11 @@ The settings page includes three tabs:
 9. Advanced settings
 
 == Changelog ==
+
+= 3.0.4 [2025-12-31] =
+* **New Feature**: Post Types settings section - Configure which post types can be duplicated and which appear in the "Post Type" dropdown menu
+* **Enhancement**: Reusable upgrade notice system - Dismissable admin notices for version upgrades with plugin icon
+* **Enhancement**: Upgrade notification for Post Types settings - Users upgrading to 3.0.4+ will see a helpful notice about the new Post Types configuration options
 
 = 3.0.3 [2025-12-22] =
 * Added general settings fields
@@ -514,4 +523,4 @@ Must upgrade in order for the plugin to work. The file paths where initially wro
 
 == Upgrade Notice ==
 
-Added basic post duplication option
+New Post Types settings section allows you to configure which post types can be duplicated and which appear in the dropdown menu.

@@ -38,6 +38,11 @@ function add_row_action_link( $post ) {
 		return false;
 	}
 
+	// Check if post type is enabled for duplication
+	if ( ! is_post_type_duplication_enabled( $post->post_type ) ) {
+		return false;
+	}
+
   // Make sure the user can duplicate
 	if ( ! user_can_duplicate( $post ) ) {
 		return false;
@@ -84,6 +89,12 @@ function add_bulk_action( $actions ) {
 	}
 
 	$post_type = $screen->post_type;
+	
+	// Check if post type is enabled for duplication
+	if ( ! is_post_type_duplication_enabled( $post_type ) ) {
+		return $actions;
+	}
+	
 	$post_type_obj = get_post_type_object( $post_type );
 	
 	if ( ! $post_type_obj ) {

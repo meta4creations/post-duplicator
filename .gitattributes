@@ -2,6 +2,7 @@
 /.gitignore export-ignore
 /.github/ export-ignore
 /.cursor/ export-ignore
+/.cursorrules/ export-ignore
 /vendor/ export-ignore
 /wiki/ export-ignore
 /scripts/ export-ignore

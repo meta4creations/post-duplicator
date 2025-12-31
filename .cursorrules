@@ -1,0 +1,7 @@
+# Post Duplicator Plugin - Cursor Rules
+
+## Documentation Files
+- NEVER create .md (markdown) files for this project unless explicitly requested by the user
+- Do not create README.md, documentation files, or any other markdown files
+- Only create .md files when the user specifically asks for them
+

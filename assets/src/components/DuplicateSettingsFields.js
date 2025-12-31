@@ -86,6 +86,50 @@ const DuplicateSettingsFields = ( {
 	const postTypesAuthorSupport = window.postDuplicatorVars?.postTypesAuthorSupport || {};
 	const postTypesHierarchicalSupport = window.postDuplicatorVars?.postTypesHierarchicalSupport || {};
 
+	// Ensure original post type is always in the dropdown options, even if not enabled
+	const getPostTypesForDropdown = () => {
+		const types = { ...postTypes };
+		
+		// Always include the original post's type if it exists and isn't already in the list
+		if ( originalPost?.type && ! types[ originalPost.type ] ) {
+			// Get the post type object to get its label
+			const allPostTypes = window.postDuplicatorVars?.allPostTypes || [];
+			const postTypeObj = allPostTypes.find( 
+				pt => pt.id === originalPost.type 
+			);
+			
+			if ( postTypeObj ) {
+				types[ originalPost.type ] = postTypeObj.label;
+			} else {
+				// Fallback: capitalize the post type slug
+				const fallbackLabel = originalPost.type
+					.split( '_' )
+					.map( word => word.charAt( 0 ).toUpperCase() + word.slice( 1 ) )
+					.join( ' ' );
+				types[ originalPost.type ] = fallbackLabel;
+			}
+		}
+		
+		// Sort alphabetically by label (keep 'same' at the top if it exists)
+		const sortedTypes = {};
+		if ( types.same ) {
+			sortedTypes.same = types.same;
+			delete types.same;
+		}
+		
+		// Sort remaining types by label
+		const entries = Object.entries( types ).sort( ( a, b ) => {
+			return a[1].localeCompare( b[1], undefined, { sensitivity: 'base' } );
+		} );
+		
+		// Rebuild object with sorted entries
+		entries.forEach( ( [ key, value ] ) => {
+			sortedTypes[ key ] = value;
+		} );
+		
+		return sortedTypes;
+	};
+
 	// Check if current post type supports authors
 	const getCurrentPostType = () => {
 		return localSettings.type === 'same' ? originalPost?.type : localSettings.type;
@@ -706,7 +750,7 @@ const DuplicateSettingsFields = ( {
 				<SelectControl
 					label={ __( 'Post Type', 'post-duplicator' ) }
 					value={ localSettings.type }
-					options={ formatChoices( postTypes ) }
+					options={ formatChoices( getPostTypesForDropdown() ) }
 					onChange={ ( value ) => handleChange( 'type', value ) }
 					__nextHasNoMarginBottom
 					__next40pxDefaultSize

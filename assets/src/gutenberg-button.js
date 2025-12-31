@@ -19,6 +19,9 @@ const DuplicatePostButton = () => {
 	const [ duplicationResult, setDuplicationResult ] = useState( null );
 	const [ showSuccessModal, setShowSuccessModal ] = useState( false );
 
+	// Check if current post type is enabled for duplication
+	const enabledPostTypes = window.postDuplicatorVars?.enabledPostTypesForDuplication || [];
+
 	const {
 		postId,
 		postType,
@@ -63,6 +66,11 @@ const DuplicatePostButton = () => {
 			featuredMediaId: featuredMediaId,
 		};
 	}, [] );
+
+	// Don't render button if post type is not enabled for duplication
+	if ( ! enabledPostTypes.includes( postType ) ) {
+		return null;
+	}
 
 	// Fetch taxonomy, custom meta, and featured image data when modal opens
 	useEffect( () => {

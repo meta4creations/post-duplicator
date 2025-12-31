@@ -10,4 +10,5 @@ config.codekit3
 .nova
 .npmrc
 .cursor/*
+.cursorrules/*
 /includes/mtphr-settings-git/

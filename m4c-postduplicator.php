@@ -2,7 +2,7 @@
 /*
 Plugin Name: Post Duplicator
 Description: Creates functionality to duplicate any and all post types, including taxonomies & custom fields
-Version: 3.0.3
+Version: 3.0.4
 Author: Metaphor Creations
 Author URI: http://www.metaphorcreations.com
 License:           GPL-2.0+
@@ -35,7 +35,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // Plugin version.
 if ( ! defined( 'MTPHR_POST_DUPLICATOR_VERSION' ) ) {
-	define( 'MTPHR_POST_DUPLICATOR_VERSION', '3.0.3' );
+	define( 'MTPHR_POST_DUPLICATOR_VERSION', '3.0.4' );
 }
 
 // Plugin Folder Path.
@@ -80,6 +80,9 @@ require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/hooks.php' );
 require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/install.php' );
 require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/settings.php' );
 require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/helpers.php' );
+
+// Load integrations
+require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/integrations/the-events-calendar.php' );
 
 if ( is_admin() ) { 
 	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/scripts.php' );

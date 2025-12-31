@@ -1,6 +1,7 @@
 <?php
 namespace Mtphr\PostDuplicator\Hooks;
 use function Mtphr\PostDuplicator\user_can_duplicate;
+use function Mtphr\PostDuplicator\is_post_type_duplication_enabled;
 
 // Disable WC product review count
 add_filter( 'mtphr_post_duplicator_meta__wc_review_count_enabled', '__return_false' );
@@ -30,6 +31,12 @@ function duplicator_submitbox( $post ) {
 	if ( 'publish' != $post->post_status || ! user_can_duplicate( $post ) ) {
     return false;
   }
+  
+  // Check if post type is enabled for duplication
+  if ( ! is_post_type_duplication_enabled( $post->post_type ) ) {
+    return false;
+  }
+  
   if ( $post_type = get_post_type_object( $post->post_type ) ) {
     ?>
     <div class="misc-pub-section misc-pub-duplicator" id="duplicator">
