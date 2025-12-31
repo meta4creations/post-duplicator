@@ -8,7 +8,7 @@ final class Settings {
 
   private static $instance;
 
-  private $version = '1.1.3';
+  private $version = '1.1.3.1';
   private $id = '';
   private $textdomain = 'mtphr-settings';
   private $settings_dir = '';
@@ -53,8 +53,8 @@ final class Settings {
       add_action( 'admin_notices', array( self::$instance, 'admin_notices' ) );
 
       // Register initialization hooks - fires namespace-specific action hooks
-      add_action( 'rest_api_init', array( self::$instance, 'initialize_settings' ), 1 );
-      add_action( 'init', array( self::$instance, 'initialize_settings' ), 1 );
+      add_action( 'rest_api_init', array( self::$instance, 'initialize_settings' ), 20 );
+      add_action( 'init', array( self::$instance, 'initialize_settings' ), 20 );
       add_action( 'init', array( self::$instance, 'initialize_fields' ), 20 );
 
       list( $path, $url ) = self::$instance->get_path( dirname( __FILE__ ) );

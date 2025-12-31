@@ -69,8 +69,3 @@ function wpml_duplication( $original_id, $duplicate_id ) {
     ) );
   }
 }
-
-// add_action( 'wp', function() {
-//   $custom = get_post_custom( get_the_ID() );
-//   error_log( print_r( $custom, true ) );
-// } );

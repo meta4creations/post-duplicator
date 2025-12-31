@@ -268,3 +268,16 @@ function is_post_type_duplication_enabled( $post_type ) {
 	$enabled = get_enabled_post_types_for_duplication();
 	return in_array( $post_type, $enabled );
 }
+
+// add_action( 'admin_notices', function() {
+//   if ( ! current_user_can( 'manage_options' ) ) {
+//     return;
+//   }
+//   $settings = Settings::get_value( 'mtphr_post_duplicator_settings' );
+// 	unset( $settings['post_types_config'] );
+// 	//update_option( 'mtphr_post_duplicator_settings', $settings );
+	
+//   echo '<div class="notice notice-info"><pre style="background: #fff; padding: 15px; overflow: auto;">';
+//   print_r( $settings );
+//   echo '</pre></div>';
+// } );
