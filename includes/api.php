@@ -829,16 +829,20 @@ function duplicate_post( $request ) {
 	
 	// Only duplicate custom meta if explicitly enabled
 	if ( $include_custom_meta === true ) {
+
+		$excluded_meta_keys = get_excluded_meta_keys();
+		$cloned_meta_data = [];
+		
 		// Use provided custom meta data if available, otherwise fetch from original post
 		if ( isset( $settings['customMetaData'] ) && is_array( $settings['customMetaData'] ) ) {
 			// Use provided custom meta data
-			$excluded_meta_keys = get_excluded_meta_keys();
+			$original_custom_fields = get_post_custom( $original_id );
+			
 			foreach ( $settings['customMetaData'] as $meta_item ) {
 				if ( ! isset( $meta_item['key'] ) || ! isset( $meta_item['value'] ) ) {
 					continue;
 				}
-				
-				$meta_key = sanitize_key( $meta_item['key'] );
+				$meta_key = $meta_item['key'];
 				
 				// Validate meta key is not empty and follows WordPress naming conventions
 				if ( empty( $meta_key ) || strlen( $meta_key ) > 255 ) {
@@ -849,122 +853,68 @@ function duplicate_post( $request ) {
 				if ( in_array( $meta_key, $excluded_meta_keys, true ) ) {
 					continue;
 				}
-				
-				// Prefer originalValue if available - it contains the raw value from the database
-				// This ensures we preserve HTML that might have been processed/stripped in the frontend
+
+				if ( ! array_key_exists( $meta_key, $cloned_meta_data ) ) {
+					$cloned_meta_data[$meta_key] = [];
+				}
+
+				// before add the meta value check if the original value is a serialized array or object or json string and if so, format the new value accordingly
+				$original_value = isset( $original_custom_fields[$meta_key] ) ? $original_custom_fields[$meta_key][0] : false;
+
+				// Get the new meta value and decode JSON string if it is a JSON string
 				$meta_value = $meta_item['value'];
-				$use_original = false;
-				
-				if ( isset( $meta_item['originalValue'] ) && ! empty( $meta_item['originalValue'] ) && is_string( $meta_item['originalValue'] ) ) {
-					// Check if this is an ACF WYSIWYG field - if so, always use originalValue
-					if ( function_exists( 'acf_get_field' ) && $original_id > 0 ) {
-						$field_key_meta = '_' . $meta_key;
-						$field_key = get_post_meta( $original_id, $field_key_meta, true );
-						if ( ! empty( $field_key ) && strpos( $field_key, 'field_' ) === 0 ) {
-							$field = acf_get_field( $field_key );
-							if ( $field && isset( $field['type'] ) && $field['type'] === 'wysiwyg' ) {
-								// This is a WYSIWYG field, always use originalValue
-								$use_original = true;
-							}
-						}
-					}
-					
-					// Also check if originalValue contains HTML
-					if ( ! $use_original && meta_value_contains_html( $meta_item['originalValue'], $meta_key, $original_id ) ) {
-						$use_original = true;
-					}
-					
-					if ( $use_original ) {
-						$meta_value = $meta_item['originalValue'];
-					}
+				if ( is_string( $meta_value ) && is_json_string( $meta_value ) ) {
+					$meta_value = json_decode( $meta_value, true );
 				}
 				
-				// Handle data type preservation
-				if ( isset( $meta_item['type'] ) && isset( $meta_item['isSerialized'] ) ) {
-					if ( $meta_item['isSerialized'] ) {
-						// It was originally serialized, so serialize it again
-						// Try to decode JSON first if it's a JSON string (from the modal)
-						$json_decoded = json_decode( $meta_value, true );
-						if ( json_last_error() === JSON_ERROR_NONE ) {
-							$meta_value = maybe_serialize( $json_decoded );
-						} else {
-							// Already a string, serialize it
+				// Format the new meta value accordingly
+				if ( is_array( $meta_value ) ) {
+					if ( $original_value ) {
+						if ( is_serialized( $original_value ) ) {
+							$meta_value = maybe_serialize( $meta_value );
+						} elseif ( is_json_string( $original_value ) ) {
+							$meta_value = wp_json_encode( $meta_value );
+						}
+					} else {
+						// if $meta_value is array or object, serialize it
+						if ( is_array( $meta_value ) || is_object( $meta_value ) ) {
 							$meta_value = maybe_serialize( $meta_value );
 						}
-					} elseif ( in_array( $meta_item['type'], array( 'array', 'object' ) ) ) {
-						// It was originally a JSON string (not serialized), so keep it as JSON
-						// Validate it's valid JSON - if valid, keep as-is to preserve exact format
-						// Only re-encode if necessary (e.g., if user modified it in the modal)
-						$json_decoded = json_decode( $meta_value, true );
-						if ( json_last_error() === JSON_ERROR_NONE ) {
-							// Valid JSON - re-encode to ensure it's properly formatted
-							// Use wp_json_encode which handles WordPress-specific encoding
-							$meta_value = wp_json_encode( $json_decoded );
-						} else {
-							// Invalid JSON, sanitize appropriately (may contain HTML)
-							$meta_value = sanitize_meta_value( $meta_value, $meta_key, $original_id );
-						}
-					} elseif ( $meta_item['type'] === 'number' ) {
-						// Preserve as number (WordPress will store as string anyway, but we can validate)
-						$meta_value = is_numeric( $meta_value ) ? $meta_value : sanitize_text_field( $meta_value );
-					} else {
-						// String type - check if it contains HTML (e.g., ACF WYSIWYG fields)
-						$meta_value = sanitize_meta_value( $meta_value, $meta_key, $original_id );
 					}
-				} else {
-					// Fallback: sanitize appropriately (may contain HTML)
-					$meta_value = sanitize_meta_value( $meta_value, $meta_key, $original_id );
 				}
-				
-				// Apply filters
-				if ( ! apply_filters( "mtphr_post_duplicator_meta_{$meta_key}_enabled", true ) ) {
-					continue;
-				}
-				
-				$meta_value = apply_filters( "mtphr_post_duplicator_meta_value", $meta_value, $meta_key, $duplicate_id, $duplicate['post_type'] );
-				
-				$data = array(
-					'post_id' 		=> intval( $duplicate_id ),
-					'meta_key' 		=> $meta_key,
-					'meta_value' 	=> $meta_value,
-				);
-				$formats = array(
-					'%d',
-					'%s',
-					'%s',
-				);
-				$result = $wpdb->insert( $wpdb->prefix.'postmeta', $data, $formats );
+				$cloned_meta_data[$meta_key][] = $meta_value;
 			}
+
 		} else {
 			// Fall back to original behavior: duplicate all custom fields
-			$custom_fields = get_post_custom( $original_id );
-			$excluded_meta_keys = get_excluded_meta_keys();
-			foreach ( $custom_fields as $key => $value ) {
-				// Skip excluded meta keys
-				if ( in_array( $key, $excluded_meta_keys, true ) ) {
-					continue;
-				}
-				
-				if( is_array($value) && count($value) > 0 ) {
-					foreach( $value as $i=>$v ) {
-						if ( ! apply_filters( "mtphr_post_duplicator_meta_{$key}_enabled", true ) ) {
-							continue;
-						}
-						// Sanitize meta value appropriately (may contain HTML for ACF WYSIWYG fields)
-						$meta_value = sanitize_meta_value( $v, $key, $original_id );
-						$meta_value = apply_filters( "mtphr_post_duplicator_meta_value", $meta_value, $key, $duplicate_id, $duplicate['post_type'] );
-						$data = array(
-							'post_id' 		=> intval( $duplicate_id ),
-							'meta_key' 		=> sanitize_text_field( $key ),
-							'meta_value' 	=> $meta_value,
-						);
-						$formats = array(
-							'%d',
-							'%s',
-							'%s',
-						);
-						$result = $wpdb->insert( $wpdb->prefix.'postmeta', $data, $formats );
+			$cloned_meta_data = get_post_custom( $original_id );
+		}
+
+		// Insert the cloned meta data into the database
+		foreach( $cloned_meta_data as $key => $value ) {
+
+			// Skip excluded meta keys
+			if ( in_array( $key, $excluded_meta_keys, true ) ) {
+				continue;
+			}
+
+			if ( is_array( $value ) && count( $value ) > 0 ) {
+				foreach( $value as $i => $v ) {
+					if ( ! apply_filters( "mtphr_post_duplicator_meta_{$key}_enabled", true ) ) {
+						continue;
 					}
+					$meta_value = apply_filters( "mtphr_post_duplicator_meta_value", $v, $key, $duplicate_id, $duplicate['post_type'] );
+					$data = array(
+						'post_id' 		=> intval( $duplicate_id ),
+						'meta_key' 		=> sanitize_text_field( $key ),
+						'meta_value' 	=> $meta_value,
+					);
+					$formats = array(
+						'%d',
+						'%s',
+						'%s',
+					);
+					$result = $wpdb->insert( $wpdb->prefix . 'postmeta', $data, $formats );
 				}
 			}
 		}

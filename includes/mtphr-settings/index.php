@@ -8,7 +8,7 @@ final class Settings {
 
   private static $instance;
 
-  private $version = '1.1.3.1';
+  private $version = '1.1.4';
   private $id = '';
   private $textdomain = 'mtphr-settings';
   private $settings_dir = '';
@@ -735,7 +735,6 @@ final class Settings {
     }
     $sanitize_settings[$option] = $sanitize_option_settings;
     self::$instance->sanitize_settings = $sanitize_settings;
-
     return $sanitize_settings;
   }
 
@@ -1189,7 +1188,7 @@ final class Settings {
     }
 
     return $existing_values;
-}
+  }
 
 
   /**
@@ -1236,67 +1235,46 @@ final class Settings {
   }
 
   /**
-   * Apply a sanitizer to a scalar value.
-   * Handles core simple sanitizers, 'none', custom callbacks, and fallback default.
+   * Loop through an array and sanitize values
    */
-  private function apply_sanitizer( $sanitizer, $value, $key, $option, $type ) {
-    switch ( $sanitizer ) {
+  private function loop_sanitize_value( $value, $sanitizer ) { 
+    $sanitized_value = [];
+    if ( is_array( $value ) && ! empty( $value ) ) {
+      foreach ( $value as $key => $val ) {
+        // If the value is an array, recursively sanitize it
+        if ( is_array( $val ) ) {
+          $sanitized_value[$key] = $this->loop_sanitize_value( $val, $sanitizer );
+        } else {
+          $sanitized_value[$key] = $sanitizer( $val );
+        }
+      }
+    }
+    return $sanitized_value;
+  }
+
+  /**
+   * Sanitize a value
+   */
+  private function sanitize_value( $value, $sanitizer, $key, $option, $type = false ) { 
+    switch( $sanitizer ) {
       case 'esc_attr':
       case 'sanitize_text_field':
       case 'wp_kses_post':
       case 'intval':
       case 'floatval':
       case 'boolval':
-        return $sanitizer( $value );
-
+        return is_array( $value ) ? self::$instance->loop_sanitize_value( $value, $sanitizer ) : $sanitizer( $value );
       case 'none':
         return $value;
-
       default:
-        if ( is_callable( $sanitizer ) ) {
-          // Custom sanitizer gets full context.
-          return call_user_func( $sanitizer, $value, $key, $option, $type );
+        if ( function_exists( $sanitizer ) ) {
+          return $sanitizer( $value, $key, $option, $type );
+        } else {
+          $default = self::$instance->get_default_sanitizer();
+          return is_array( $value ) ? self::$instance->loop_sanitize_value( $value, $default ) : $default( $value );
         }
-
-        // Fallback to your default sanitizer.
-        $default = self::$instance->get_default_sanitizer();
-        return is_callable( $default ) ? $default( $value ) : $value;
+        break;
     }
-  }
-
-  /**
-   * Recursively sanitize arrays of any depth.
-   */
-  private function loop_sanitize_value( $value, $sanitizer, $key, $option, $type = false ) {
-    $sanitized = [];
-
-    foreach ( (array) $value as $k => $v ) {
-      if ( is_array( $v ) ) {
-        $sanitized[ $k ] = $this->loop_sanitize_value( $v, $sanitizer, $key, $option, $type );
-      } else {
-        $sanitized[ $k ] = $this->apply_sanitizer( $sanitizer, $v, $key, $option, $type );
-      }
-    }
-
-    return $sanitized;
-  }
-
-  /**
-   * Sanitize a value (scalar or multi-level array).
-   */
-  private function sanitize_value( $value, $sanitizer, $key, $option, $type = false ) {
-    // If it's an array, recurse no matter which sanitizer we use.
-    if ( is_array( $value ) ) {
-      return $this->loop_sanitize_value( $value, $sanitizer, $key, $option, $type );
-    }
-
-    // If it's an object, return as-is (can't sanitize objects with string sanitizers).
-    if ( is_object( $value ) ) {
-      return $value;
-    }
-
-    // Scalar: just apply.
-    return $this->apply_sanitizer( $sanitizer, $value, $key, $option, $type );
   }
 
   /**

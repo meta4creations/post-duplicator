@@ -191,6 +191,111 @@ const DuplicateModal = ( {
 		}
 	}, [ posts, isMultiple, isBulkMode, duplicateStatus ] );
 
+	// Helper function to calculate cascading clone date
+	const calculateCloneDate = ( cloneIndex, baseSettings, originalPost ) => {
+		// Only calculate cascading dates if time_offset is enabled
+		if ( ! baseSettings.time_offset ) {
+			return null;
+		}
+		
+		// Start with base date
+		let baseDate;
+		if ( baseSettings.timestamp === 'duplicate' && originalPost?.date ) {
+			baseDate = new Date( originalPost.date );
+		} else {
+			baseDate = new Date();
+		}
+		
+		// Calculate total offset in milliseconds
+		const offsetMilliseconds = 
+			( baseSettings.time_offset_days || 0 ) * 86400000 +
+			( baseSettings.time_offset_hours || 0 ) * 3600000 +
+			( baseSettings.time_offset_minutes || 0 ) * 60000 +
+			( baseSettings.time_offset_seconds || 0 ) * 1000;
+		
+		// Apply cascading offset: clone 0 gets 1x offset, clone 1 gets 2x offset, etc.
+		const multiplier = cloneIndex + 1;
+		const totalOffset = offsetMilliseconds * multiplier;
+		
+		// Apply direction
+		if ( baseSettings.time_offset_direction === 'newer' ) {
+			baseDate.setTime( baseDate.getTime() + totalOffset );
+		} else {
+			baseDate.setTime( baseDate.getTime() - totalOffset );
+		}
+		
+		return baseDate.toISOString();
+	};
+
+	// Recalculate clone dates when time offset settings change
+	useEffect( () => {
+		if ( ! isMultiple || isBulkMode || duplicateStatus !== 'idle' ) {
+			return;
+		}
+
+		const firstPost = posts.find( ( p ) => ! p.isDuplicate );
+		if ( ! firstPost ) {
+			return;
+		}
+
+		// Check if time offset settings exist
+		if ( ! defaultSettings.time_offset ) {
+			return;
+		}
+
+		// Update all clones with recalculated dates
+		const updatedPosts = posts.map( ( post, index ) => {
+			if ( ! post.isDuplicate ) {
+				return post; // Keep original post as-is
+			}
+
+			// Find this clone's index among clones (0-based)
+			const clones = posts.filter( p => p.isDuplicate );
+			const cloneIndex = clones.findIndex( c => c.id === post.id );
+			
+			if ( cloneIndex === -1 ) {
+				return post;
+			}
+
+			// Calculate new date for this clone
+			const newDate = calculateCloneDate( cloneIndex, defaultSettings, firstPost.originalPost );
+			
+			if ( ! newDate ) {
+				return post;
+			}
+
+			// Update clone's settings with new date
+			return {
+				...post,
+				settings: {
+					...post.settings,
+					customDate: newDate,
+					timestamp: 'custom',
+				},
+			};
+		} );
+
+		// Only update if dates actually changed
+		const datesChanged = updatedPosts.some( ( post, index ) => {
+			return post.settings?.customDate !== posts[ index ]?.settings?.customDate;
+		} );
+
+		if ( datesChanged ) {
+			setPosts( updatedPosts );
+		}
+	}, [
+		defaultSettings.time_offset,
+		defaultSettings.time_offset_days,
+		defaultSettings.time_offset_hours,
+		defaultSettings.time_offset_minutes,
+		defaultSettings.time_offset_seconds,
+		defaultSettings.time_offset_direction,
+		defaultSettings.timestamp,
+		isMultiple,
+		isBulkMode,
+		duplicateStatus,
+	] );
+
 	// Handle mode change and clone count changes - generate/update clones
 	useEffect( () => {
 		// Skip regeneration if we're syncing from deletion
@@ -222,11 +327,20 @@ const DuplicateModal = ( {
 						// Keep existing clone with same ID and settings
 						clones.push( existingClone );
 					} else {
-						// Create new clone
+						// Create new clone with cascading date if time_offset is enabled
+						const cloneDate = calculateCloneDate( i, defaultSettings, firstPost.originalPost );
+						const cloneSettings = { ...defaultSettings };
+						
+						// If we have a calculated date, set it as customDate and switch to custom timestamp
+						if ( cloneDate ) {
+							cloneSettings.customDate = cloneDate;
+							cloneSettings.timestamp = 'custom';
+						}
+						
 						clones.push( {
 							id: `clone-${ firstPost.originalPost.id }-${ i }`,
 							originalPost: firstPost.originalPost,
-							settings: { ...defaultSettings },
+							settings: cloneSettings,
 							isDuplicate: true,
 						} );
 					}
@@ -347,7 +461,21 @@ const DuplicateModal = ( {
 		const currentPost = posts[0]?.originalPost || originalPost;
 		const targetType =
 			settings.type === 'same' ? currentPost?.type : settings.type;
-		const postTypeLabel = postTypes[ targetType ] || targetType;
+		
+		// First try to get label from postTypes (enabled post types)
+		let postTypeLabel = postTypes[ targetType ];
+		
+		// If not found, look it up in allPostTypes (includes all post types)
+		if ( ! postTypeLabel && targetType ) {
+			const allPostTypes = window.postDuplicatorVars?.allPostTypes || [];
+			const postTypeObj = allPostTypes.find( 
+				pt => pt.id === targetType 
+			);
+			postTypeLabel = postTypeObj?.label || targetType;
+		} else if ( ! postTypeLabel ) {
+			postTypeLabel = targetType;
+		}
+		
 		return __( `Duplicate ${ postTypeLabel }`, 'post-duplicator' );
 	};
 

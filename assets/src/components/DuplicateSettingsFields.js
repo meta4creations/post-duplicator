@@ -259,8 +259,43 @@ const DuplicateSettingsFields = ( {
 			// If post type doesn't support authors, initialAuthorId remains '' (No Author)
 			setSelectedAuthorId( initialAuthorId );
 
-			// Set initial date
-			const initialDate = settings.customDate || new Date().toISOString();
+			// Set initial date based on timestamp setting
+			let initialDate;
+			let shouldApplyOffset = false;
+			
+			if ( settings.customDate ) {
+				// Use custom date if provided (offset already applied in multiple clone mode)
+				initialDate = settings.customDate;
+				// Don't apply offset again if customDate is provided
+				shouldApplyOffset = false;
+			} else if ( settings.timestamp === 'duplicate' && originalPost?.date ) {
+				// Use original post's date if timestamp is set to 'duplicate'
+				initialDate = originalPost.date;
+				shouldApplyOffset = true;
+			} else {
+				// Default to current time
+				initialDate = new Date().toISOString();
+				shouldApplyOffset = true;
+			}
+			
+			// Apply time offset if enabled (only if we're not using a pre-calculated customDate)
+			if ( settings.time_offset && shouldApplyOffset ) {
+				const date = new Date( initialDate );
+				const offsetMilliseconds = 
+					( settings.time_offset_days || 0 ) * 86400000 +
+					( settings.time_offset_hours || 0 ) * 3600000 +
+					( settings.time_offset_minutes || 0 ) * 60000 +
+					( settings.time_offset_seconds || 0 ) * 1000;
+				
+				if ( settings.time_offset_direction === 'newer' ) {
+					date.setTime( date.getTime() + offsetMilliseconds );
+				} else {
+					date.setTime( date.getTime() - offsetMilliseconds );
+				}
+				
+				initialDate = date.toISOString();
+			}
+			
 			setPostDate( initialDate );
 			setDateInputValue( formatDateDisplay( initialDate ) );
 

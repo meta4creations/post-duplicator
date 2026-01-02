@@ -168,6 +168,7 @@ function get_excluded_meta_keys() {
 	$excluded_keys = apply_filters( 'mtphr_post_duplicator_excluded_meta_keys', array(
 		'_elementor_css',
 		'_elementor_element_cache',
+		'_edit_lock',
 	) );
 	
 	return $excluded_keys;
@@ -267,6 +268,21 @@ function get_enabled_post_types_for_dropdown() {
 function is_post_type_duplication_enabled( $post_type ) {
 	$enabled = get_enabled_post_types_for_duplication();
 	return in_array( $post_type, $enabled );
+}
+
+/**
+ * Check if a string is valid JSON
+ * 
+ * @param string $string String to check
+ * @return bool True if valid JSON
+ */
+function is_json_string( $string ) {
+	if ( ! is_string( $string ) ) {
+		return false;
+	}
+	
+	json_decode( $string );
+	return json_last_error() === JSON_ERROR_NONE;
 }
 
 // add_action( 'admin_notices', function() {

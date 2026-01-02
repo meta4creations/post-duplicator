@@ -4,7 +4,7 @@ Tags: posts, post, duplicate, duplication
 Requires at least: 6.6
 Requires PHP: 7.4
 Tested up to: 6.9
-Stable tag: 3.0.4
+Stable tag: 3.0.5
 License: GPL2
 
 Creates functionality to duplicate any and all post types, including taxonomies & custom fields. Perfect for developers and content creators.
@@ -310,6 +310,11 @@ The settings page includes four tabs:
 
 == Changelog ==
 
+= 3.0.5 [2025-01-02] =
+* Post meta duplication bug fixes
+* Post date offset updates and fixes
+* Settings sanitization bug fixes
+
 = 3.0.4 [2025-12-31] =
 * **New Feature**: Post Types settings section - Configure which post types can be duplicated and which appear in the "Post Type" dropdown menu
 * **Enhancement**: Reusable upgrade notice system - Dismissable admin notices for version upgrades with plugin icon
@@ -523,4 +528,4 @@ Must upgrade in order for the plugin to work. The file paths where initially wro
 
 == Upgrade Notice ==
 
-New Post Types settings section allows you to configure which post types can be duplicated and which appear in the dropdown menu.
+Bug fixes and updates

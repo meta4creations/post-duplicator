@@ -588,10 +588,10 @@ function update_capabilities( $value, $key, $option, $type ) {
   if ( 'update' == $type ) {
     $role = get_role( $key );
     $active_capabilities = get_active_capabilities( $role );
-    $capability_value = is_array( $value ) ? $value : [];;
-
+    $capability_value = is_array( $value ) ? $value : [];
     $added_capabilities = array_diff( $capability_value, $active_capabilities );
     $removed_capabilities = array_diff( $active_capabilities, $capability_value );
+
     if ( is_array( $added_capabilities ) && count( $added_capabilities ) > 0 ) {
       foreach ( $added_capabilities as $added_capability ) {
         $role->add_cap( esc_attr( $added_capability ) );
