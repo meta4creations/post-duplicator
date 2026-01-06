@@ -7,9 +7,6 @@ import {
 	Dropdown,
 	Popover,
 	Button,
-	Flex,
-	FlexBlock,
-	FlexItem,
 	__experimentalNumberControl as NumberControl,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
@@ -79,9 +76,12 @@ const DuplicateSettingsFields = ( {
 	const [ fullTitle, setFullTitle ] = useState( '' );
 	const [ fullSlug, setFullSlug ] = useState( '' );
 	const [ initialized, setInitialized ] = useState( false );
+	
+	// State for users list - loaded lazily via REST API to avoid memory issues
+	const [ usersList, setUsersList ] = useState( [] );
+	const [ usersLoading, setUsersLoading ] = useState( false );
 
-	// Get users list and current user from localized data
-	const usersList = window.postDuplicatorVars?.users || [];
+	// Get current user from localized data (still available immediately)
 	const currentUser = window.postDuplicatorVars?.currentUser;
 	const postTypesAuthorSupport = window.postDuplicatorVars?.postTypesAuthorSupport || {};
 	const postTypesHierarchicalSupport = window.postDuplicatorVars?.postTypesHierarchicalSupport || {};
@@ -171,6 +171,54 @@ const DuplicateSettingsFields = ( {
 	const [ isDatePickerOpen, setIsDatePickerOpen ] = useState( false );
 	const dateInputRef = useRef( null );
 	const dateButtonRef = useRef( null );
+	
+	// Fetch users lazily when component mounts (only once)
+	useEffect( () => {
+		const fetchUsers = async () => {
+			// Only fetch if we don't have users yet and we're not already loading
+			if ( usersList.length === 0 && ! usersLoading ) {
+				setUsersLoading( true );
+				try {
+					const restUrl = window.postDuplicatorVars?.restUrl || '';
+					const nonce = window.postDuplicatorVars?.nonce || '';
+					
+					if ( ! restUrl || ! nonce ) {
+						console.error( 'Missing REST URL or nonce for users fetch' );
+						setUsersLoading( false );
+						return;
+					}
+					
+					const endpoint = `${ restUrl }users`;
+					const response = await fetch( endpoint, {
+						method: 'GET',
+						headers: {
+							'X-WP-Nonce': nonce,
+							'Content-Type': 'application/json',
+						},
+					} );
+					
+					if ( response.ok ) {
+						const users = await response.json();
+						if ( Array.isArray( users ) ) {
+							setUsersList( users );
+						} else {
+							console.error( 'Invalid users response format:', users );
+						}
+					} else {
+						const errorText = await response.text();
+						console.error( 'Error fetching users:', response.status, response.statusText, errorText );
+					}
+				} catch ( error ) {
+					console.error( 'Error fetching users:', error );
+				} finally {
+					setUsersLoading( false );
+				}
+			}
+		};
+		
+		fetchUsers();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [] ); // Only run once on mount
 	
 	// Check if MediaUpload is available at runtime
 	const { MediaUpload, MediaUploadCheck } = getMediaUploadComponents();

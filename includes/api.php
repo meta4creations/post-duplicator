@@ -59,6 +59,12 @@ function register_routes() {
       ),
     ),
   ) );
+  
+  register_rest_route( 'post-duplicator/v1', 'users', array(
+    'methods' => 'GET',
+    'permission_callback' => __NAMESPACE__ . '\get_users_permissions',
+    'callback' => __NAMESPACE__ . '\get_users',
+  ) );
 }
 
 /**
@@ -931,6 +937,49 @@ function duplicate_post( $request ) {
 		'duplicate_id' => $duplicate_id,
 		'other_data' => $other_data,
 	] , 200 );
+}
+
+/**
+ * Permission check for getting users
+ */
+function get_users_permissions( $request ) {
+  // User must be logged in and have edit capabilities
+  if ( ! is_user_logged_in() ) {
+    return new \WP_Error( 'not_logged_in', esc_html__( 'You must be logged in to access this endpoint.', 'post-duplicator' ), array( 'status' => 401 ) );
+  }
+  
+  // Check if user has edit capabilities
+  if ( ! current_user_can( 'edit_posts' ) ) {
+    return new \WP_Error( 'no_permission', esc_html__( 'You do not have permission to access this endpoint.', 'post-duplicator' ), array( 'status' => 403 ) );
+  }
+  
+  return true;
+}
+
+/**
+ * Get users with edit capabilities
+ * 
+ * Note: This is now only called when the duplicate modal opens (via REST API),
+ * not on every admin page load, so memory usage is acceptable even with full user objects.
+ */
+function get_users( $request ) {
+  // Get users with edit_posts capability
+  // Use global namespace \get_users() to avoid conflict with this function name
+  $users = \get_users( [
+    'capability__in' => ['edit_posts'],
+    'orderby' => 'display_name',
+    'order' => 'ASC',
+  ] );
+  
+  $user_options = [];
+  foreach ( $users as $user ) {
+    $user_options[] = [
+      'value' => (string) $user->ID,
+      'label' => $user->display_name . ' (' . $user->user_login . ')',
+    ];
+  }
+  
+  return rest_ensure_response( $user_options );
 }
 
 /**

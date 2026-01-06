@@ -4,33 +4,13 @@ namespace Mtphr\PostDuplicator;
 add_action( 'admin_enqueue_scripts', __NAMESPACE__ . '\enqueue_scripts' );
 
 /**
- * Get users with edit capabilities
- */
-function get_users_with_edit_caps() {
-  $users = get_users( [
-    'capability__in' => ['edit_posts'],
-    'orderby' => 'display_name',
-    'order' => 'ASC',
-  ] );
-  
-  $user_options = [];
-  foreach ( $users as $user ) {
-    $user_options[] = [
-      'value' => (string) $user->ID, // Convert to string for React select
-      'label' => $user->display_name . ' (' . $user->user_login . ')',
-    ];
-  }
-  
-  return $user_options;
-}
-
-/**
  * Enqueue admin scripts
  */
 function enqueue_scripts() {
 
   $current_screen = get_current_screen();
-  if ( 'site-editor' == $current_screen->id ) {
+
+  if ( 'edit' != $current_screen->base && 'post' != $current_screen->base ) {
     return;
   }
 
@@ -57,7 +37,6 @@ function enqueue_scripts() {
   ); 
   $settings = get_option_value();
   $current_user = wp_get_current_user();
-  $users_list = get_users_with_edit_caps();
   
   wp_localize_script( 'post-duplicator', 'postDuplicatorVars', [
     'siteUrl'  => site_url(),
@@ -67,7 +46,6 @@ function enqueue_scripts() {
       'id' => $current_user->ID,
       'name' => $current_user->display_name,
     ],
-    'users' => $users_list,
     'defaultSettings' => [
       'status' => isset( $settings['status'] ) ? $settings['status'] : 'draft',
       'type' => isset( $settings['type'] ) ? $settings['type'] : 'same',
@@ -134,7 +112,6 @@ function enqueue_scripts() {
     );
     $settings = get_option_value();
     $current_user = wp_get_current_user();
-    $users_list = get_users_with_edit_caps();
     
     wp_localize_script( 'post-duplicator-gutenberg', 'postDuplicatorVars', [
       'siteUrl'  => site_url(),
@@ -144,7 +121,6 @@ function enqueue_scripts() {
         'id' => $current_user->ID,
         'name' => $current_user->display_name,
       ],
-      'users' => $users_list,
       'defaultSettings' => [
         'status' => isset( $settings['status'] ) ? $settings['status'] : 'draft',
         'type' => isset( $settings['type'] ) ? $settings['type'] : 'same',
