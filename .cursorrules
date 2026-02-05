@@ -1,5 +1,19 @@
 # Post Duplicator Plugin - Cursor Rules
 
+## Integrations
+- Custom code for specific scenarios with other plugins or themes must be siloed into integration folders
+- Do not intertwine integration code with default functionality; keep integrations as separate as possible
+- PHP integrations: `includes/integrations/` — one file per integration (e.g. `wp-nested-pages.php`, `the-events-calendar.php`)
+- JS integrations: `assets/src/integrations/` — create this directory and add integration-specific JavaScript as needed
+- SCSS integrations: `assets/src/integrations/` — add integration-specific styles here
+- Only minimal connection code (e.g. require/include, webpack entry, enqueue) should exist in main files to connect or build integration assets
+- Each integration file should check that the target plugin/theme is active before registering hooks or running code
+
+## Changelog Updates
+- When making updates to the plugin, auto-update readme.txt with brief bulleted updates below the UNRELEASED heading
+- If the UNRELEASED heading does not exist in the changelog, add it to the top of the Changelog section and then add the updates
+- Keep update descriptions short and generic
+
 ## Documentation Files
 - NEVER create .md (markdown) files for this project unless explicitly requested by the user
 - Do not create README.md, documentation files, or any other markdown files

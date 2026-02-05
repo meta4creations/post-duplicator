@@ -10,7 +10,11 @@ function enqueue_scripts() {
 
   $current_screen = get_current_screen();
 
-  if ( 'edit' != $current_screen->base && 'post' != $current_screen->base ) {
+  $is_list_screen = $current_screen
+    && ( 'edit' === $current_screen->base || 'post' === $current_screen->base );
+  $is_integration_screen = apply_filters( 'mtphr_post_duplicator_should_enqueue_list_scripts', false );
+
+  if ( ! $is_list_screen && ! $is_integration_screen ) {
     return;
   }
 

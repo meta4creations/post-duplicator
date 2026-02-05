@@ -81,9 +81,6 @@ require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/install.php' );
 require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/settings.php' );
 require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/helpers.php' );
 
-// Load integrations
-require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/integrations/the-events-calendar.php' );
-
 if ( is_admin() ) { 
 	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/scripts.php' );
 	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/edit.php' );
@@ -91,6 +88,12 @@ if ( is_admin() ) {
 	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/scripts.php' );
   require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/upgrades.php' );
 }
+
+// Load integrations
+add_action( 'plugins_loaded', function () {
+	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/integrations/the-events-calendar.php' );
+	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/integrations/wp-nested-pages.php' );
+}, 20 );
 
 
 

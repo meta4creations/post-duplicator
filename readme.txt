@@ -310,6 +310,12 @@ The settings page includes four tabs:
 
 == Changelog ==
 
+= UNRELEASED =
+* WP Nested Pages integration
+* Integration loads moved to plugins_loaded
+* Filter for script enqueue on integration screens
+* Integration folder structure rules
+
 = 3.0.6 [2025-01-05] =
 * Script loading updates and optimization
 * Moved user query to API call
