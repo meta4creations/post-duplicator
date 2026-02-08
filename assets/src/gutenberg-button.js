@@ -282,6 +282,7 @@ const DuplicatePostButton = () => {
 						// Show success modal
 						setDuplicationResult( {
 							postId: result.duplicate_id,
+							permalink: result.permalink,
 							title: finalTitle,
 							featuredImage: duplicatedFeaturedImage,
 							postType: finalPostType,
@@ -381,6 +382,7 @@ const DuplicatePostButton = () => {
 				currentUser={ postDuplicatorVars.currentUser }
 				initialDuplicationResult={ showSuccessModal && duplicationResult ? {
 					postId: duplicationResult.postId,
+					permalink: duplicationResult.permalink,
 					title: duplicationResult.title,
 					featuredImage: duplicationResult.featuredImage,
 					postType: duplicationResult.postType,

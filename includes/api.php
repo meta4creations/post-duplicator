@@ -935,6 +935,7 @@ function duplicate_post( $request ) {
 	);
   return rest_ensure_response( [
 		'duplicate_id' => $duplicate_id,
+		'permalink' => get_permalink( $duplicate_id ),
 		'other_data' => $other_data,
 	] , 200 );
 }

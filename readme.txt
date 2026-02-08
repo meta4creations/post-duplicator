@@ -4,7 +4,7 @@ Tags: posts, post, duplicate, duplication
 Requires at least: 6.6
 Requires PHP: 7.4
 Tested up to: 6.9.1
-Stable tag: 3.0.7
+Stable tag: 3.0.8
 License: GPL2
 
 Creates functionality to duplicate any and all post types, including taxonomies & custom fields. Perfect for developers and content creators.
@@ -310,6 +310,9 @@ The settings page includes four tabs:
 
 == Changelog ==
 
+= 3.0.8 [2025-02-07] =
+* View Post button now uses get_permalink() for reliable URLs on sites with custom permalink structures
+
 = 3.0.7 [2025-02-05] =
 * WP Nested Pages integration
 * Integration loads moved to plugins_loaded
@@ -538,4 +541,4 @@ Must upgrade in order for the plugin to work. The file paths where initially wro
 
 == Upgrade Notice ==
 
-WP Nested Pages integration
+View Post button now uses get_permalink() for reliable URLs on sites with custom permalink structures

@@ -515,6 +515,7 @@ const DuplicateModal = ( {
 							results.push( {
 								success: true,
 								postId: result.duplicate_id,
+								permalink: result.permalink,
 								title: finalTitle,
 								originalPost: currentPost.originalPost,
 								featuredImage,
@@ -577,6 +578,7 @@ const DuplicateModal = ( {
 								results.push( {
 									success: true,
 									postId: result.duplicate_id,
+									permalink: result.permalink,
 									title: finalTitle,
 									originalPost: post.originalPost,
 									featuredImage: postFeaturedImage,
@@ -869,14 +871,12 @@ const DuplicateModal = ( {
 													finalPostType = settings.type === 'same' ? originalPost?.type : settings.type;
 												}
 												const isPublic = postTypesPublicSupport[ finalPostType ] !== false;
+												const viewUrl = initialDuplicationResult?.permalink || duplicationResults[0]?.permalink || `${ siteUrl }/?p=${ postId }`;
 												return isPublic && (
 													<Button
 														variant="secondary"
 														onClick={ () =>
-															window.open(
-																`${ siteUrl }/?p=${ postId }`,
-																'_blank'
-															)
+															window.open( viewUrl, '_blank' )
 														}
 													>
 														{ __( 'View Post', 'post-duplicator' ) }
@@ -958,14 +958,12 @@ const DuplicateModal = ( {
 														// Check if post type is public
 														const finalPostType = result.postType || result.originalPost?.type;
 														const isPublic = postTypesPublicSupport[ finalPostType ] !== false;
+														const viewUrl = result.permalink || `${ siteUrl }/?p=${ result.postId }`;
 														return isPublic && (
 															<Button
 																variant="secondary"
 																onClick={ () =>
-																	window.open(
-																		`${ siteUrl }/?p=${ result.postId }`,
-																		'_blank'
-																	)
+																	window.open( viewUrl, '_blank' )
 																}
 															>
 																{ __( 'View Post', 'post-duplicator' ) }

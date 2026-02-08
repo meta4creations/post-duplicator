@@ -205,6 +205,7 @@ const DuplicatePostHandler = () => {
 									setCurrentPost( postData );
 									setInitialDuplicationResults( {
 										postId: result.duplicate_id,
+										permalink: result.permalink,
 										title: finalTitle,
 										featuredImage: duplicatedFeaturedImage || postData.featuredImage,
 										postType: finalPostType,
@@ -358,6 +359,7 @@ const DuplicatePostHandler = () => {
 									duplicationResults.push( {
 										success: true,
 										postId: result.duplicate_id,
+										permalink: result.permalink,
 										title: finalTitle,
 										originalPost: post,
 										featuredImage: post.featuredImage,
