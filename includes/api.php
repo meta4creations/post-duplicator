@@ -842,9 +842,9 @@ function duplicate_post( $request ) {
 		
 		// Use provided custom meta data if available, otherwise fetch from original post
 		if ( isset( $settings['customMetaData'] ) && is_array( $settings['customMetaData'] ) ) {
-			// Security: Only copy keys that exist on the original post. Reject any key not in the
-			// original to prevent injection of arbitrary protected meta. Use values from the original
-			// only (never from request) to prevent value injection.
+			// Security: Only copy keys that exist on the original post (blocks key injection).
+			// For protected meta (e.g. _wp_page_template): use original values only (blocks value injection).
+			// For non-protected meta: allow user-edited values from the request.
 			foreach ( $settings['customMetaData'] as $meta_item ) {
 				if ( ! isset( $meta_item['key'] ) ) {
 					continue;
@@ -866,8 +866,34 @@ function duplicate_post( $request ) {
 					continue;
 				}
 
-				// Use values from original only - never trust request values to prevent injection
-				$cloned_meta_data[$meta_key] = $original_custom_fields[$meta_key];
+				if ( is_protected_meta( $meta_key, 'post' ) ) {
+					// Protected meta: use original values only to prevent value injection
+					$cloned_meta_data[ $meta_key ] = $original_custom_fields[ $meta_key ];
+				} else {
+					// Non-protected meta: allow user-edited values from the request
+					if ( ! array_key_exists( $meta_key, $cloned_meta_data ) ) {
+						$cloned_meta_data[ $meta_key ] = [];
+					}
+					$original_value = isset( $original_custom_fields[ $meta_key ] ) ? $original_custom_fields[ $meta_key ][0] : false;
+					$meta_value = isset( $meta_item['value'] ) ? $meta_item['value'] : '';
+					// Decode JSON string if needed
+					if ( is_string( $meta_value ) && is_json_string( $meta_value ) ) {
+						$meta_value = json_decode( $meta_value, true );
+					}
+					// Format value for storage (serialize vs json based on original format)
+					if ( is_array( $meta_value ) ) {
+						if ( $original_value ) {
+							if ( is_serialized( $original_value ) ) {
+								$meta_value = maybe_serialize( $meta_value );
+							} elseif ( is_json_string( $original_value ) ) {
+								$meta_value = wp_json_encode( $meta_value );
+							}
+						} else {
+							$meta_value = maybe_serialize( $meta_value );
+						}
+					}
+					$cloned_meta_data[ $meta_key ][] = $meta_value;
+				}
 			}
 
 		} else {

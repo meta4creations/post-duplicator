@@ -311,8 +311,9 @@ The settings page includes four tabs:
 == Changelog ==
 
 = UNRELEASED =
-* Security: Fix unauthorized arbitrary protected post meta insertion vulnerability by validating meta keys against original post and using original values only
+* Security: Fix unauthorized arbitrary protected post meta insertion vulnerability by validating meta keys against original post and using original values only for protected meta
 * Fix: ACF Flexible Content and other protected meta fields now copy correctly when duplicating
+* Restore: User-edited custom meta values (non-protected) are now copied when duplicating via the modal
 
 = 3.0.8 [2025-02-07] =
 * View Post button now uses get_permalink() for reliable URLs on sites with custom permalink structures
