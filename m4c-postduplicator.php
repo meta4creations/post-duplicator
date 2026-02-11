@@ -1,10 +1,11 @@
 <?php
 /*
 Plugin Name: Post Duplicator
-Description: Creates functionality to duplicate any and all post types, including taxonomies & custom fields
-Version: 3.0.8
-Author: Metaphor Creations
-Author URI: http://www.metaphorcreations.com
+Plugin URI:        https://www.metaphorcreations.com/post-duplicator/
+Description:       Creates functionality to duplicate any and all post types, including taxonomies & custom fields
+Version:           3.0.8
+Author:            Meta4Creations
+Author URI:        https://www.metaphorcreations.com/
 License:           GPL-2.0+
 License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
 Requires at least: 6.6
