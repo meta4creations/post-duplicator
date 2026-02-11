@@ -543,7 +543,7 @@ function duplicate_post_permissions( $request ) {
 function duplicate_post( $request ) {
   $data = $request->get_json_params();
 
-  // Get access to the database
+  // Get access to the database (used for meta insertion when copying validated keys from original)
 	global $wpdb;
 
   // Get and validate the original id
@@ -837,15 +837,16 @@ function duplicate_post( $request ) {
 	if ( $include_custom_meta === true ) {
 
 		$excluded_meta_keys = get_excluded_meta_keys();
+		$original_custom_fields = get_post_custom( $original_id );
 		$cloned_meta_data = [];
 		
 		// Use provided custom meta data if available, otherwise fetch from original post
 		if ( isset( $settings['customMetaData'] ) && is_array( $settings['customMetaData'] ) ) {
-			// Use provided custom meta data
-			$original_custom_fields = get_post_custom( $original_id );
-			
+			// Security: Only copy keys that exist on the original post. Reject any key not in the
+			// original to prevent injection of arbitrary protected meta. Use values from the original
+			// only (never from request) to prevent value injection.
 			foreach ( $settings['customMetaData'] as $meta_item ) {
-				if ( ! isset( $meta_item['key'] ) || ! isset( $meta_item['value'] ) ) {
+				if ( ! isset( $meta_item['key'] ) ) {
 					continue;
 				}
 				$meta_key = $meta_item['key'];
@@ -855,48 +856,27 @@ function duplicate_post( $request ) {
 					continue; // Skip invalid meta keys
 				}
 				
+				// Security: Only allow keys that exist on the original post (blocks injection)
+				if ( ! array_key_exists( $meta_key, $original_custom_fields ) ) {
+					continue;
+				}
+				
 				// Skip excluded meta keys
 				if ( in_array( $meta_key, $excluded_meta_keys, true ) ) {
 					continue;
 				}
 
-				if ( ! array_key_exists( $meta_key, $cloned_meta_data ) ) {
-					$cloned_meta_data[$meta_key] = [];
-				}
-
-				// before add the meta value check if the original value is a serialized array or object or json string and if so, format the new value accordingly
-				$original_value = isset( $original_custom_fields[$meta_key] ) ? $original_custom_fields[$meta_key][0] : false;
-
-				// Get the new meta value and decode JSON string if it is a JSON string
-				$meta_value = $meta_item['value'];
-				if ( is_string( $meta_value ) && is_json_string( $meta_value ) ) {
-					$meta_value = json_decode( $meta_value, true );
-				}
-				
-				// Format the new meta value accordingly
-				if ( is_array( $meta_value ) ) {
-					if ( $original_value ) {
-						if ( is_serialized( $original_value ) ) {
-							$meta_value = maybe_serialize( $meta_value );
-						} elseif ( is_json_string( $original_value ) ) {
-							$meta_value = wp_json_encode( $meta_value );
-						}
-					} else {
-						// if $meta_value is array or object, serialize it
-						if ( is_array( $meta_value ) || is_object( $meta_value ) ) {
-							$meta_value = maybe_serialize( $meta_value );
-						}
-					}
-				}
-				$cloned_meta_data[$meta_key][] = $meta_value;
+				// Use values from original only - never trust request values to prevent injection
+				$cloned_meta_data[$meta_key] = $original_custom_fields[$meta_key];
 			}
 
 		} else {
 			// Fall back to original behavior: duplicate all custom fields
-			$cloned_meta_data = get_post_custom( $original_id );
+			$cloned_meta_data = $original_custom_fields;
 		}
 
 		// Insert the cloned meta data into the database
+		// Uses $wpdb->insert for keys validated against original (including protected meta like ACF fields)
 		foreach( $cloned_meta_data as $key => $value ) {
 
 			// Skip excluded meta keys
@@ -920,7 +900,7 @@ function duplicate_post( $request ) {
 						'%s',
 						'%s',
 					);
-					$result = $wpdb->insert( $wpdb->prefix . 'postmeta', $data, $formats );
+					$wpdb->insert( $wpdb->prefix . 'postmeta', $data, $formats );
 				}
 			}
 		}
