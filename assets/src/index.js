@@ -95,6 +95,20 @@ const DuplicatePostHandler = () => {
 		       window.location.href.includes( '/wp-admin/post.php' ) === false;
 	};
 
+	// Check if we're on a WP Nested Pages screen (uses admin.php?page=nestedpages)
+	const isNestedPagesScreen = () => window.location.href.includes( 'nestedpages' );
+
+	// Refresh the page - use cache-busting redirect on Nested Pages so cloned posts appear in list
+	const refreshListScreen = () => {
+		if ( isNestedPagesScreen() ) {
+			const url = new URL( window.location.href );
+			url.searchParams.set( 'pd_refresh', Date.now() );
+			window.location.replace( url.toString() );
+		} else {
+			window.location.reload();
+		}
+	};
+
 	// Check if we're on a classic edit post screen
 	const isClassicEditScreen = () => {
 		return window.location.href.includes( '/wp-admin/post.php' ) && 
@@ -157,6 +171,7 @@ const DuplicatePostHandler = () => {
 						} ) );
 
 						// Prepare settings with defaults
+						// Include parent for hierarchical post types (e.g. pages) so duplicate appears in correct place
 						const duplicateSettings = {
 							...postDuplicatorVars.defaultSettings,
 							includeTaxonomies: true,
@@ -164,6 +179,7 @@ const DuplicatePostHandler = () => {
 							taxonomyData: taxonomyData,
 							customMetaData: customMetaData,
 							featuredImageId: postData.featuredImage?.id || null,
+							selectedParentId: postData.parent > 0 ? postData.parent : null,
 						};
 
 						// Duplicate the post
@@ -227,7 +243,7 @@ const DuplicatePostHandler = () => {
 								} else if ( action === 'refresh' ) {
 									// Refresh the page
 									setWasDuplicated( true );
-									window.location.reload();
+									refreshListScreen();
 								}
 							},
 							onError: ( error ) => {
@@ -342,6 +358,7 @@ const DuplicatePostHandler = () => {
 							} ) );
 
 							// Prepare settings with defaults
+							// Include parent for hierarchical post types so duplicate appears in correct place
 							const duplicateSettings = {
 								...postDuplicatorVars.defaultSettings,
 								includeTaxonomies: true,
@@ -349,6 +366,7 @@ const DuplicatePostHandler = () => {
 								taxonomyData: taxonomyData,
 								customMetaData: customMetaData,
 								featuredImageId: post.featuredImage?.id || null,
+								selectedParentId: post.parent > 0 ? post.parent : null,
 							};
 
 							const finalPostType = duplicateSettings.type === 'same' ? post.type : duplicateSettings.type;
@@ -396,7 +414,7 @@ const DuplicatePostHandler = () => {
 					} else if ( action === 'refresh' ) {
 						// Refresh the page
 						setWasDuplicated( true );
-						window.location.reload();
+						refreshListScreen();
 					}
 				} catch ( error ) {
 					console.error( 'Error in bulk duplication:', error );
@@ -480,7 +498,7 @@ const DuplicatePostHandler = () => {
 		
 		// Refresh page if on posts list screen and posts were duplicated
 		if ( shouldRefresh ) {
-			window.location.reload();
+			refreshListScreen();
 		}
 	};
 

@@ -10,6 +10,11 @@
  */
 export const duplicatePost = async ( postId, settings, callbacks = {} ) => {
 	const { onSuccess, onError } = callbacks;
+	const parsedParentId = Number.parseInt( settings?.selectedParentId, 10 );
+	const normalizedParentId =
+		Number.isFinite( parsedParentId ) && parsedParentId > 0
+			? parsedParentId
+			: null;
 
 	try {
 		const response = await fetch(
@@ -23,6 +28,8 @@ export const duplicatePost = async ( postId, settings, callbacks = {} ) => {
 				body: JSON.stringify( {
 					original_id: postId,
 					...settings,
+					// Always send a normalized parent id (or null for "No Parent")
+					selectedParentId: normalizedParentId,
 				} ),
 			}
 		);

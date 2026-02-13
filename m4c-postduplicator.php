@@ -94,6 +94,7 @@ if ( is_admin() ) {
 add_action( 'plugins_loaded', function () {
 	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/integrations/the-events-calendar.php' );
 	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/integrations/wp-nested-pages.php' );
+	require_once( MTPHR_POST_DUPLICATOR_DIR.'includes/integrations/simple-custom-post-order.php' );
 }, 20 );
 
 

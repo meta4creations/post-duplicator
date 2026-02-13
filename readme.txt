@@ -311,6 +311,8 @@ The settings page includes four tabs:
 == Changelog ==
 
 = UNRELEASED =
+* WP Nested Pages: pass parent page to duplicates in Basic mode and modal, validate parent post type on save, and use cache-busting refresh so clones appear in list
+* Simple Custom Post Order integration: assign unique menu_order to duplicates to prevent order scrambling on page refresh
 * Security: Fix unauthorized arbitrary protected post meta insertion vulnerability by validating meta keys against original post and using original values only for protected meta
 * Fix: ACF Flexible Content and other protected meta fields now copy correctly when duplicating
 * Restore: User-edited custom meta values (non-protected) are now copied when duplicating via the modal

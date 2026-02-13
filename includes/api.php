@@ -277,7 +277,7 @@ function get_post_full_data( $request ) {
     'date' => $post->post_date,
     'author' => $author_name,
     'authorId' => $post->post_author,
-    'parent' => $post->post_parent || 0,
+    'parent' => (int) $post->post_parent,
     'parentPost' => $parent_post,
     'featuredImage' => $featured_image,
   ) );
@@ -537,6 +537,7 @@ function duplicate_post_permissions( $request ) {
   return true;
 }
 
+
 /**
  * Duplicate a post
  */
@@ -644,9 +645,27 @@ function duplicate_post( $request ) {
 		}
 	}
 	
-	// Set the parent - check for selectedParentId first, otherwise keep original parent
-	if ( isset( $settings['selectedParentId'] ) ) {
-		$duplicate['post_parent'] = intval( $settings['selectedParentId'] );
+	// Set the parent from request data.
+	// Validate parent is the same post type to avoid invalid cross-type assignments.
+	if ( array_key_exists( 'selectedParentId', $data ) ) {
+		$selected_parent = $data['selectedParentId'];
+
+		// Explicit "No Parent" selection.
+		if ( null === $selected_parent || '' === $selected_parent || 0 === $selected_parent || '0' === $selected_parent ) {
+			$duplicate['post_parent'] = 0;
+		} else {
+			$selected_parent_id = absint( $selected_parent );
+			if ( $selected_parent_id > 0 ) {
+				$selected_parent_post = get_post( $selected_parent_id );
+				if (
+					$selected_parent_post &&
+					$selected_parent_post->post_type === $duplicate['post_type'] &&
+					is_post_type_hierarchical( $duplicate['post_type'] )
+				) {
+					$duplicate['post_parent'] = $selected_parent_id;
+				}
+			}
+		}
 	}
 	
 	// Set the post date

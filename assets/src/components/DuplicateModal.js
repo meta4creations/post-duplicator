@@ -498,6 +498,10 @@ const DuplicateModal = ( {
 			setDuplicatedPostTitle( finalTitle );
 			
 			try {
+				// Ensure parent is passed for hierarchical types - fallback to original if not in settings (e.g. race on modal open)
+				const parentId = settings.selectedParentId !== undefined
+					? settings.selectedParentId
+					: ( currentPost.originalPost?.parent > 0 ? currentPost.originalPost.parent : null );
 				const duplicateSettings = {
 					...settings,
 					includeTaxonomies,
@@ -505,6 +509,7 @@ const DuplicateModal = ( {
 					...( includeTaxonomies ? { taxonomyData } : {} ),
 					customMetaData,
 					featuredImageId: featuredImage?.id || null,
+					selectedParentId: parentId,
 				};
 				
 				await new Promise( ( resolve, reject ) => {
