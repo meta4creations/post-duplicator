@@ -185,7 +185,10 @@ function get_all_post_types( $label_type = 'label' ) {
 	$result = array();
 	
 	// System post types to exclude
-	$excluded = array( 'attachment', 'revision', 'nav_menu_item', 'wooframework' );
+	$excluded = apply_filters(
+		'mtphr_post_duplicator_excluded_post_types',
+		array( 'attachment', 'revision', 'nav_menu_item', 'wooframework' )
+	);
 	
 	foreach ( $post_types as $post_type => $post_type_obj ) {
 		if ( ! in_array( $post_type, $excluded ) ) {
@@ -217,13 +220,7 @@ function get_all_post_types( $label_type = 'label' ) {
  * @return array Array of post type slugs
  */
 function get_enabled_post_types_for_duplication() {
-	$config = get_option_value( 'post_types_config' );
-	
-	// If no config, enable all post types by default
-	if ( empty( $config ) || ! is_array( $config ) ) {
-		$all_types = get_all_post_types();
-		return array_column( $all_types, 'id' );
-	}
+	$config = get_post_types_config_with_defaults();
 	
 	$enabled = array();
 	foreach ( $config as $post_type => $settings ) {
@@ -242,12 +239,7 @@ function get_enabled_post_types_for_duplication() {
  * @return array Array of post type slugs
  */
 function get_enabled_post_types_for_dropdown() {
-	$config = get_option_value( 'post_types_config' );
-	
-	// If no config, only enable post and page by default
-	if ( empty( $config ) || ! is_array( $config ) ) {
-		return array( 'post', 'page' );
-	}
+	$config = get_post_types_config_with_defaults();
 	
 	$enabled = array();
 	foreach ( $config as $post_type => $settings ) {
@@ -268,6 +260,48 @@ function get_enabled_post_types_for_dropdown() {
 function is_post_type_duplication_enabled( $post_type ) {
 	$enabled = get_enabled_post_types_for_duplication();
 	return in_array( $post_type, $enabled );
+}
+
+/**
+ * Get post type configuration merged with current defaults.
+ *
+ * This keeps backward compatibility when a saved config is missing newly
+ * registered post types (for example when another plugin/theme only registers
+ * post types on specific admin screens). Missing current post types fall back
+ * to default behavior; legacy saved-only post types are still respected.
+ *
+ * @return array
+ */
+function get_post_types_config_with_defaults() {
+	$saved_config   = get_option_value( 'post_types_config' );
+	$default_config = get_default_post_types_config();
+
+	if ( empty( $saved_config ) || ! is_array( $saved_config ) ) {
+		return $default_config;
+	}
+
+	foreach ( $saved_config as $post_type => $settings ) {
+		if ( ! is_array( $settings ) ) {
+			continue;
+		}
+
+		if ( ! isset( $default_config[ $post_type ] ) ) {
+			$default_config[ $post_type ] = array(
+				'allow_duplication' => ! empty( $settings['allow_duplication'] ),
+				'allow_in_dropdown' => ! empty( $settings['allow_in_dropdown'] ),
+			);
+			continue;
+		}
+
+		if ( isset( $settings['allow_duplication'] ) ) {
+			$default_config[ $post_type ]['allow_duplication'] = (bool) $settings['allow_duplication'];
+		}
+		if ( isset( $settings['allow_in_dropdown'] ) ) {
+			$default_config[ $post_type ]['allow_in_dropdown'] = (bool) $settings['allow_in_dropdown'];
+		}
+	}
+
+	return $default_config;
 }
 
 /**

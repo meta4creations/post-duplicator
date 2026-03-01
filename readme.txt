@@ -4,7 +4,7 @@ Tags: posts, post, duplicate, duplication
 Requires at least: 6.6
 Requires PHP: 7.4
 Tested up to: 6.9.1
-Stable tag: 3.0.9
+Stable tag: 3.0.10
 License: GPL2
 
 Creates functionality to duplicate any and all post types, including taxonomies & custom fields. Perfect for developers and content creators.
@@ -310,27 +310,37 @@ The settings page includes four tabs:
 
 == Changelog ==
 
-= 3.0.9 [2025-02-17] =
+= 3.0.10 [2026-02-28] =
+* Divi integration: ensure Divi Library post type appears in Post Types settings
+* Divi integration: force Basic mode for Divi Library duplication due to React compatibility
+* Divi integration: add duplicate button on Divi Library edit screen
+* Divi integration: exclude internal Divi post types from duplication
+* Added filterable excluded post types list
+* Added filters for mode and after-duplication actions
+* Added settings filter for integration notices on General tab
+* React render fallback for environments without createRoot support
+
+= 3.0.9 [2026-02-17] =
 * WP Nested Pages: pass parent page to duplicates in Basic mode and modal, validate parent post type on save, and use cache-busting refresh so clones appear in list
 * Simple Custom Post Order integration: assign unique menu_order to duplicates to prevent order scrambling on page refresh
 * Security: Fix unauthorized arbitrary protected post meta insertion vulnerability by validating meta keys against original post and using original values only for protected meta
 * Fix: ACF Flexible Content and other protected meta fields now copy correctly when duplicating
 * Restore: User-edited custom meta values (non-protected) are now copied when duplicating via the modal
 
-= 3.0.8 [2025-02-07] =
+= 3.0.8 [2026-02-07] =
 * View Post button now uses get_permalink() for reliable URLs on sites with custom permalink structures
 
-= 3.0.7 [2025-02-05] =
+= 3.0.7 [2026-02-05] =
 * WP Nested Pages integration
 * Integration loads moved to plugins_loaded
 * Filter for script enqueue on integration screens
 * Integration folder structure rules
 
-= 3.0.6 [2025-01-05] =
+= 3.0.6 [2026-01-05] =
 * Script loading updates and optimization
 * Moved user query to API call
 
-= 3.0.5 [2025-01-02] =
+= 3.0.5 [2026-01-02] =
 * Post meta duplication bug fixes
 * Post date offset updates and fixes
 * Settings sanitization bug fixes
@@ -548,4 +558,4 @@ Must upgrade in order for the plugin to work. The file paths where initially wro
 
 == Upgrade Notice ==
 
-Improves duplication reliability with better WP Nested Pages parent handling/refresh behavior and a new Simple Custom Post Order compatibility fix to preserve menu order.
+Adds Divi theme compatibility for duplicating Divi Library Layouts.

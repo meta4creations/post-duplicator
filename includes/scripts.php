@@ -79,10 +79,10 @@ function enqueue_scripts() {
       'pending' => esc_html__( 'Pending', 'post-duplicator' ),
       'private' => esc_html__( 'Private', 'post-duplicator' ),
     ],
-    'mode' => isset( $settings['mode'] ) ? $settings['mode'] : 'advanced',
-    'singleAfterDuplicationAction' => isset( $settings['single_after_duplication_action'] ) ? $settings['single_after_duplication_action'] : 'notice',
-    'listSingleAfterDuplicationAction' => isset( $settings['list_single_after_duplication_action'] ) ? $settings['list_single_after_duplication_action'] : 'notice',
-    'listMultipleAfterDuplicationAction' => isset( $settings['list_multiple_after_duplication_action'] ) ? $settings['list_multiple_after_duplication_action'] : 'notice',
+    'mode' => apply_filters( 'mtphr_post_duplicator_mode', isset( $settings['mode'] ) ? $settings['mode'] : 'advanced' ),
+    'singleAfterDuplicationAction' => apply_filters( 'mtphr_post_duplicator_single_after_duplication_action', isset( $settings['single_after_duplication_action'] ) ? $settings['single_after_duplication_action'] : 'notice' ),
+    'listSingleAfterDuplicationAction' => apply_filters( 'mtphr_post_duplicator_list_single_after_duplication_action', isset( $settings['list_single_after_duplication_action'] ) ? $settings['list_single_after_duplication_action'] : 'notice' ),
+    'listMultipleAfterDuplicationAction' => apply_filters( 'mtphr_post_duplicator_list_multiple_after_duplication_action', isset( $settings['list_multiple_after_duplication_action'] ) ? $settings['list_multiple_after_duplication_action'] : 'notice' ),
   ] );
 
   // Enqueue Gutenberg button on block editor pages (but not in widgets editor)

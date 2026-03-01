@@ -527,7 +527,9 @@ document.addEventListener( 'DOMContentLoaded', function () {
 	modalRoot.id = 'duplicate-post-modal-root';
 	document.body.appendChild( modalRoot );
 
-	// Use createRoot for React 18
-	const root = createRoot( modalRoot );
-	root.render( <DuplicatePostHandler /> );
+	if ( typeof createRoot === 'function' ) {
+		createRoot( modalRoot ).render( <DuplicatePostHandler /> );
+	} else {
+		render( <DuplicatePostHandler />, modalRoot );
+	}
 } );

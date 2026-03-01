@@ -193,10 +193,13 @@ function initialize_sidebar() {
  */
 function initialize_fields() {
 
+  // Allow integrations to prepend notices/fields to the general section
+  $general_notices = apply_filters( 'mtphr_post_duplicator_general_notices', array() );
+
   // Add general fields
   Settings::fields( [
     'section' => 'mtphr_post_duplicator_general',
-    'fields'  => [
+    'fields'  => array_merge( $general_notices, [
       [
         'type'    => 'selection',
         'id'      => 'mode',
@@ -260,7 +263,7 @@ function initialize_fields() {
           'compare' => '='
         ],
       ],
-    ],
+    ] ),
   ] );
 
   // Add default fields
