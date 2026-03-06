@@ -312,6 +312,9 @@ The settings page includes four tabs:
 
 = UNRELEASED =
 * Security hardening for serialized custom meta handling in REST responses
+* Build dependencies: pin immutable to patched version to address prototype pollution advisory
+* Build dependencies: pin @babel/runtime to patched version for moderate vulnerability remediation
+* Build dependencies: pin svgo to patched version for XML entity expansion vulnerability remediation
 
 = 3.0.10 [2026-02-28] =
 * Divi integration: ensure Divi Library post type appears in Post Types settings
