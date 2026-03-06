@@ -4,7 +4,7 @@ Tags: posts, post, duplicate, duplication
 Requires at least: 6.6
 Requires PHP: 7.4
 Tested up to: 6.9.1
-Stable tag: 3.0.10
+Stable tag: 3.0.11
 License: GPL2
 
 Creates functionality to duplicate any and all post types, including taxonomies & custom fields. Perfect for developers and content creators.
@@ -310,7 +310,7 @@ The settings page includes four tabs:
 
 == Changelog ==
 
-= UNRELEASED =
+= 3.0.11 [2026-03-06] =
 * Security hardening for serialized custom meta handling in REST responses
 * Build dependencies: pin immutable to patched version to address prototype pollution advisory
 * Build dependencies: pin @babel/runtime to patched version for moderate vulnerability remediation
