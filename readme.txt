@@ -310,6 +310,9 @@ The settings page includes four tabs:
 
 == Changelog ==
 
+= UNRELEASED =
+* Security hardening for serialized custom meta handling in REST responses
+
 = 3.0.10 [2026-02-28] =
 * Divi integration: ensure Divi Library post type appears in Post Types settings
 * Divi integration: force Basic mode for Divi Library duplication due to React compatibility

@@ -169,15 +169,21 @@ function get_post_data( $request ) {
       // Check if serialized
       if ( is_serialized( $value ) ) {
         $is_serialized = true;
-        $unserialized = maybe_unserialize( $value );
-        if ( is_array( $unserialized ) ) {
-          $type = 'array';
-          $value = wp_json_encode( $unserialized, JSON_PRETTY_PRINT );
-        } elseif ( is_object( $unserialized ) ) {
-          $type = 'object';
-          $value = wp_json_encode( $unserialized, JSON_PRETTY_PRINT );
-        } else {
+        $trimmed_value = trim( $value );
+
+        // Never decode serialized objects; keep them as raw strings.
+        if ( preg_match( '/^(?:O|C):\d+:/', $trimmed_value ) ) {
           $type = 'string';
+        } else {
+          $unserialized = @unserialize( $trimmed_value, array( 'allowed_classes' => false ) );
+          $is_valid_unserialized = ( false !== $unserialized || 'b:0;' === $trimmed_value );
+
+          if ( $is_valid_unserialized && is_array( $unserialized ) ) {
+            $type = 'array';
+            $value = wp_json_encode( $unserialized, JSON_PRETTY_PRINT );
+          } else {
+            $type = 'string';
+          }
         }
       } elseif ( is_numeric( $value ) ) {
         // Check if it's a number (int or float)
