@@ -296,6 +296,10 @@ The settings page includes four tabs:
 * **Permissions**: Control who can duplicate posts
 * **Advanced**: Settings for duplicating special post statuses
 
+= Where do I report security bugs found in this plugin? =
+
+Please report any security bugs found in the source code of this project through the [Patchstack Vulnerability Disclosure  Program](https://patchstack.com/database/vdp/e70e28e9-1470-4c6a-b52d-e05fbd68a516). The Patchstack team will assist you with verification, CVE assignment, and notify the developers of this plugin.
+
 == Screenshots ==
 
 1. Single post duplicate button
