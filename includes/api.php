@@ -540,6 +540,10 @@ function duplicate_post_permissions( $request ) {
 	  return new \WP_Error( 'no_permission', esc_html__( 'User does not have permission to duplicate post.', 'post-duplicator' ), array( 'status' => 403 ) );
 	}
 
+  if ( ! is_post_type_duplication_enabled( $post->post_type ) ) {
+    return new \WP_Error( 'type_disabled', esc_html__( 'Duplication is disabled for this post type.', 'post-duplicator' ), array( 'status' => 403 ) );
+  }
+
   return true;
 }
 
@@ -631,10 +635,9 @@ function duplicate_post( $request ) {
 		}
 	}
 	
-	// Check if a user has publish get_post_type_capabilities. If not, make sure they can't _publish
+	// Check if a user has publish capabilities. If not, restrict status-gated statuses.
 	if ( ! current_user_can( 'publish_posts' ) ) {
-		// Force the post status to pending
-		if ( 'publish' == $duplicate['post_status'] ) {
+		if ( in_array( $duplicate['post_status'], array( 'publish', 'private', 'future' ), true ) ) {
 			$duplicate['post_status'] = 'pending';
 		}
 	}
@@ -721,11 +724,19 @@ function duplicate_post( $request ) {
 	// Set author - check for selectedAuthorId first, then fall back to post_author setting
 	// Handle "No Author" case (null or empty selectedAuthorId)
 	if ( isset( $settings['selectedAuthorId'] ) ) {
-		if ( $settings['selectedAuthorId'] === null || $settings['selectedAuthorId'] === '' || $settings['selectedAuthorId'] === 0 ) {
+		$requested_author = intval( $settings['selectedAuthorId'] );
+		if ( $settings['selectedAuthorId'] === null || $settings['selectedAuthorId'] === '' || $requested_author === 0 ) {
 			// "No Author" - set to 0 for post types that don't support authors
 			$duplicate['post_author'] = 0;
+		} elseif ( $requested_author !== get_current_user_id() ) {
+			// Only allow assigning to another user if the current user can edit others' posts
+			if ( current_user_can( 'edit_others_posts' ) ) {
+				$duplicate['post_author'] = $requested_author;
+			} else {
+				$duplicate['post_author'] = get_current_user_id();
+			}
 		} else {
-			$duplicate['post_author'] = intval( $settings['selectedAuthorId'] );
+			$duplicate['post_author'] = $requested_author;
 		}
 	} elseif ( 'current_user' == $settings['post_author'] ) {
 		$duplicate['post_author'] = get_current_user_id();
