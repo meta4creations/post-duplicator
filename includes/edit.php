@@ -5,6 +5,9 @@ add_filter( 'post_row_actions', __NAMESPACE__ . '\add_row_action', 10, 2 );
 add_filter( 'page_row_actions', __NAMESPACE__ . '\add_row_action', 10, 2 );
 add_filter( 'cuar/core/admin/content-list-table/row-actions', __NAMESPACE__ . '\add_row_action', 10, 2 );
 
+// PHP fallback: handles the duplicate link when JS scripts are not loaded on the current screen
+add_action( 'admin_post_mtphr_quick_duplicate', __NAMESPACE__ . '\handle_quick_duplicate' );
+
 // Add bulk actions for all post types dynamically
 add_action( 'admin_init', __NAMESPACE__ . '\register_bulk_actions' );
 add_action( 'admin_footer', __NAMESPACE__ . '\add_bulk_action_script' );
@@ -63,8 +66,15 @@ function add_row_action_link( $post ) {
     }
 	}
 
+	// Build a PHP fallback URL for screens where scripts may not be loaded.
+	// When JS is present it intercepts the click and opens the modal instead.
+	$fallback_url = admin_url(
+		'admin-post.php?action=mtphr_quick_duplicate&post_id=' . $post->ID
+		. '&_wpnonce=' . wp_create_nonce( 'mtphr_quick_duplicate_' . $post->ID )
+	);
+
 	// Return the link
-	return '<a class="m4c-duplicate-post" href="#" data-postid="'.esc_attr( $post->ID ).'" data-posttype="'.esc_attr( $post->post_type ).'">'.wp_kses_post( $label ).'</a>';
+	return '<a class="m4c-duplicate-post" href="' . esc_url( $fallback_url ) . '" data-postid="' . esc_attr( $post->ID ) . '" data-posttype="' . esc_attr( $post->post_type ) . '">' . wp_kses_post( $label ) . '</a>';
 }
 
 // Add the duplicate link to post actions
@@ -108,6 +118,54 @@ function add_bulk_action( $actions ) {
 	);
 
 	return $actions;
+}
+
+/**
+ * PHP fallback handler for the duplicate row-action link.
+ *
+ * Fires when the duplicate link is clicked on a screen where the Post Duplicator
+ * JavaScript is not enqueued. Performs duplication using global default settings
+ * (equivalent to Basic mode) then redirects back to the referring page.
+ *
+ * All security checks mirror those in the REST API permission callback so that
+ * the same rules apply regardless of which code path triggers the duplication.
+ */
+function handle_quick_duplicate() {
+	$post_id = isset( $_GET['post_id'] ) ? absint( $_GET['post_id'] ) : 0;
+
+	if ( ! $post_id ) {
+		wp_die( esc_html__( 'Invalid post ID.', 'post-duplicator' ) );
+	}
+
+	// Verify nonce — tied to the specific post ID so one nonce cannot be replayed
+	// against a different post. Also implicitly confirms the user is logged in.
+	check_admin_referer( 'mtphr_quick_duplicate_' . $post_id );
+
+	$post = get_post( $post_id );
+	if ( ! $post ) {
+		wp_die( esc_html__( 'Post not found.', 'post-duplicator' ) );
+	}
+
+	// Enforce the same permission rules as the REST API
+	if ( ! user_can_duplicate( $post ) ) {
+		wp_die( esc_html__( 'You do not have permission to duplicate this post.', 'post-duplicator' ) );
+	}
+
+	if ( ! is_post_type_duplication_enabled( $post->post_type ) ) {
+		wp_die( esc_html__( 'Duplication is disabled for this post type.', 'post-duplicator' ) );
+	}
+
+	// Duplicate using global default settings (no modal overrides)
+	$result = perform_duplication( $post, get_option_value() );
+
+	$redirect = wp_get_referer() ?: admin_url();
+
+	if ( is_wp_error( $result ) ) {
+		wp_safe_redirect( add_query_arg( 'duplicated', '0', $redirect ) );
+	} else {
+		wp_safe_redirect( add_query_arg( 'duplicated', '1', $redirect ) );
+	}
+	exit;
 }
 
 /**

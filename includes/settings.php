@@ -81,6 +81,7 @@ function initialize_settings() {
 
   // Add default values
   Settings::default_values( 'mtphr_post_duplicator_settings', [
+    'additional_screens' => "nestedpages\nwpca-list",
     'mode' => 'advanced',
     'single_after_duplication_action' => 'notice',
     'list_single_after_duplication_action' => 'notice',
@@ -428,6 +429,17 @@ function initialize_fields() {
   Settings::fields( [
     'section' => 'mtphr_post_duplicator_advanced',
     'fields' => [
+      [
+        'type'  => 'heading',
+        'label' => __( 'Additional Admin Screens', 'post-duplicator' ),
+        'help'  => __( 'Enter admin page slugs (one per line) where Post Duplicator scripts should load. Use this for plugins that display post lists on non-standard admin screens so the full duplication modal is available. Common examples are pre-filled below.', 'post-duplicator' ),
+      ],
+      [
+        'type'  => 'textarea',
+        'id'    => 'additional_screens',
+        'label' => __( 'Page Slugs', 'post-duplicator' ),
+        'help'  => __( 'One slug prefix per line. Scripts load when the current page slug starts with any entry here.', 'post-duplicator' ),
+      ],
       [
         'type'    => 'heading',
         'label'   => __( 'Advanced Duplication Settings', 'post-duplicator' ),

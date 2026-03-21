@@ -227,12 +227,13 @@ If you don't see the duplicate option, contact your site administrator to grant 
 **I don't see the duplicate option:**
 - Check that you have the necessary permissions (contact your administrator)
 - Make sure you're not viewing the Trash page
-- Some post types may have restrictions
+- Some post types may have duplication disabled — check the Post Types tab in Settings
+- On custom plugin admin screens, the duplicate link may not appear unless that post type is enabled for duplication
 
 **The duplicate button doesn't work:**
 - Refresh the page and try again
 - Check your browser console for JavaScript errors
-- Ensure you have JavaScript enabled
+- Note: basic duplication using your default settings works even without JavaScript (the link will redirect to a PHP handler). If the modal isn't appearing on a custom admin screen, add that screen's page slug to **Settings > Post Duplicator > Advanced > Page Slugs**
 
 **The duplicate isn't created:**
 - Check that you have permission to create posts of that type

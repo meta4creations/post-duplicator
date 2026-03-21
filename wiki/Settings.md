@@ -7,7 +7,7 @@ This guide explains all the settings available in the Post Duplicator plugin. Ac
 The settings page is divided into three main sections:
 1. **Defaults** - Configure default behavior for all duplications
 2. **Permissions** - Control who can duplicate posts
-3. **Advanced** - Fine-tune duplication behavior for special post types
+3. **Advanced** - Configure additional admin screens and fine-tune duplication behavior for special post types
 
 ## Defaults Section
 
@@ -118,6 +118,38 @@ For each user role (Administrator, Editor, Author, Contributor, etc.), you can e
 **Security Note:** Be careful when granting "duplicate_others_posts" to lower-level roles, as this allows them to copy content created by others.
 
 ## Advanced Section
+
+### Additional Admin Screens
+
+**Description:** A list of admin page slug prefixes (one per line) where Post Duplicator scripts should be loaded. This enables the full duplication modal on non-standard post list screens used by third-party plugins.
+
+**Default:** Pre-filled with `nestedpages` (WP Nested Pages) and `wpca-list` (WP Customer Area).
+
+**How it works:**
+
+When the duplicate link is clicked on any admin screen, basic duplication using your default settings always works regardless of this setting. This setting controls whether the **full duplication modal** (Advanced mode) loads on custom screens. If a page's slug starts with any entry in this list, the Post Duplicator scripts are enqueued on that page.
+
+**Adding a custom screen:**
+1. Find the admin page slug from the URL — it's the value of the `page` query parameter (e.g., `admin.php?page=my-plugin-list` → slug is `my-plugin-list`)
+2. Add the slug (or a prefix of it) to the list, one per line
+3. Click **Save Changes**
+
+**Example:**
+
+If a plugin uses pages like `admin.php?page=my-plugin-list` and `admin.php?page=my-plugin-list-archive`, you can add `my-plugin-list` as a single entry and it will match both.
+
+**Developer filter:**
+
+Developers can register additional screens programmatically without touching the settings:
+
+```php
+add_filter( 'mtphr_post_duplicator_additional_screens', function( $slugs ) {
+    $slugs[] = 'my-plugin-page-slug';
+    return $slugs;
+} );
+```
+
+---
 
 These settings control duplication behavior for special post statuses created by other users.
 

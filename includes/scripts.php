@@ -12,7 +12,33 @@ function enqueue_scripts() {
 
   $is_list_screen = $current_screen
     && ( 'edit' === $current_screen->base || 'post' === $current_screen->base );
+
+  // Backward-compatible boolean filter (used by existing integrations such as Divi)
   $is_integration_screen = apply_filters( 'mtphr_post_duplicator_should_enqueue_list_scripts', false );
+
+  // Slug-based approach: check against developer-registered and user-configured page slugs
+  if ( ! $is_integration_screen ) {
+    $page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : '';
+
+    if ( $page ) {
+      // Developer filter — return an array of page-slug prefixes to match
+      $additional_slugs = apply_filters( 'mtphr_post_duplicator_additional_screens', array() );
+
+      // User-configured slugs stored in plugin settings (one per line)
+      $saved_slugs = get_option_value( 'additional_screens' );
+      if ( ! empty( $saved_slugs ) && is_string( $saved_slugs ) ) {
+        $user_slugs       = array_filter( array_map( 'trim', explode( "\n", $saved_slugs ) ) );
+        $additional_slugs = array_merge( $additional_slugs, $user_slugs );
+      }
+
+      foreach ( $additional_slugs as $slug ) {
+        if ( ! empty( $slug ) && strpos( $page, $slug ) === 0 ) {
+          $is_integration_screen = true;
+          break;
+        }
+      }
+    }
+  }
 
   if ( ! $is_list_screen && ! $is_integration_screen ) {
     return;

@@ -549,44 +549,24 @@ function duplicate_post_permissions( $request ) {
 
 
 /**
- * Duplicate a post
+ * Core duplication engine.
+ *
+ * Performs the actual post duplication using the provided settings array.
+ * Both the REST API endpoint and the PHP fallback handler use this function
+ * so that all duplication logic lives in one place.
+ *
+ * @param WP_Post $orig     The original post object.
+ * @param array   $settings Merged settings (plugin defaults + any caller overrides).
+ * @return array|\WP_Error  Array with duplicate_id, permalink, duplicate, duplicate_terms
+ *                          on success; WP_Error on failure.
  */
-function duplicate_post( $request ) {
-  $data = $request->get_json_params();
-
-  // Get access to the database (used for meta insertion when copying validated keys from original)
+function perform_duplication( $orig, $settings ) {
 	global $wpdb;
 
-  // Get and validate the original id
-  $original_id = isset( $data['original_id'] ) ? absint( $data['original_id'] ) : 0;
-  
-  if ( ! $original_id || $original_id <= 0 ) {
-    return new \WP_Error( 'invalid_original_id', esc_html__( 'Invalid original id.', 'post-duplicator' ), array( 'status' => 400 ) );
-  }
-	
-	// Get the original post object
-	$orig = get_post( $original_id );
-	
-	if ( ! $orig ) {
-		return new \WP_Error( 'post_not_found', esc_html__( 'Original post not found.', 'post-duplicator' ), array( 'status' => 404 ) );
-	}
-		
-	// Get default settings
-	$default_settings = get_option_value();
-	
-	// Merge with any override settings from the request
-	// Remove original_id from data to get only settings
-	$override_settings = $data;
-	unset( $override_settings['original_id'] );
-	
-	// Merge: override settings take precedence
-	$settings = array_merge( $default_settings, $override_settings );
-	
-	// Create an empty array and populate only the fields we want
-	// This ensures we don't carry over any unwanted data
+	$original_id = $orig->ID;
+
 	$duplicate = array();
-	
-	// Copy basic post fields explicitly
+
 	$duplicate['post_author'] = $orig->post_author;
 	$duplicate['post_content'] = $orig->post_content;
 	$duplicate['post_title'] = $orig->post_title;
@@ -603,63 +583,54 @@ function duplicate_post( $request ) {
 	$duplicate['menu_order'] = $orig->menu_order;
 	$duplicate['post_type'] = $orig->post_type;
 	$duplicate['post_mime_type'] = $orig->post_mime_type;
-	
+
 	// Modify the title
-	// If fullTitle is provided (user edited the full title), use it
-	// Otherwise, append the suffix
 	if ( isset( $settings['fullTitle'] ) && ! empty( $settings['fullTitle'] ) ) {
 		$duplicate['post_title'] = sanitize_text_field( $settings['fullTitle'] );
 	} else {
 		$appended = isset( $settings['title'] ) ? sanitize_text_field( $settings['title'] ) : esc_html__( 'Copy', 'post-duplicator' );
 		$duplicate['post_title'] = $duplicate['post_title'] . ' ' . $appended;
 	}
-	
+
 	// Modify the slug
-	// If fullSlug is provided (user edited the full slug), use it
-	// Otherwise, append the suffix
 	if ( isset( $settings['fullSlug'] ) && ! empty( $settings['fullSlug'] ) ) {
 		$duplicate['post_name'] = sanitize_title( $settings['fullSlug'] );
 	} else {
 		$duplicate['post_name'] = sanitize_title( $duplicate['post_name'] . '-' . $settings['slug'] );
 	}
-	
+
 	// Set the status - validate against allowed statuses
-	if( $settings['status'] != 'same' ) {
+	if ( $settings['status'] != 'same' ) {
 		$allowed_statuses = array( 'draft', 'publish', 'pending', 'private', 'future' );
 		$requested_status = sanitize_text_field( $settings['status'] );
 		if ( in_array( $requested_status, $allowed_statuses, true ) ) {
 			$duplicate['post_status'] = $requested_status;
 		} else {
-			// Invalid status, default to draft
 			$duplicate['post_status'] = 'draft';
 		}
 	}
-	
-	// Check if a user has publish capabilities. If not, restrict status-gated statuses.
+
+	// Restrict publish-gated statuses for users without publish capability
 	if ( ! current_user_can( 'publish_posts' ) ) {
 		if ( in_array( $duplicate['post_status'], array( 'publish', 'private', 'future' ), true ) ) {
 			$duplicate['post_status'] = 'pending';
 		}
 	}
-	
+
 	// Set the type - validate against allowed post types
-	if( $settings['type'] != 'same' ) {
+	if ( $settings['type'] != 'same' ) {
 		$requested_type = sanitize_key( $settings['type'] );
-		// Validate that the post type exists and user has permission to create it
 		if ( post_type_exists( $requested_type ) && current_user_can( get_post_type_object( $requested_type )->cap->create_posts ) ) {
 			$duplicate['post_type'] = $requested_type;
 		} else {
-			// Invalid post type or no permission, keep original type
 			$duplicate['post_type'] = $orig->post_type;
 		}
 	}
-	
-	// Set the parent from request data.
-	// Validate parent is the same post type to avoid invalid cross-type assignments.
-	if ( array_key_exists( 'selectedParentId', $data ) ) {
-		$selected_parent = $data['selectedParentId'];
 
-		// Explicit "No Parent" selection.
+	// Set the parent - only when explicitly provided in settings
+	if ( array_key_exists( 'selectedParentId', $settings ) ) {
+		$selected_parent = $settings['selectedParentId'];
+
 		if ( null === $selected_parent || '' === $selected_parent || 0 === $selected_parent || '0' === $selected_parent ) {
 			$duplicate['post_parent'] = 0;
 		} else {
@@ -676,60 +647,49 @@ function duplicate_post( $request ) {
 			}
 		}
 	}
-	
+
 	// Set the post date
 	if ( $settings['timestamp'] == 'duplicate' ) {
-		$timestamp = strtotime($orig->post_date);
-		$timestamp_gmt = strtotime($orig->post_date_gmt);
+		$timestamp     = strtotime( $orig->post_date );
+		$timestamp_gmt = strtotime( $orig->post_date_gmt );
 	} elseif ( $settings['timestamp'] == 'custom' && isset( $settings['customDate'] ) && ! empty( $settings['customDate'] ) ) {
-		// Use custom date if provided
 		$custom_date = $settings['customDate'];
 		try {
-			// Parse the ISO date string (e.g., "2024-01-15T10:30:00.000Z")
-			// JavaScript's toISOString() returns UTC time
-			// Convert ISO format to WordPress date format (Y-m-d H:i:s)
-			$date_obj = new \DateTime( $custom_date, new \DateTimeZone( 'UTC' ) );
-			$gmt_date = $date_obj->format( 'Y-m-d H:i:s' );
-			
-			// Convert GMT date to local timezone using WordPress function
-			$local_date = get_date_from_gmt( $gmt_date );
-			
-			$timestamp = strtotime( $local_date );
+			$date_obj      = new \DateTime( $custom_date, new \DateTimeZone( 'UTC' ) );
+			$gmt_date      = $date_obj->format( 'Y-m-d H:i:s' );
+			$local_date    = get_date_from_gmt( $gmt_date );
+			$timestamp     = strtotime( $local_date );
 			$timestamp_gmt = strtotime( $gmt_date );
 		} catch ( \Exception $e ) {
-			// If date parsing fails, fall back to current time
-			$timestamp = current_time('timestamp',0);
-			$timestamp_gmt = current_time('timestamp',1);
+			$timestamp     = current_time( 'timestamp', 0 );
+			$timestamp_gmt = current_time( 'timestamp', 1 );
 		}
 	} else {
-		$timestamp = current_time('timestamp',0);
-		$timestamp_gmt = current_time('timestamp',1);
+		$timestamp     = current_time( 'timestamp', 0 );
+		$timestamp_gmt = current_time( 'timestamp', 1 );
 	}
-	
-	if( isset( $settings['time_offset'] ) && $settings['time_offset'] ) {
-		$offset = intval($settings['time_offset_seconds']+$settings['time_offset_minutes']*60+$settings['time_offset_hours']*3600+$settings['time_offset_days']*86400);
-		if( $settings['time_offset_direction'] == 'newer' ) {
-			$timestamp = intval($timestamp+$offset);
-			$timestamp_gmt = intval($timestamp_gmt+$offset);
+
+	if ( isset( $settings['time_offset'] ) && $settings['time_offset'] ) {
+		$offset = intval( $settings['time_offset_seconds'] + $settings['time_offset_minutes'] * 60 + $settings['time_offset_hours'] * 3600 + $settings['time_offset_days'] * 86400 );
+		if ( $settings['time_offset_direction'] == 'newer' ) {
+			$timestamp     = intval( $timestamp + $offset );
+			$timestamp_gmt = intval( $timestamp_gmt + $offset );
 		} else {
-			$timestamp = intval($timestamp-$offset);
-			$timestamp_gmt = intval($timestamp_gmt-$offset);
+			$timestamp     = intval( $timestamp - $offset );
+			$timestamp_gmt = intval( $timestamp_gmt - $offset );
 		}
 	}
-	$duplicate['post_date'] = date('Y-m-d H:i:s', $timestamp);
-	$duplicate['post_date_gmt'] = date('Y-m-d H:i:s', $timestamp_gmt);
-	$duplicate['post_modified'] = date('Y-m-d H:i:s', current_time('timestamp',0));
-	$duplicate['post_modified_gmt'] = date('Y-m-d H:i:s', current_time('timestamp',1));
-	
-	// Set author - check for selectedAuthorId first, then fall back to post_author setting
-	// Handle "No Author" case (null or empty selectedAuthorId)
+	$duplicate['post_date']         = date( 'Y-m-d H:i:s', $timestamp );
+	$duplicate['post_date_gmt']     = date( 'Y-m-d H:i:s', $timestamp_gmt );
+	$duplicate['post_modified']     = date( 'Y-m-d H:i:s', current_time( 'timestamp', 0 ) );
+	$duplicate['post_modified_gmt'] = date( 'Y-m-d H:i:s', current_time( 'timestamp', 1 ) );
+
+	// Set author
 	if ( isset( $settings['selectedAuthorId'] ) ) {
 		$requested_author = intval( $settings['selectedAuthorId'] );
 		if ( $settings['selectedAuthorId'] === null || $settings['selectedAuthorId'] === '' || $requested_author === 0 ) {
-			// "No Author" - set to 0 for post types that don't support authors
 			$duplicate['post_author'] = 0;
 		} elseif ( $requested_author !== get_current_user_id() ) {
-			// Only allow assigning to another user if the current user can edit others' posts
 			if ( current_user_can( 'edit_others_posts' ) ) {
 				$duplicate['post_author'] = $requested_author;
 			} else {
@@ -744,84 +704,66 @@ function duplicate_post( $request ) {
 
 	// Sanitize post content
 	add_filter( 'wp_kses_allowed_html', __NAMESPACE__ . '\additional_kses', 10, 2 );
-	$duplicate['post_content'] = wp_slash( wp_kses_post( $duplicate['post_content'] ) ); 
+	$duplicate['post_content'] = wp_slash( wp_kses_post( $duplicate['post_content'] ) );
 	remove_filter( 'wp_kses_allowed_html', __NAMESPACE__ . '\additional_kses', 10, 2 );
 
 	// Insert the post into the database
 	$duplicate_id = wp_insert_post( $duplicate );
 
+	if ( is_wp_error( $duplicate_id ) || ! $duplicate_id ) {
+		return new \WP_Error( 'insert_failed', esc_html__( 'Failed to create duplicate post.', 'post-duplicator' ) );
+	}
+
 	// Handle featured image
 	if ( isset( $settings['featuredImageId'] ) ) {
-		// If featuredImageId is null or 0, remove the featured image
 		if ( empty( $settings['featuredImageId'] ) ) {
 			delete_post_thumbnail( $duplicate_id );
 		} else {
-			// Set the featured image
 			$thumbnail_id = intval( $settings['featuredImageId'] );
-			// Verify the attachment exists and is an image
-			$attachment = get_post( $thumbnail_id );
+			$attachment   = get_post( $thumbnail_id );
 			if ( $attachment && wp_attachment_is_image( $thumbnail_id ) ) {
 				set_post_thumbnail( $duplicate_id, $thumbnail_id );
 			}
 		}
 	} else {
-		// Default behavior: copy featured image from original post if it exists
 		$original_thumbnail_id = get_post_thumbnail_id( $original_id );
 		if ( $original_thumbnail_id ) {
 			set_post_thumbnail( $duplicate_id, $original_thumbnail_id );
 		}
 	}
 
-	// check which terms are connected to the duplicate post right here and now
 	$duplicate_terms = wp_get_post_terms( $duplicate_id, get_object_taxonomies( $duplicate['post_type'] ) );
-	
+
 	// Handle taxonomies
-	// Default to true for backward compatibility
 	$include_taxonomies = false;
 	if ( isset( $settings['includeTaxonomies'] ) && false !== $settings['includeTaxonomies'] ) {
 		$tax_value = $settings['includeTaxonomies'];
-		// Handle both boolean and string boolean values from JSON
 		if ( is_bool( $tax_value ) ) {
 			$include_taxonomies = $tax_value;
 		} elseif ( is_string( $tax_value ) ) {
-			// Handle string booleans - explicitly check for false strings
 			$include_taxonomies = ! ( $tax_value === 'false' || $tax_value === '0' || $tax_value === '' );
 		} elseif ( $tax_value === 0 || $tax_value === '0' ) {
-			// Explicitly handle 0/false values
 			$include_taxonomies = false;
 		} else {
-			// For any other value, cast to bool
 			$include_taxonomies = (bool) $tax_value;
 		}
 	}
-	
-	// Only duplicate taxonomies if explicitly enabled
-	// Use strict comparison to ensure false/0 values are respected
+
 	if ( $include_taxonomies === true ) {
-		// Use provided taxonomy data if available, otherwise fetch from original post
 		if ( isset( $settings['taxonomyData'] ) && is_array( $settings['taxonomyData'] ) && ! empty( $settings['taxonomyData'] ) ) {
-			// Use provided taxonomy data
 			foreach ( $settings['taxonomyData'] as $taxonomy_slug => $term_ids ) {
 				if ( ! is_array( $term_ids ) ) {
 					continue;
 				}
-				
-				// Validate taxonomy slug
 				$taxonomy_slug = sanitize_key( $taxonomy_slug );
 				if ( ! taxonomy_exists( $taxonomy_slug ) ) {
-					continue; // Skip invalid taxonomy
+					continue;
 				}
-				
-				// Verify taxonomy is registered for this post type
 				if ( ! is_object_in_taxonomy( $duplicate['post_type'], $taxonomy_slug ) ) {
-					continue; // Skip taxonomies not registered for this post type
+					continue;
 				}
-				
-				// Convert term IDs to integers and filter out invalid values
-				$term_ids = array_map( 'absint', $term_ids );
-				$term_ids = array_filter( $term_ids );
-				
-				// Verify all term IDs exist and belong to the correct taxonomy
+				$term_ids       = array_map( 'absint', $term_ids );
+				$term_ids       = array_filter( $term_ids );
 				$valid_term_ids = array();
 				foreach ( $term_ids as $term_id ) {
 					$term = get_term( $term_id, $taxonomy_slug );
@@ -829,94 +771,70 @@ function duplicate_post( $request ) {
 						$valid_term_ids[] = $term_id;
 					}
 				}
-				
 				if ( ! empty( $valid_term_ids ) ) {
 					wp_set_object_terms( $duplicate_id, $valid_term_ids, $taxonomy_slug );
 				}
 			}
 		} elseif ( ! isset( $settings['taxonomyData'] ) ) {
-			// Only fall back to original behavior if taxonomyData was not provided at all
-			// This means the user didn't customize, so use default behavior
-			$taxonomies = get_object_taxonomies( $duplicate['post_type'] );
-			$disabled_taxonomies = ['post_translations'];
-			foreach( $taxonomies as $taxonomy ) {
+			$taxonomies          = get_object_taxonomies( $duplicate['post_type'] );
+			$disabled_taxonomies = array( 'post_translations' );
+			foreach ( $taxonomies as $taxonomy ) {
 				if ( in_array( $taxonomy, $disabled_taxonomies ) ) {
 					continue;
 				}
-				$terms = wp_get_post_terms( $original_id, $taxonomy, array('fields' => 'names') );
+				$terms = wp_get_post_terms( $original_id, $taxonomy, array( 'fields' => 'names' ) );
 				wp_set_object_terms( $duplicate_id, $terms, $taxonomy );
 			}
 		}
-		// If includeTaxonomies is false, do nothing - taxonomies are not duplicated
 	}
 
-	
 	// Handle custom meta fields
-	// Default to true for backward compatibility
 	$include_custom_meta = false;
 	if ( isset( $settings['includeCustomMeta'] ) && false !== $settings['includeCustomMeta'] ) {
-		// Handle both boolean and string boolean values from JSON
 		if ( is_bool( $settings['includeCustomMeta'] ) ) {
 			$include_custom_meta = $settings['includeCustomMeta'];
 		} elseif ( is_string( $settings['includeCustomMeta'] ) ) {
-			// Handle string booleans (shouldn't happen with proper JSON, but be safe)
 			$include_custom_meta = ( $settings['includeCustomMeta'] === 'true' || $settings['includeCustomMeta'] === '1' );
 		} elseif ( $settings['includeCustomMeta'] === 0 || $settings['includeCustomMeta'] === '0' ) {
-			// Explicitly handle 0/false values
 			$include_custom_meta = false;
 		} else {
 			$include_custom_meta = (bool) $settings['includeCustomMeta'];
 		}
 	}
-	
-	// Only duplicate custom meta if explicitly enabled
-	if ( $include_custom_meta === true ) {
 
-		$excluded_meta_keys = get_excluded_meta_keys();
+	if ( $include_custom_meta === true ) {
+		$excluded_meta_keys    = get_excluded_meta_keys();
 		$original_custom_fields = get_post_custom( $original_id );
-		$cloned_meta_data = [];
-		
-		// Use provided custom meta data if available, otherwise fetch from original post
+		$cloned_meta_data      = array();
+
 		if ( isset( $settings['customMetaData'] ) && is_array( $settings['customMetaData'] ) ) {
-			// Security: Only copy keys that exist on the original post (blocks key injection).
-			// For protected meta (e.g. _wp_page_template): use original values only (blocks value injection).
-			// For non-protected meta: allow user-edited values from the request.
+			// Security: only copy keys that exist on the original post (blocks key injection).
+			// For protected meta: use original values only (blocks value injection).
 			foreach ( $settings['customMetaData'] as $meta_item ) {
 				if ( ! isset( $meta_item['key'] ) ) {
 					continue;
 				}
 				$meta_key = $meta_item['key'];
-				
-				// Validate meta key is not empty and follows WordPress naming conventions
 				if ( empty( $meta_key ) || strlen( $meta_key ) > 255 ) {
-					continue; // Skip invalid meta keys
+					continue;
 				}
-				
-				// Security: Only allow keys that exist on the original post (blocks injection)
 				if ( ! array_key_exists( $meta_key, $original_custom_fields ) ) {
 					continue;
 				}
-				
-				// Skip excluded meta keys
 				if ( in_array( $meta_key, $excluded_meta_keys, true ) ) {
 					continue;
 				}
-
 				if ( is_protected_meta( $meta_key, 'post' ) ) {
-					// Protected meta: use original values only to prevent value injection
 					$cloned_meta_data[ $meta_key ] = $original_custom_fields[ $meta_key ];
 				} else {
-					// Non-protected meta: allow user-edited values from the request
 					if ( ! array_key_exists( $meta_key, $cloned_meta_data ) ) {
-						$cloned_meta_data[ $meta_key ] = [];
+						$cloned_meta_data[ $meta_key ] = array();
 					}
 					$original_value = isset( $original_custom_fields[ $meta_key ] ) ? $original_custom_fields[ $meta_key ][0] : false;
-					$meta_value = isset( $meta_item['value'] ) ? $meta_item['value'] : '';
-					// Decode JSON string if needed
+					$meta_value     = isset( $meta_item['value'] ) ? $meta_item['value'] : '';
 					if ( is_string( $meta_value ) && is_json_string( $meta_value ) ) {
 						$meta_value = json_decode( $meta_value, true );
 					}
-					// Format value for storage (serialize vs json based on original format)
 					if ( is_array( $meta_value ) ) {
 						if ( $original_value ) {
 							if ( is_serialized( $original_value ) ) {
@@ -931,55 +849,78 @@ function duplicate_post( $request ) {
 					$cloned_meta_data[ $meta_key ][] = $meta_value;
 				}
 			}
-
 		} else {
-			// Fall back to original behavior: duplicate all custom fields
 			$cloned_meta_data = $original_custom_fields;
 		}
 
-		// Insert the cloned meta data into the database
-		// Uses $wpdb->insert for keys validated against original (including protected meta like ACF fields)
-		foreach( $cloned_meta_data as $key => $value ) {
-
-			// Skip excluded meta keys
+		foreach ( $cloned_meta_data as $key => $value ) {
 			if ( in_array( $key, $excluded_meta_keys, true ) ) {
 				continue;
 			}
-
 			if ( is_array( $value ) && count( $value ) > 0 ) {
-				foreach( $value as $i => $v ) {
+				foreach ( $value as $i => $v ) {
 					if ( ! apply_filters( "mtphr_post_duplicator_meta_{$key}_enabled", true ) ) {
 						continue;
 					}
 					$meta_value = apply_filters( "mtphr_post_duplicator_meta_value", $v, $key, $duplicate_id, $duplicate['post_type'] );
-					$data = array(
-						'post_id' 		=> intval( $duplicate_id ),
-						'meta_key' 		=> sanitize_text_field( $key ),
-						'meta_value' 	=> $meta_value,
+					$data       = array(
+						'post_id'    => intval( $duplicate_id ),
+						'meta_key'   => sanitize_text_field( $key ),
+						'meta_value' => $meta_value,
 					);
-					$formats = array(
-						'%d',
-						'%s',
-						'%s',
-					);
+					$formats = array( '%d', '%s', '%s' );
 					$wpdb->insert( $wpdb->prefix . 'postmeta', $data, $formats );
 				}
 			}
 		}
 	}
-	
-	// Add an action for others to do custom stuff
+
 	do_action( 'mtphr_post_duplicator_created', $original_id, $duplicate_id, $settings );
 
-	$other_data = array(
-		'duplicate_post' => $duplicate,
+	return array(
+		'duplicate_id'    => $duplicate_id,
+		'permalink'       => get_permalink( $duplicate_id ),
+		'duplicate'       => $duplicate,
 		'duplicate_terms' => $duplicate_terms,
 	);
-  return rest_ensure_response( [
-		'duplicate_id' => $duplicate_id,
-		'permalink' => get_permalink( $duplicate_id ),
-		'other_data' => $other_data,
-	] , 200 );
+}
+
+/**
+ * Duplicate a post (REST API callback)
+ */
+function duplicate_post( $request ) {
+	$data = $request->get_json_params();
+
+	$original_id = isset( $data['original_id'] ) ? absint( $data['original_id'] ) : 0;
+
+	if ( ! $original_id || $original_id <= 0 ) {
+		return new \WP_Error( 'invalid_original_id', esc_html__( 'Invalid original id.', 'post-duplicator' ), array( 'status' => 400 ) );
+	}
+
+	$orig = get_post( $original_id );
+
+	if ( ! $orig ) {
+		return new \WP_Error( 'post_not_found', esc_html__( 'Original post not found.', 'post-duplicator' ), array( 'status' => 404 ) );
+	}
+
+	$override_settings = $data;
+	unset( $override_settings['original_id'] );
+	$settings = array_merge( get_option_value(), $override_settings );
+
+	$result = perform_duplication( $orig, $settings );
+
+	if ( is_wp_error( $result ) ) {
+		return $result;
+	}
+
+	return rest_ensure_response( array(
+		'duplicate_id' => $result['duplicate_id'],
+		'permalink'    => $result['permalink'],
+		'other_data'   => array(
+			'duplicate_post'  => $result['duplicate'],
+			'duplicate_terms' => $result['duplicate_terms'],
+		),
+	), 200 );
 }
 
 /**

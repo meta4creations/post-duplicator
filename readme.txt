@@ -4,7 +4,7 @@ Tags: posts, post, duplicate, duplication
 Requires at least: 6.6
 Requires PHP: 7.4
 Tested up to: 6.9.4
-Stable tag: 3.0.12
+Stable tag: 3.0.13
 License: GPL2
 
 Creates functionality to duplicate any and all post types, including taxonomies & custom fields. Perfect for developers and content creators.
@@ -314,6 +314,12 @@ Please report any security bugs found in the source code of this project through
 
 == Changelog ==
 
+= 3.0.13 [2026-03-21] =
+* Added PHP fallback for duplicate row-action link so duplication works on any admin screen even when scripts are not loaded
+* Added `mtphr_post_duplicator_additional_screens` filter and settings field for configuring extra admin screens where scripts should load
+* Removed WP Nested Pages and WP Customer Area dedicated integration files; their slugs are now pre-filled in the new Additional Admin Screens setting
+* Extracted shared `perform_duplication()` core function used by both the REST API and the PHP fallback handler
+
 = 3.0.12 [2026-03-18] =
 * Security fix: restrict `future` and `private` statuses for users without `publish_posts` capability
 * Security fix: enforce post type duplication restrictions in the REST API permission callback
@@ -573,4 +579,4 @@ Must upgrade in order for the plugin to work. The file paths where initially wro
 
 == Upgrade Notice ==
 
-Security fixes
+Added php fallback for duplication without js. New setting to add custom admin screens for script enqueue.

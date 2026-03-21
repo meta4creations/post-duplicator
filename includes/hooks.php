@@ -40,7 +40,13 @@ function duplicator_submitbox( $post ) {
   if ( $post_type = get_post_type_object( $post->post_type ) ) {
     ?>
     <div class="misc-pub-section misc-pub-duplicator" id="duplicator">
-      <a class="m4c-duplicate-post button button-small" href="#" data-postid="<?php echo esc_attr( $post->ID ); ?>" data-posttype="<?php echo esc_attr( $post->post_type ); ?>"><?php printf( esc_html__( 'Duplicate %s', 'post-duplicator' ), $post_type->labels->singular_name ); ?></a><span class="spinner" style="float:none;margin-top:2px;margin-left:4px;"></span>
+      <?php
+      $fallback_url = admin_url(
+        'admin-post.php?action=mtphr_quick_duplicate&post_id=' . $post->ID
+        . '&_wpnonce=' . wp_create_nonce( 'mtphr_quick_duplicate_' . $post->ID )
+      );
+      ?>
+      <a class="m4c-duplicate-post button button-small" href="<?php echo esc_url( $fallback_url ); ?>" data-postid="<?php echo esc_attr( $post->ID ); ?>" data-posttype="<?php echo esc_attr( $post->post_type ); ?>"><?php printf( esc_html__( 'Duplicate %s', 'post-duplicator' ), $post_type->labels->singular_name ); ?></a><span class="spinner" style="float:none;margin-top:2px;margin-left:4px;"></span>
     </div>
     <?php
   }
