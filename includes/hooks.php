@@ -8,7 +8,7 @@ add_filter( 'mtphr_post_duplicator_meta__wc_review_count_enabled', '__return_fal
 add_filter( 'plugin_action_links_' . MTPHR_POST_DUPLICATOR_BASENAME, __NAMESPACE__ . '\add_plugin_settings_link' );
 add_action( 'post_submitbox_misc_actions', __NAMESPACE__ . '\duplicator_submitbox' );
 add_action( 'mtphr_post_duplicator_created', __NAMESPACE__ . '\wpml_duplication', 10, 2 );
-
+add_filter( 'mtphr_post_duplicator_additional_screens', __NAMESPACE__ . '\register_additional_screens' );
 
 /**
  * Add settings link to the plugin screen
@@ -74,4 +74,19 @@ function wpml_duplication( $original_id, $duplicate_id ) {
         'source_language_code' => null,
     ) );
   }
+}
+
+/**
+ * Register additional admin screen slugs for third-party plugins that use
+ * non-standard list pages. Adding a slug here loads Post Duplicator scripts
+ * on that screen so the full duplication modal is available.
+ *
+ * Only add slugs here. If an integration requires any other customisation
+ * (mode overrides, post-type exclusions, etc.) create a dedicated file in
+ * includes/integrations/ instead.
+ */
+function register_additional_screens( $slugs ) {
+  $slugs[] = 'nestedpages';
+  $slugs[] = 'wpca-list';
+	return $slugs;
 }

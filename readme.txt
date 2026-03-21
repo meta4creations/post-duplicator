@@ -314,6 +314,10 @@ Please report any security bugs found in the source code of this project through
 
 == Changelog ==
 
+= UNRELEASED =
+* Moved `nestedpages` and `wpca-list` screen slugs from settings default value to hardcoded filter in `hooks.php`
+* Cleared `additional_screens` default value; slugs now shown as placeholder examples in the settings field
+
 = 3.0.13 [2026-03-21] =
 * Added PHP fallback for duplicate row-action link so duplication works on any admin screen even when scripts are not loaded
 * Added `mtphr_post_duplicator_additional_screens` filter and settings field for configuring extra admin screens where scripts should load
