@@ -583,6 +583,11 @@ function perform_duplication( $orig, $settings ) {
 	$duplicate['menu_order'] = $orig->menu_order;
 	$duplicate['post_type'] = $orig->post_type;
 	$duplicate['post_mime_type'] = $orig->post_mime_type;
+	// Explicitly omit guid — WordPress generates a fresh one from get_permalink()
+	// after insertion. An empty string here guarantees the original's guid is
+	// never carried over, including for non-public post types where get_permalink()
+	// may otherwise return an ambiguous fallback URL.
+	$duplicate['guid'] = '';
 
 	// Modify the title
 	if ( isset( $settings['fullTitle'] ) && ! empty( $settings['fullTitle'] ) ) {
