@@ -170,7 +170,13 @@ function get_excluded_meta_keys() {
 		'_elementor_element_cache',
 		'_edit_lock',
 	) );
-	
+
+	$setting = get_option_value( 'excluded_meta_keys' );
+	if ( ! empty( $setting ) ) {
+		$user_keys = array_filter( array_map( 'trim', explode( "\n", $setting ) ) );
+		$excluded_keys = array_unique( array_merge( $excluded_keys, $user_keys ) );
+	}
+
 	return $excluded_keys;
 }
 

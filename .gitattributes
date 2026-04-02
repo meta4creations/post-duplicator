@@ -5,6 +5,7 @@
 /.cursor/ export-ignore
 /.cursorrules/ export-ignore
 /vendor/ export-ignore
+/documentation/ export-ignore
 /wiki/ export-ignore
 /scripts/ export-ignore
 /composer.json export-ignore

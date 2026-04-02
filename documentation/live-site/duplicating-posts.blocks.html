@@ -1,0 +1,843 @@
+<!-- wp:paragraph -->
+<p>This guide explains how to duplicate posts using the Post Duplicator plugin.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"url":"https://placehold.co/960x420/e9ecef/495057?text=Hero+Screenshot","alt":"Overview screenshot of the WordPress posts list screen showing where Post Duplicator adds its controls","sizeSlug":"large"} -->
+<figure class="wp-block-image size-large"><img src="https://placehold.co/960x420/e9ecef/495057?text=Hero+Screenshot" alt="Overview screenshot of the WordPress posts list screen showing where Post Duplicator adds its controls"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:separator {"className":"is-style-wide"} -->
+<hr class="wp-block-separator has-alpha-channel-opacity is-style-wide"/>
+<!-- /wp:separator -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Overview</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Post Duplicator allows you to create exact copies of any post type, including all content, custom fields, taxonomies, and metadata. This is useful for creating templates, making variations of existing content, or quickly creating similar posts.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:spacer {"height":"40px"} -->
+<div style="height:40px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Methods to Duplicate Posts</h2>
+<!-- /wp:heading -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Method 1: From the Posts List Screen</h3>
+<!-- /wp:heading -->
+
+<!-- wp:list {"ordered":true} -->
+<ol class="wp-block-list"><!-- wp:list-item -->
+<li>Navigate to your posts list (e.g., <strong>Posts &gt; All Posts</strong>, <strong>Pages &gt; All Pages</strong>, or any custom post type list)</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Hover over the post you want to duplicate</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Click the <strong>"Duplicate [Post Type]"</strong> link that appears in the row actions
+<ul><li>For example: "Duplicate Post", "Duplicate Page", etc.</li></ul></li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>A modal window will open with duplication options</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Review and adjust settings if needed (see The Duplication Modal below)</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Click the <strong>"Duplicate [Post Type]"</strong> button to create the duplicate</li>
+<!-- /wp:list-item --></ol>
+<!-- /wp:list -->
+
+<!-- wp:image {"url":"https://placehold.co/960x340/e9ecef/495057?text=List+Row+Actions","alt":"WordPress posts list with row actions visible — the Duplicate Post link is highlighted below a post title","sizeSlug":"large"} -->
+<figure class="wp-block-image size-large"><img src="https://placehold.co/960x340/e9ecef/495057?text=List+Row+Actions" alt="WordPress posts list with row actions visible — the Duplicate Post link is highlighted below a post title"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:spacer {"height":"24px"} -->
+<div style="height:24px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Method 2: From the Post Edit Screen (Gutenberg)</h3>
+<!-- /wp:heading -->
+
+<!-- wp:list {"ordered":true} -->
+<ol class="wp-block-list"><!-- wp:list-item -->
+<li>Open the post you want to duplicate in the WordPress block editor</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Look for the <strong>"Duplicate Post"</strong> button in the Gutenberg toolbar (top of the screen)</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Click the button to open the duplication modal</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Review and adjust settings if needed</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Click the <strong>"Duplicate [Post Type]"</strong> button to create the duplicate</li>
+<!-- /wp:list-item --></ol>
+<!-- /wp:list -->
+
+<!-- wp:image {"url":"https://placehold.co/960x260/e9ecef/495057?text=Gutenberg+Toolbar","alt":"Gutenberg block editor top toolbar with the Duplicate Post button visible","sizeSlug":"large"} -->
+<figure class="wp-block-image size-large"><img src="https://placehold.co/960x260/e9ecef/495057?text=Gutenberg+Toolbar" alt="Gutenberg block editor top toolbar with the Duplicate Post button visible"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:spacer {"height":"24px"} -->
+<div style="height:24px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Method 3: From the Classic Editor</h3>
+<!-- /wp:heading -->
+
+<!-- wp:list {"ordered":true} -->
+<ol class="wp-block-list"><!-- wp:list-item -->
+<li>Open the post you want to duplicate in the classic editor</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>In the <strong>Publish</strong> meta box (right sidebar), find the <strong>"Duplicate [Post Type]"</strong> button
+<ul><li>Note: This button only appears for published posts</li></ul></li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Click the button to open the duplication modal</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Review and adjust settings if needed</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Click the <strong>"Duplicate [Post Type]"</strong> button to create the duplicate</li>
+<!-- /wp:list-item --></ol>
+<!-- /wp:list -->
+
+<!-- wp:image {"url":"https://placehold.co/480x340/e9ecef/495057?text=Classic+Editor+Publish+Box","alt":"Classic editor Publish meta box in the right sidebar with the Duplicate Post button","sizeSlug":"large","align":"center"} -->
+<figure class="wp-block-image aligncenter size-large"><img src="https://placehold.co/480x340/e9ecef/495057?text=Classic+Editor+Publish+Box" alt="Classic editor Publish meta box in the right sidebar with the Duplicate Post button"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:spacer {"height":"24px"} -->
+<div style="height:24px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Method 4: Bulk Duplication (Multiple Posts)</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>You can duplicate multiple posts at once from the posts list screen:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list {"ordered":true} -->
+<ol class="wp-block-list"><!-- wp:list-item -->
+<li>Navigate to your posts list (e.g., <strong>Posts &gt; All Posts</strong>, <strong>Pages &gt; All Pages</strong>, or any custom post type list)</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Select the posts you want to duplicate by checking the boxes next to each post
+<ul><li>You can select multiple posts across different pages</li>
+<li>Use the checkbox in the table header to select all posts on the current page</li></ul></li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>In the <strong>Bulk Actions</strong> dropdown at the top of the list, select <strong>"Duplicate [Post Type]"</strong>
+<ul><li>For example: "Duplicate Posts", "Duplicate Pages", etc.</li></ul></li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Click the <strong>Apply</strong> button</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>A modal window will open showing all selected posts</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Configure settings for each post individually, or apply global settings to all posts</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Click <strong>"Duplicate [Post Type]"</strong> to create duplicates for all selected posts</li>
+<!-- /wp:list-item --></ol>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Bulk Duplication Tips:</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Each post in the list can be expanded to configure individual settings</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>You can remove posts from the list before duplicating by clicking the delete/remove button</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>All duplicates are created sequentially, so larger batches may take longer</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>The page will automatically refresh after successful bulk duplication</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:image {"url":"https://placehold.co/960x380/e9ecef/495057?text=Bulk+Actions+Dropdown","alt":"Posts list table with multiple rows checked and the Bulk Actions dropdown showing the Duplicate action","sizeSlug":"large"} -->
+<figure class="wp-block-image size-large"><img src="https://placehold.co/960x380/e9ecef/495057?text=Bulk+Actions+Dropdown" alt="Posts list table with multiple rows checked and the Bulk Actions dropdown showing the Duplicate action"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:spacer {"height":"60px"} -->
+<div style="height:60px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">The Duplication Modal</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>When you click to duplicate a post, a modal window opens with various options. Here's what you'll see:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"url":"https://placehold.co/720x500/e9ecef/495057?text=Duplication+Modal","alt":"The Post Duplicator modal showing basic settings — title, slug, featured image, post type, status, author, and date fields","sizeSlug":"large","align":"center"} -->
+<figure class="wp-block-image aligncenter size-large"><img src="https://placehold.co/720x500/e9ecef/495057?text=Duplication+Modal" alt="The Post Duplicator modal showing basic settings — title, slug, featured image, post type, status, author, and date fields"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Basic Settings</h3>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li><strong>Title:</strong> The title for the duplicated post (defaults to original title + "Copy")</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Slug:</strong> The URL-friendly version of the title (auto-generated from title, but can be edited)</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Featured Image:</strong> Preview and option to change the featured image</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Post Type:</strong> Choose the post type for the duplicate (defaults to same type)</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Post Status:</strong> Choose the status (Draft, Published, Pending, or Same as original)</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Post Author:</strong> Select who should be listed as the author</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Post Date:</strong> Set the publication date for the duplicate</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Advanced Options</h3>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li><strong>Taxonomies:</strong> Toggle to include or exclude categories, tags, and custom taxonomies</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Custom Meta:</strong> Toggle to include or exclude custom fields and metadata</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:image {"url":"https://placehold.co/720x300/e9ecef/495057?text=Modal+Advanced+Options","alt":"The modal's advanced options showing taxonomy and custom meta toggles","sizeSlug":"large","align":"center"} -->
+<figure class="wp-block-image aligncenter size-large"><img src="https://placehold.co/720x300/e9ecef/495057?text=Modal+Advanced+Options" alt="The modal's advanced options showing taxonomy and custom meta toggles"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:spacer {"height":"24px"} -->
+<div style="height:24px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Multiple Clones Mode</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>When duplicating a single post, you can create multiple copies at once:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list {"ordered":true} -->
+<ol class="wp-block-list"><!-- wp:list-item -->
+<li>Open the duplication modal for a single post</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Look for the <strong>"Create Multiple Copies"</strong> toggle or option</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Enable multiple clones mode</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Set the number of copies you want to create (default is 2)</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Each clone will appear in the list with its own settings</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>You can customize settings for each clone individually:
+<ul><li>Edit titles and slugs</li>
+<li>Change post types, status, author, or date</li>
+<li>Modify taxonomies and custom meta</li></ul></li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Remove individual clones by clicking the delete button (minimum 1 clone required)</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Click <strong>"Duplicate [Post Type]"</strong> to create all clones at once</li>
+<!-- /wp:list-item --></ol>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Multiple Clones Tips:</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>All clones are created from the same original post</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Each clone can have different settings</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Clones are numbered automatically in titles (e.g., "My Post Copy", "My Post Copy 2", "My Post Copy 3")</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Useful for creating variations or A/B testing content</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:image {"url":"https://placehold.co/720x420/e9ecef/495057?text=Multiple+Clones+Mode","alt":"The duplication modal with Create Multiple Copies enabled — showing a list of clones each with individual settings","sizeSlug":"large","align":"center"} -->
+<figure class="wp-block-image aligncenter size-large"><img src="https://placehold.co/720x420/e9ecef/495057?text=Multiple+Clones+Mode" alt="The duplication modal with Create Multiple Copies enabled — showing a list of clones each with individual settings"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:spacer {"height":"24px"} -->
+<div style="height:24px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Bulk Duplication Modal</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>When duplicating multiple posts via bulk action, the modal shows:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li><strong>Post List:</strong> All selected posts displayed in a scrollable list</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Individual Configuration:</strong> Each post can be expanded to configure its own settings</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Global Settings:</strong> Some settings can be applied to all posts at once</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Remove Posts:</strong> Delete posts from the list before duplicating if needed</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Sequential Processing:</strong> Posts are duplicated one after another</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:image {"url":"https://placehold.co/720x400/e9ecef/495057?text=Bulk+Duplication+Modal","alt":"The bulk duplication modal showing multiple posts listed with expandable individual settings","sizeSlug":"large","align":"center"} -->
+<figure class="wp-block-image aligncenter size-large"><img src="https://placehold.co/720x400/e9ecef/495057?text=Bulk+Duplication+Modal" alt="The bulk duplication modal showing multiple posts listed with expandable individual settings"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:spacer {"height":"24px"} -->
+<div style="height:24px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">After Duplication</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Once the duplicate is created, you'll see:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>A success message</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>View Post</strong> button — Opens the duplicate on the frontend</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Edit Post</strong> button — Opens the duplicate in the WordPress editor</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p>For bulk duplications, you'll see a summary of all created duplicates, and the page will refresh to show the new posts in your list.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"url":"https://placehold.co/720x260/e9ecef/495057?text=Success+State","alt":"The duplication success state showing View Post and Edit Post action buttons","sizeSlug":"large","align":"center"} -->
+<figure class="wp-block-image aligncenter size-large"><img src="https://placehold.co/720x260/e9ecef/495057?text=Success+State" alt="The duplication success state showing View Post and Edit Post action buttons"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:spacer {"height":"60px"} -->
+<div style="height:60px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Duplicating Multiple Posts</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Post Duplicator offers two powerful ways to create multiple duplicates:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Option 1: Bulk Duplication (Different Posts)</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Duplicate multiple different posts at once:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list {"ordered":true} -->
+<ol class="wp-block-list"><!-- wp:list-item -->
+<li><strong>From Posts List:</strong> Select multiple posts using checkboxes, then use the Bulk Actions dropdown</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Configure Each Post:</strong> In the modal, expand each post to set individual settings</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Apply to All:</strong> Some settings can be applied globally to all selected posts</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Create All:</strong> Click the duplicate button to create all duplicates sequentially</li>
+<!-- /wp:list-item --></ol>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Best For:</strong> Duplicating a batch of posts with similar settings, content migrations, creating variations of multiple existing posts, and bulk content updates.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:spacer {"height":"16px"} -->
+<div style="height:16px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Option 2: Multiple Clones (Same Post)</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Create multiple copies of a single post:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list {"ordered":true} -->
+<ol class="wp-block-list"><!-- wp:list-item -->
+<li><strong>Open Duplication Modal:</strong> Start duplicating any single post</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Enable Multiple Clones:</strong> Toggle the "Create Multiple Copies" option</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Set Count:</strong> Choose how many copies to create (2, 3, 5, 10, etc.)</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Customize Each Clone:</strong> Each clone can have unique settings</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Create All:</strong> All clones are created from the same original</li>
+<!-- /wp:list-item --></ol>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Best For:</strong> Creating variations of the same content, A/B testing different versions, content series with similar structure, and template-based content creation.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:spacer {"height":"24px"} -->
+<div style="height:24px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Comparison</h3>
+<!-- /wp:heading -->
+
+<!-- wp:table {"hasFixedLayout":true,"className":"is-style-stripes"} -->
+<figure class="wp-block-table is-style-stripes"><table class="has-fixed-layout"><thead><tr><th>Feature</th><th>Bulk Duplication</th><th>Multiple Clones</th></tr></thead><tbody><tr><td><strong>Source</strong></td><td>Multiple different posts</td><td>One single post</td></tr><tr><td><strong>Use Case</strong></td><td>Different content, similar settings</td><td>Same content, different variations</td></tr><tr><td><strong>Configuration</strong></td><td>Individual settings per post</td><td>Individual settings per clone</td></tr><tr><td><strong>Speed</strong></td><td>Sequential (one after another)</td><td>Sequential (one after another)</td></tr></tbody></table></figure>
+<!-- /wp:table -->
+
+<!-- wp:spacer {"height":"60px"} -->
+<div style="height:60px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">What Gets Duplicated</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>The following content is automatically copied to the duplicate:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:columns -->
+<div class="wp-block-columns"><!-- wp:column -->
+<div class="wp-block-column"><!-- wp:heading {"level":4} -->
+<h4 class="wp-block-heading">Included by Default</h4>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Post content and formatting</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Title and slug (with customizable suffixes)</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>All custom fields and metadata</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Categories, tags, and custom taxonomies</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Featured images</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Post format and excerpt</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Comment and ping status settings</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Post password (if applicable)</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Menu order</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Post parent (for hierarchical post types)</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></div>
+<!-- /wp:column -->
+
+<!-- wp:column -->
+<div class="wp-block-column"><!-- wp:heading {"level":4} -->
+<h4 class="wp-block-heading">Not Duplicated</h4>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Comments (by design — prevents duplicate comment threads)</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Post ID and GUID (new unique identifiers are assigned)</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns -->
+
+<!-- wp:spacer {"height":"60px"} -->
+<div style="height:60px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Quick Duplication</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>For the fastest duplication:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list {"ordered":true} -->
+<ol class="wp-block-list"><!-- wp:list-item -->
+<li>Click the duplicate link/button</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Click <strong>"Duplicate [Post Type]"</strong> immediately (uses default settings)</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>The duplicate will be created as a Draft with "Copy" appended to the title</li>
+<!-- /wp:list-item --></ol>
+<!-- /wp:list -->
+
+<!-- wp:spacer {"height":"60px"} -->
+<div style="height:60px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Customizing Individual Duplications</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>You can override the default settings for any individual duplication:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list {"ordered":true} -->
+<ol class="wp-block-list"><!-- wp:list-item -->
+<li>Open the duplication modal</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Adjust any of the settings:
+<ul><li>Change the title or slug</li>
+<li>Select a different post type</li>
+<li>Change the status</li>
+<li>Set a different author</li>
+<li>Modify the date</li>
+<li>Toggle taxonomies or custom meta on/off</li></ul></li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Click <strong>"Duplicate [Post Type]"</strong> to create with your custom settings</li>
+<!-- /wp:list-item --></ol>
+<!-- /wp:list -->
+
+<!-- wp:spacer {"height":"60px"} -->
+<div style="height:60px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Permissions</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Your ability to duplicate posts depends on your user role and permissions:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li><strong>Duplicate Posts:</strong> Allows you to duplicate your own posts</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Duplicate Others' Posts:</strong> Allows you to duplicate posts created by other users</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p>If you don't see the duplicate option, contact your site administrator to grant the necessary permissions.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:spacer {"height":"60px"} -->
+<div style="height:60px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Tips</h2>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li><strong>Creating Templates:</strong> Duplicate a well-structured post to use as a template for future content</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Making Variations:</strong> Create multiple versions of a post with different titles or content</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Bulk Operations:</strong> Use bulk duplication to efficiently duplicate multiple posts at once — ideal for migrations or many variations</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Multiple Clones:</strong> Create several copies of a single post at once for A/B testing, variations, or content series</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Testing:</strong> Use duplication to test changes without affecting the original post</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Scheduling:</strong> Duplicate published posts and schedule them for future publication dates</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Content Series:</strong> Use multiple clones for related posts with similar structure but different content</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Batch Processing:</strong> For large batches, duplicate in smaller groups to avoid timeouts</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:spacer {"height":"60px"} -->
+<div style="height:60px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:separator {"className":"is-style-wide"} -->
+<hr class="wp-block-separator has-alpha-channel-opacity is-style-wide"/>
+<!-- /wp:separator -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Troubleshooting</h2>
+<!-- /wp:heading -->
+
+<!-- wp:spacer {"height":"8px"} -->
+<div style="height:8px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading {"level":4} -->
+<h4 class="wp-block-heading">I don't see the duplicate option</h4>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Check that you have the necessary permissions (contact your administrator)</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Make sure you're not viewing the Trash page</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Some post types may have duplication disabled — check the Post Types tab in Settings</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>On custom plugin admin screens, the duplicate link may not appear unless that post type is enabled for duplication</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:spacer {"height":"8px"} -->
+<div style="height:8px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading {"level":4} -->
+<h4 class="wp-block-heading">The duplicate button doesn't work</h4>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Refresh the page and try again</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Check your browser console for JavaScript errors</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Note: basic duplication using your default settings works even without JavaScript (the link will redirect to a PHP handler). If the modal isn't appearing on a custom admin screen, add that screen's page slug to <strong>Settings &gt; Post Duplicator &gt; Advanced &gt; Page Slugs</strong></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:spacer {"height":"8px"} -->
+<div style="height:8px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading {"level":4} -->
+<h4 class="wp-block-heading">The duplicate isn't created</h4>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Check that you have permission to create posts of that type</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Verify your user role has the necessary capabilities</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Contact your site administrator if issues persist</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:spacer {"height":"8px"} -->
+<div style="height:8px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading {"level":4} -->
+<h4 class="wp-block-heading">Bulk duplication isn't working</h4>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Make sure you've selected at least one post before applying the bulk action</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Check that all selected posts are of the same post type (bulk actions work per post type)</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Verify you have permissions to duplicate all selected posts</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>For large batches, try duplicating in smaller groups</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:spacer {"height":"8px"} -->
+<div style="height:8px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading {"level":4} -->
+<h4 class="wp-block-heading">Multiple clones aren't being created</h4>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Ensure the "Create Multiple Copies" option is enabled</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Check that the clone count is set to at least 2</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Verify you have permission to create multiple posts</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->

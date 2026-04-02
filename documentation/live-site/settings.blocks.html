@@ -1,0 +1,806 @@
+<!-- wp:paragraph -->
+<p>This guide explains all the settings available in the Post Duplicator plugin. Access these settings by going to <strong>Settings &gt; Post Duplicator</strong> in your WordPress admin.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"url":"https://placehold.co/960x480/e9ecef/495057?text=Settings+Page+Overview","alt":"Full view of the Settings > Post Duplicator screen showing the Defaults, Permissions, and Advanced sections","sizeSlug":"large"} -->
+<figure class="wp-block-image size-large"><img src="https://placehold.co/960x480/e9ecef/495057?text=Settings+Page+Overview" alt="Full view of the Settings > Post Duplicator screen showing the Defaults, Permissions, and Advanced sections"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:separator {"className":"is-style-wide"} -->
+<hr class="wp-block-separator has-alpha-channel-opacity is-style-wide"/>
+<!-- /wp:separator -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Overview</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>The settings page is divided into three main sections:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list {"ordered":true} -->
+<ol class="wp-block-list"><!-- wp:list-item -->
+<li><strong>Defaults</strong> — Configure default behavior for all duplications</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Permissions</strong> — Control who can duplicate posts</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Advanced</strong> — Configure additional admin screens and fine-tune duplication behavior for special post types</li>
+<!-- /wp:list-item --></ol>
+<!-- /wp:list -->
+
+<!-- wp:spacer {"height":"60px"} -->
+<div style="height:60px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Defaults Section</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>These settings determine the default behavior when duplicating posts. You can override these defaults for individual duplications using the duplication modal.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"url":"https://placehold.co/960x400/e9ecef/495057?text=Defaults+Section","alt":"The Defaults section of the settings page showing Post Status, Post Type, Post Author, Post Date, Title, Slug, and Offset Date fields","sizeSlug":"large"} -->
+<figure class="wp-block-image size-large"><img src="https://placehold.co/960x400/e9ecef/495057?text=Defaults+Section" alt="The Defaults section of the settings page showing Post Status, Post Type, Post Author, Post Date, Title, Slug, and Offset Date fields"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:spacer {"height":"24px"} -->
+<div style="height:24px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Post Status</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p><strong>Options:</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li><strong>Same as original</strong> — The duplicate will have the same status as the original post</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Draft</strong> — All duplicates will be created as drafts (recommended default)</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Published</strong> — All duplicates will be published immediately</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Pending</strong> — All duplicates will be set to pending review</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Recommendation:</strong> Keep this set to <strong>Draft</strong> to prevent accidentally publishing duplicates.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:spacer {"height":"16px"} -->
+<div style="height:16px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Post Type</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p><strong>Options:</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li><strong>Same</strong> — Duplicate will be the same post type as the original</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>[List of available post types]</strong> — Choose a specific post type to convert duplicates to</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Use Case:</strong> If you want to convert all duplicated posts to a different type (for example, convert all duplicated Posts to a custom "Article" post type).</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:spacer {"height":"16px"} -->
+<div style="height:16px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Post Author</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p><strong>Options:</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li><strong>Current User</strong> — The person duplicating the post becomes the author (recommended)</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Original Post Author</strong> — The duplicate keeps the original author</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Recommendation:</strong> Use <strong>Current User</strong> so duplicates are attributed to the person creating them.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:spacer {"height":"16px"} -->
+<div style="height:16px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Post Date</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p><strong>Options:</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li><strong>Duplicate Timestamp</strong> — The duplicate will have the same publication date as the original</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Current Time</strong> — The duplicate will use the current date and time (recommended)</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Recommendation:</strong> Use <strong>Current Time</strong> so duplicates have fresh timestamps.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:spacer {"height":"16px"} -->
+<div style="height:16px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Duplicate Title</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p><strong>Description:</strong> Text that will be appended to the original post title.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>Default:</strong> "Copy"</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>Example:</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Original: "My Blog Post"</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Duplicate: "My Blog Post Copy"</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Tip:</strong> You can customize this per duplication in the modal, but this sets the default suffix.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:spacer {"height":"16px"} -->
+<div style="height:16px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Duplicate Slug</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p><strong>Description:</strong> Text that will be appended to the original post slug (URL-friendly version).</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>Default:</strong> "copy"</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>Example:</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Original slug: "my-blog-post"</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Duplicate slug: "my-blog-post-copy"</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Tip:</strong> Keep this lowercase and URL-friendly. WordPress will automatically format it.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:spacer {"height":"16px"} -->
+<div style="height:16px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Offset Date</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p><strong>Description:</strong> When enabled, allows you to set a time offset for duplicated post dates.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>Default:</strong> Disabled</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>How it works:</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list {"ordered":true} -->
+<ol class="wp-block-list"><!-- wp:list-item -->
+<li>Check the <strong>Offset Date</strong> checkbox</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Set the offset amount:
+<ul><li><strong>Days</strong> — Number of days to offset</li>
+<li><strong>Hours</strong> — Number of hours to offset</li>
+<li><strong>Minutes</strong> — Number of minutes to offset</li>
+<li><strong>Seconds</strong> — Number of seconds to offset</li></ul></li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Choose the direction:
+<ul><li><strong>Newer</strong> — The duplicate date will be in the future</li>
+<li><strong>Older</strong> — The duplicate date will be in the past</li></ul></li>
+<!-- /wp:list-item --></ol>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Example:</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Original date: January 1, 2024</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Offset: 7 days, direction: Newer</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Duplicate date: January 8, 2024</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Use Case:</strong> Useful for scheduling duplicates at specific intervals or creating posts with historical dates.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"url":"https://placehold.co/720x260/e9ecef/495057?text=Offset+Date+Controls","alt":"The Offset Date setting expanded showing days, hours, minutes, seconds fields and newer/older direction toggle","sizeSlug":"large","align":"center"} -->
+<figure class="wp-block-image aligncenter size-large"><img src="https://placehold.co/720x260/e9ecef/495057?text=Offset+Date+Controls" alt="The Offset Date setting expanded showing days, hours, minutes, seconds fields and newer/older direction toggle"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:spacer {"height":"60px"} -->
+<div style="height:60px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Permissions Section</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Control which user roles can duplicate posts and what they can duplicate.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"url":"https://placehold.co/960x360/e9ecef/495057?text=Permissions+Section","alt":"The Permissions section showing role-based capability checkboxes for duplicate_posts and duplicate_others_posts","sizeSlug":"large"} -->
+<figure class="wp-block-image size-large"><img src="https://placehold.co/960x360/e9ecef/495057?text=Permissions+Section" alt="The Permissions section showing role-based capability checkboxes for duplicate_posts and duplicate_others_posts"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:spacer {"height":"24px"} -->
+<div style="height:24px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Role-Based Permissions</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>For each user role (Administrator, Editor, Author, Contributor, etc.), you can enable:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li><strong>duplicate_posts</strong> — Allows users to duplicate their own posts</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>duplicate_others_posts</strong> — Allows users to duplicate posts created by other users</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>How to Configure:</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list {"ordered":true} -->
+<ol class="wp-block-list"><!-- wp:list-item -->
+<li>Find the role you want to configure (e.g., "Author Permissions")</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Check the boxes for the capabilities you want to grant</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Click <strong>Save Changes</strong></li>
+<!-- /wp:list-item --></ol>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Default Behavior:</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Administrators typically have all permissions by default</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Other roles may need permissions granted manually</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Security Note:</strong> Be careful when granting "duplicate_others_posts" to lower-level roles, as this allows them to copy content created by others.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:spacer {"height":"60px"} -->
+<div style="height:60px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Advanced Section</h2>
+<!-- /wp:heading -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Additional Admin Screens</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p><strong>Description:</strong> A list of admin page slug prefixes (one per line) where Post Duplicator scripts should be loaded. This enables the full duplication modal on non-standard post list screens used by third-party plugins.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>Default:</strong> Pre-filled with <code>nestedpages</code> (WP Nested Pages) and <code>wpca-list</code> (WP Customer Area).</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>How it works:</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>When the duplicate link is clicked on any admin screen, basic duplication using your default settings always works regardless of this setting. This setting controls whether the <strong>full duplication modal</strong> (Advanced mode) loads on custom screens. If a page's slug starts with any entry in this list, the Post Duplicator scripts are enqueued on that page.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>Adding a custom screen:</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list {"ordered":true} -->
+<ol class="wp-block-list"><!-- wp:list-item -->
+<li>Find the admin page slug from the URL — it's the value of the <code>page</code> query parameter (e.g., <code>admin.php?page=my-plugin-list</code> → slug is <code>my-plugin-list</code>)</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Add the slug (or a prefix of it) to the list, one per line</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Click <strong>Save Changes</strong></li>
+<!-- /wp:list-item --></ol>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Example:</strong> If a plugin uses pages like <code>admin.php?page=my-plugin-list</code> and <code>admin.php?page=my-plugin-list-archive</code>, you can add <code>my-plugin-list</code> as a single entry and it will match both.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>Developer filter:</strong> Developers can register additional screens programmatically without touching the settings:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>add_filter( 'mtphr_post_duplicator_additional_screens', function( $slugs ) {
+    $slugs[] = 'my-plugin-page-slug';
+    return $slugs;
+} );</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:image {"url":"https://placehold.co/720x240/e9ecef/495057?text=Page+Slugs+Textarea","alt":"The Additional Admin Screens textarea field in Advanced settings showing page slug entries","sizeSlug":"large","align":"center"} -->
+<figure class="wp-block-image aligncenter size-large"><img src="https://placehold.co/720x240/e9ecef/495057?text=Page+Slugs+Textarea" alt="The Additional Admin Screens textarea field in Advanced settings showing page slug entries"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:separator {"className":"is-style-dots"} -->
+<hr class="wp-block-separator has-alpha-channel-opacity is-style-dots"/>
+<!-- /wp:separator -->
+
+<!-- wp:paragraph -->
+<p>The following settings control duplication behavior for special post statuses created by other users.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:spacer {"height":"16px"} -->
+<div style="height:16px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Draft Posts</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Should users be able to duplicate other users' draft posts?</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li><strong>Disabled</strong> — Users cannot duplicate drafts created by others</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Enabled</strong> — Users can duplicate drafts created by others (if they have permission)</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Default:</strong> Enabled &nbsp;·&nbsp; <strong>Use Case:</strong> Disable this if you want to prevent users from seeing or copying unpublished drafts from other authors.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:spacer {"height":"16px"} -->
+<div style="height:16px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Pending Posts</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Should users be able to duplicate other users' pending posts?</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li><strong>Disabled</strong> — Users cannot duplicate pending posts created by others</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Enabled</strong> — Users can duplicate pending posts created by others (if they have permission)</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Default:</strong> Enabled &nbsp;·&nbsp; <strong>Use Case:</strong> Useful in editorial workflows where pending posts are under review.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:spacer {"height":"16px"} -->
+<div style="height:16px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Private Posts</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Should users be able to duplicate other users' private posts?</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li><strong>Disabled</strong> — Users cannot duplicate private posts created by others</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Enabled</strong> — Users can duplicate private posts created by others (if they have permission)</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Default:</strong> Enabled &nbsp;·&nbsp; <strong>Use Case:</strong> Private posts are typically meant to be restricted. Consider disabling this for better privacy.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:spacer {"height":"16px"} -->
+<div style="height:16px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Password Protected Posts</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Should users be able to duplicate other users' password protected posts?</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li><strong>Disabled</strong> — Users cannot duplicate password protected posts created by others</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Enabled</strong> — Users can duplicate password protected posts created by others (if they have permission)</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Default:</strong> Enabled &nbsp;·&nbsp; <strong>Use Case:</strong> Password protected posts are meant to be restricted. Consider disabling this for better security.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:spacer {"height":"16px"} -->
+<div style="height:16px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Future Posts (Scheduled Posts)</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Should users be able to duplicate other users' scheduled/future posts?</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li><strong>Disabled</strong> — Users cannot duplicate scheduled posts created by others</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Enabled</strong> — Users can duplicate scheduled posts created by others (if they have permission)</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p><strong>Default:</strong> Enabled &nbsp;·&nbsp; <strong>Use Case:</strong> Scheduled posts are often part of content calendars. Enable this if you want to allow copying scheduled content.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"url":"https://placehold.co/960x320/e9ecef/495057?text=Advanced+Status+Toggles","alt":"The Advanced section showing enable/disable toggles for Draft, Pending, Private, Password Protected, and Future post statuses","sizeSlug":"large"} -->
+<figure class="wp-block-image size-large"><img src="https://placehold.co/960x320/e9ecef/495057?text=Advanced+Status+Toggles" alt="The Advanced section showing enable/disable toggles for Draft, Pending, Private, Password Protected, and Future post statuses"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:spacer {"height":"60px"} -->
+<div style="height:60px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Saving Settings</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>After making any changes:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list {"ordered":true} -->
+<ol class="wp-block-list"><!-- wp:list-item -->
+<li>Scroll to the bottom of the settings page</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Click <strong>Save Changes</strong></li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Your settings will be applied immediately</li>
+<!-- /wp:list-item --></ol>
+<!-- /wp:list -->
+
+<!-- wp:spacer {"height":"60px"} -->
+<div style="height:60px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Best Practices</h2>
+<!-- /wp:heading -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Recommended Default Settings</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>For most sites, we recommend:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:table {"hasFixedLayout":true,"className":"is-style-stripes"} -->
+<figure class="wp-block-table is-style-stripes"><table class="has-fixed-layout"><thead><tr><th>Setting</th><th>Recommended Value</th></tr></thead><tbody><tr><td>Post Status</td><td>Draft</td></tr><tr><td>Post Type</td><td>Same</td></tr><tr><td>Post Author</td><td>Current User</td></tr><tr><td>Post Date</td><td>Current Time</td></tr><tr><td>Duplicate Title</td><td>"Copy"</td></tr><tr><td>Duplicate Slug</td><td>"copy"</td></tr><tr><td>Offset Date</td><td>Disabled</td></tr></tbody></table></figure>
+<!-- /wp:table -->
+
+<!-- wp:spacer {"height":"24px"} -->
+<div style="height:24px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Security Recommendations</h3>
+<!-- /wp:heading -->
+
+<!-- wp:list {"ordered":true} -->
+<ol class="wp-block-list"><!-- wp:list-item -->
+<li><strong>Limit Permissions:</strong> Only grant "duplicate_others_posts" to trusted roles (Editors, Administrators)</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Private Posts:</strong> Consider disabling duplication of private posts for better privacy</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Password Protected:</strong> Consider disabling duplication of password protected posts</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Review Advanced Settings:</strong> Regularly review the Advanced section to ensure it matches your site's needs</li>
+<!-- /wp:list-item --></ol>
+<!-- /wp:list -->
+
+<!-- wp:spacer {"height":"24px"} -->
+<div style="height:24px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Workflow Tips</h3>
+<!-- /wp:heading -->
+
+<!-- wp:list {"ordered":true} -->
+<ol class="wp-block-list"><!-- wp:list-item -->
+<li><strong>Editorial Workflows:</strong> If you have a review process, you may want to disable duplication of pending posts</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Content Templates:</strong> If you use posts as templates, set default status to Draft so templates aren't accidentally published</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Multi-Author Sites:</strong> Use "Current User" for Post Author to ensure proper attribution</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Scheduled Content:</strong> Enable duplication of future posts if you want to copy scheduled content calendars</li>
+<!-- /wp:list-item --></ol>
+<!-- /wp:list -->
+
+<!-- wp:spacer {"height":"60px"} -->
+<div style="height:60px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Understanding Settings vs. Modal Overrides</h2>
+<!-- /wp:heading -->
+
+<!-- wp:columns -->
+<div class="wp-block-columns"><!-- wp:column -->
+<div class="wp-block-column"><!-- wp:heading {"level":4} -->
+<h4 class="wp-block-heading">Settings Page (Defaults)</h4>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>These are the default values used when duplicating</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>They apply to all duplications unless overridden</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Set once and use repeatedly</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></div>
+<!-- /wp:column -->
+
+<!-- wp:column -->
+<div class="wp-block-column"><!-- wp:heading {"level":4} -->
+<h4 class="wp-block-heading">Duplication Modal (Overrides)</h4>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>These allow you to customize individual duplications</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Override the defaults for that specific duplication only</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Don't affect future duplications</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns -->
+
+<!-- wp:paragraph -->
+<p><strong>Example:</strong> Default status is set to "Draft" in settings. You duplicate a post and change status to "Published" in the modal. The duplicate is published, but future duplications will still default to "Draft".</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:spacer {"height":"60px"} -->
+<div style="height:60px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:separator {"className":"is-style-wide"} -->
+<hr class="wp-block-separator has-alpha-channel-opacity is-style-wide"/>
+<!-- /wp:separator -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Troubleshooting</h2>
+<!-- /wp:heading -->
+
+<!-- wp:spacer {"height":"8px"} -->
+<div style="height:8px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading {"level":4} -->
+<h4 class="wp-block-heading">Settings aren't saving</h4>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Make sure you click "Save Changes" at the bottom</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Check that you have "manage_options" capability (typically Administrator role)</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Try refreshing the page</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:spacer {"height":"8px"} -->
+<div style="height:8px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading {"level":4} -->
+<h4 class="wp-block-heading">Defaults aren't being applied</h4>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Clear your browser cache</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Check that you saved the settings</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Verify you're looking at the correct settings section</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:spacer {"height":"8px"} -->
+<div style="height:8px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:heading {"level":4} -->
+<h4 class="wp-block-heading">Permissions aren't working</h4>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Ensure you saved the Permissions section</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Check that the user role actually has the capabilities assigned</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Some plugins may override WordPress capabilities</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
