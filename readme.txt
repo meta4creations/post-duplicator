@@ -4,7 +4,7 @@ Tags: posts, post, duplicate, duplication
 Requires at least: 6.6
 Requires PHP: 7.4
 Tested up to: 6.9.4
-Stable tag: 3.0.14
+Stable tag: 3.0.15
 License: GPL2
 
 Creates functionality to duplicate any and all post types, including taxonomies & custom fields. Perfect for developers and content creators.
@@ -314,6 +314,9 @@ Please report any security bugs found in the source code of this project through
 
 == Changelog ==
 
+= 3.0.15 [2026-05-14] =
+* Security fix: store duplicated custom meta via `add_post_meta()` so WordPress core's `maybe_serialize()` neutralizes raw serialized payloads, mitigating PHP Object Injection (CWE-502)
+
 = 3.0.14 [2026-04-02] =
 * Added "Excluded Meta Keys" setting on the Advanced tab to allow users to specify meta keys that should never be duplicated or shown in the duplication modal
 * Moved `nestedpages` and `wpca-list` screen slugs from settings default value to hardcoded filter in `hooks.php`
@@ -585,4 +588,4 @@ Must upgrade in order for the plugin to work. The file paths where initially wro
 
 == Upgrade Notice ==
 
-Added "Excluded Meta Keys" setting and other updates
+Security fix

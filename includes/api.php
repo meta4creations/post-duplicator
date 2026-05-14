@@ -506,7 +506,6 @@ function sanitize_meta_value( $meta_value, $meta_key = '', $post_id = 0 ) {
 	if ( meta_value_contains_html( $meta_value, $meta_key, $post_id ) ) {
 		// Use wp_kses_post to preserve HTML but sanitize it
 		// wp_kses_post sanitizes HTML while preserving allowed tags
-		// $wpdb->insert() handles escaping automatically via prepared statements
 		return wp_kses_post( $meta_value );
 	}
 	
@@ -561,8 +560,6 @@ function duplicate_post_permissions( $request ) {
  *                          on success; WP_Error on failure.
  */
 function perform_duplication( $orig, $settings ) {
-	global $wpdb;
-
 	$original_id = $orig->ID;
 
 	$duplicate = array();
@@ -830,7 +827,12 @@ function perform_duplication( $orig, $settings ) {
 					continue;
 				}
 				if ( is_protected_meta( $meta_key, 'post' ) ) {
-					$cloned_meta_data[ $meta_key ] = $original_custom_fields[ $meta_key ];
+					// Decode raw stored values so add_post_meta() can re-serialize them
+					// safely without double serialization corrupting the result.
+					$cloned_meta_data[ $meta_key ] = array_map(
+						'maybe_unserialize',
+						$original_custom_fields[ $meta_key ]
+					);
 				} else {
 					if ( ! array_key_exists( $meta_key, $cloned_meta_data ) ) {
 						$cloned_meta_data[ $meta_key ] = array();
@@ -841,41 +843,46 @@ function perform_duplication( $orig, $settings ) {
 						$meta_value = json_decode( $meta_value, true );
 					}
 					if ( is_array( $meta_value ) ) {
-						if ( $original_value ) {
-							if ( is_serialized( $original_value ) ) {
-								$meta_value = maybe_serialize( $meta_value );
-							} elseif ( is_json_string( $original_value ) ) {
-								$meta_value = wp_json_encode( $meta_value );
-							}
-						} else {
-							$meta_value = maybe_serialize( $meta_value );
+						// Preserve JSON encoding when the original meta was stored as JSON.
+						// For arrays destined for PHP serialization, leave as an array;
+						// add_post_meta() below will serialize via maybe_serialize().
+						if ( $original_value && is_string( $original_value ) && is_json_string( $original_value ) ) {
+							$meta_value = wp_json_encode( $meta_value );
 						}
 					}
 					$cloned_meta_data[ $meta_key ][] = $meta_value;
 				}
 			}
 		} else {
-			$cloned_meta_data = $original_custom_fields;
+			// No per-key user input: copy all original meta. Decode raw stored values
+			// so add_post_meta() can re-serialize them safely below.
+			foreach ( $original_custom_fields as $meta_key => $values ) {
+				if ( ! is_array( $values ) ) {
+					continue;
+				}
+				$cloned_meta_data[ $meta_key ] = array_map( 'maybe_unserialize', $values );
+			}
 		}
 
 		foreach ( $cloned_meta_data as $key => $value ) {
 			if ( in_array( $key, $excluded_meta_keys, true ) ) {
 				continue;
 			}
-			if ( is_array( $value ) && count( $value ) > 0 ) {
-				foreach ( $value as $i => $v ) {
-					if ( ! apply_filters( "mtphr_post_duplicator_meta_{$key}_enabled", true ) ) {
-						continue;
-					}
-					$meta_value = apply_filters( "mtphr_post_duplicator_meta_value", $v, $key, $duplicate_id, $duplicate['post_type'] );
-					$data       = array(
-						'post_id'    => intval( $duplicate_id ),
-						'meta_key'   => sanitize_text_field( $key ),
-						'meta_value' => $meta_value,
-					);
-					$formats = array( '%d', '%s', '%s' );
-					$wpdb->insert( $wpdb->prefix . 'postmeta', $data, $formats );
+			if ( ! is_array( $value ) || count( $value ) === 0 ) {
+				continue;
+			}
+			foreach ( $value as $i => $v ) {
+				if ( ! apply_filters( "mtphr_post_duplicator_meta_{$key}_enabled", true ) ) {
+					continue;
 				}
+				$meta_value = apply_filters( "mtphr_post_duplicator_meta_value", $v, $key, $duplicate_id, $duplicate['post_type'] );
+
+				// Use add_post_meta() (instead of a direct $wpdb->insert()) so WordPress
+				// core's maybe_serialize() applies double-serialization protection. A
+				// user-supplied raw serialized object string is then stored as an escaped
+				// serialized string and is NOT instantiated as a PHP object when later
+				// read back via get_post_meta(). Mitigates PHP Object Injection (CWE-502).
+				add_post_meta( $duplicate_id, $key, wp_slash( $meta_value ) );
 			}
 		}
 	}
