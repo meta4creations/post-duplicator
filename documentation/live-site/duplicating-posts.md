@@ -92,7 +92,7 @@ When you click to duplicate a post, a modal window opens with various options. H
 
 ### Advanced Options
 
-- **Taxonomies**: Toggle to include or exclude categories, tags, and custom taxonomies
+- **Taxonomies**: Toggle to include or exclude categories, tags, and custom taxonomies. Expand the section to add or remove terms — type to search, rather than loading every term in the taxonomy
 - **Custom Meta**: Toggle to include or exclude custom fields and metadata
 
 <!-- IMAGE(placeholder): duplicating-posts-modal-advanced.png — Modal with Advanced / taxonomies / custom meta options visible -->
@@ -288,6 +288,11 @@ If you don't see the duplicate option, contact your site administrator to grant 
 - Check that all selected posts are of the same post type (bulk actions work per post type)
 - Verify you have permissions to duplicate all selected posts
 - For large batches, try duplicating in smaller groups
+
+**Duplicating is slow or times out on sites with large taxonomies:**
+
+- The duplication modal loads only the terms already assigned to the post, then searches as you type
+- You do not need to load every term in a taxonomy to duplicate a post
 
 **Multiple clones aren't being created:**
 

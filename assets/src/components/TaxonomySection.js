@@ -1,10 +1,174 @@
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import {
 	ToggleControl,
 	FormTokenField,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+
+const SEARCH_DEBOUNCE_MS = 300;
+const SEARCH_LIMIT = 20;
+
+const buildTermMaps = ( terms ) => {
+	const byId = {};
+	const byName = {};
+	( terms || [] ).forEach( ( term ) => {
+		byId[ term.id ] = term;
+		byName[ term.name ] = term;
+	} );
+	return { byId, byName };
+};
+
+const TaxonomyTermField = ( { taxonomy, selectedTermIds, onChange } ) => {
+	const [ suggestions, setSuggestions ] = useState( () =>
+		( taxonomy.terms || [] ).map( ( term ) => term.name )
+	);
+	const termMapsRef = useRef( buildTermMaps( taxonomy.terms ) );
+	const debounceRef = useRef( null );
+	const abortRef = useRef( null );
+	const requestIdRef = useRef( 0 );
+	const hasFetchedInitialRef = useRef( false );
+
+	const mergeTerms = ( terms ) => {
+		const maps = termMapsRef.current;
+		( terms || [] ).forEach( ( term ) => {
+			maps.byId[ term.id ] = term;
+			maps.byName[ term.name ] = term;
+		} );
+	};
+
+	useEffect( () => {
+		mergeTerms( taxonomy.terms );
+	}, [ taxonomy.terms ] );
+
+	const searchTerms = useCallback(
+		async ( query ) => {
+			const restUrl = window.postDuplicatorVars?.restUrl || '';
+			const nonce = window.postDuplicatorVars?.nonce || '';
+			if ( ! restUrl || ! nonce ) {
+				return;
+			}
+
+			if ( abortRef.current ) {
+				abortRef.current.abort();
+			}
+
+			const controller = new AbortController();
+			abortRef.current = controller;
+			const requestId = ++requestIdRef.current;
+
+			const params = new URLSearchParams( {
+				taxonomy: taxonomy.slug,
+				number: String( SEARCH_LIMIT ),
+			} );
+			if ( query ) {
+				params.set( 'search', query );
+			}
+
+			try {
+				const response = await fetch(
+					`${ restUrl }search-terms?${ params.toString() }`,
+					{
+						method: 'GET',
+						headers: {
+							'X-WP-Nonce': nonce,
+						},
+						signal: controller.signal,
+					}
+				);
+
+				if ( ! response.ok || requestId !== requestIdRef.current ) {
+					return;
+				}
+
+				const terms = await response.json();
+				if ( ! Array.isArray( terms ) ) {
+					return;
+				}
+
+				mergeTerms( terms );
+				setSuggestions( terms.map( ( term ) => term.name ) );
+			} catch ( error ) {
+				if ( error.name !== 'AbortError' ) {
+					console.error( 'Error searching terms:', error );
+				}
+			}
+		},
+		[ taxonomy.slug ]
+	);
+
+	useEffect( () => {
+		return () => {
+			if ( debounceRef.current ) {
+				clearTimeout( debounceRef.current );
+			}
+			if ( abortRef.current ) {
+				abortRef.current.abort();
+			}
+		};
+	}, [] );
+
+	const handleFocus = () => {
+		if ( hasFetchedInitialRef.current ) {
+			return;
+		}
+		hasFetchedInitialRef.current = true;
+		searchTerms( '' );
+	};
+
+	const handleInputChange = ( value ) => {
+		if ( debounceRef.current ) {
+			clearTimeout( debounceRef.current );
+		}
+		debounceRef.current = setTimeout( () => {
+			hasFetchedInitialRef.current = true;
+			searchTerms( value.trim() );
+		}, SEARCH_DEBOUNCE_MS );
+	};
+
+	const selectedTermNames = ( selectedTermIds || [] )
+		.map( ( id ) => termMapsRef.current.byId[ id ]?.name )
+		.filter( Boolean );
+
+	return (
+		<div onFocus={ handleFocus }>
+			<label
+				style={ {
+					display: 'block',
+					marginBottom: '8px',
+					fontWeight: 500,
+				} }
+			>
+				{ taxonomy.label }
+			</label>
+			<FormTokenField
+				value={ selectedTermNames }
+				suggestions={ suggestions }
+				placeholder={ __( 'Type to search terms', 'post-duplicator' ) }
+				onInputChange={ handleInputChange }
+				onChange={ ( tokens ) => {
+					const newTermIds = tokens
+						.map( ( tokenName ) => {
+							const term =
+								termMapsRef.current.byName[ tokenName ];
+							return term ? term.id : null;
+						} )
+						.filter( ( id ) => id !== null );
+
+					onChange( newTermIds );
+				} }
+				__experimentalValidateInput={ ( token ) =>
+					Boolean( termMapsRef.current.byName[ token ] )
+				}
+				__experimentalExpandOnFocus
+				__experimentalShowHowTo={ false }
+				__nextHasNoMarginBottom
+				__next40pxDefaultSize
+				maxSuggestions={ SEARCH_LIMIT }
+			/>
+		</div>
+	);
+};
 
 const TaxonomySection = ( { taxonomies, onChange, enabled, onToggle } ) => {
 	const [ isExpanded, setIsExpanded ] = useState( false );
@@ -21,19 +185,6 @@ const TaxonomySection = ( { taxonomies, onChange, enabled, onToggle } ) => {
 			setSelectedTerms( initialTerms );
 		}
 	}, [ taxonomies ] );
-
-	// Calculate counts
-	const taxonomyCount = taxonomies ? taxonomies.length : 0;
-	const totalTermsCount = taxonomies
-		? taxonomies.reduce(
-				( sum, taxonomy ) => sum + taxonomy.terms.length,
-				0
-		  )
-		: 0;
-	const selectedTermsCount = Object.values( selectedTerms ).reduce(
-		( sum, termIds ) => sum + termIds.length,
-		0
-	);
 
 	const handleTermChange = ( taxonomySlug, termIds ) => {
 		const newSelectedTerms = {
@@ -60,8 +211,14 @@ const TaxonomySection = ( { taxonomies, onChange, enabled, onToggle } ) => {
 		return null;
 	}
 
+	const taxonomyCount = taxonomies.length;
+	const selectedTermsCount = Object.values( selectedTerms ).reduce(
+		( sum, termIds ) => sum + termIds.length,
+		0
+	);
+
 	return (
-		<div 
+		<div
 			className="duplicate-post-modal__taxonomy-section"
 			style={ {
 				opacity: enabled ? 1 : 0.5,
@@ -95,7 +252,7 @@ const TaxonomySection = ( { taxonomies, onChange, enabled, onToggle } ) => {
 							{ ' ' }
 							({ taxonomyCount }{ ' ' }
 							{ __( 'taxonomies', 'post-duplicator' ) },{ ' ' }
-							{ selectedTermsCount || totalTermsCount }{ ' ' }
+							{ selectedTermsCount }{ ' ' }
 							{ __( 'terms', 'post-duplicator' ) })
 						</span>
 					) }
@@ -108,67 +265,18 @@ const TaxonomySection = ( { taxonomies, onChange, enabled, onToggle } ) => {
 					style={ { padding: '16px' } }
 				>
 					<VStack spacing="20px">
-						{ taxonomies.map( ( taxonomy ) => {
-							const currentTermIds =
-								selectedTerms[ taxonomy.slug ] || [];
-
-							// Get ALL term names for suggestions
-							const termSuggestions = taxonomy.terms.map(
-								( term ) => term.name
-							);
-							
-							// Get selected term names
-							const selectedTermNames = taxonomy.terms
-								.filter( ( term ) =>
-									currentTermIds.includes( term.id )
-								)
-								.map( ( term ) => term.name );
-
-							return (
-								<div key={ taxonomy.slug }>
-									<label
-										style={ {
-											display: 'block',
-											marginBottom: '8px',
-											fontWeight: 500,
-										} }
-									>
-										{ taxonomy.label }
-									</label>
-									<FormTokenField
-										value={ selectedTermNames }
-										suggestions={ termSuggestions }
-										onChange={ ( tokens ) => {
-											// Convert term names back to IDs
-											const newTermIds = tokens
-												.map( ( tokenName ) => {
-													const term =
-														taxonomy.terms.find(
-															( t ) =>
-																t.name ===
-																tokenName
-														);
-													return term
-														? term.id
-														: null;
-												} )
-												.filter(
-													( id ) => id !== null
-												);
-
-											handleTermChange(
-												taxonomy.slug,
-												newTermIds
-											);
-										} }
-										__experimentalExpandOnFocus
-										__experimentalShowHowTo={ false }
-										__nextHasNoMarginBottom
-										__next40pxDefaultSize
-									/>
-								</div>
-							);
-						} ) }
+						{ taxonomies.map( ( taxonomy ) => (
+							<TaxonomyTermField
+								key={ taxonomy.slug }
+								taxonomy={ taxonomy }
+								selectedTermIds={
+									selectedTerms[ taxonomy.slug ] || []
+								}
+								onChange={ ( termIds ) =>
+									handleTermChange( taxonomy.slug, termIds )
+								}
+							/>
+						) ) }
 					</VStack>
 				</div>
 			) }

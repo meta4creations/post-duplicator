@@ -65,6 +65,34 @@ function register_routes() {
     'permission_callback' => __NAMESPACE__ . '\get_users_permissions',
     'callback' => __NAMESPACE__ . '\get_users',
   ) );
+
+  register_rest_route( 'post-duplicator/v1', 'search-terms', array(
+    'methods' => 'GET',
+    'permission_callback' => __NAMESPACE__ . '\search_terms_permissions',
+    'callback' => __NAMESPACE__ . '\search_terms',
+    'args' => array(
+      'taxonomy' => array(
+        'required' => true,
+        'type' => 'string',
+        'sanitize_callback' => 'sanitize_key',
+        'validate_callback' => function( $param ) {
+          return taxonomy_exists( sanitize_key( $param ) );
+        },
+      ),
+      'search' => array(
+        'required' => false,
+        'type' => 'string',
+        'default' => '',
+        'sanitize_callback' => 'sanitize_text_field',
+      ),
+      'number' => array(
+        'required' => false,
+        'type' => 'integer',
+        'default' => 20,
+        'sanitize_callback' => 'absint',
+      ),
+    ),
+  ) );
 }
 
 /**
@@ -115,26 +143,26 @@ function get_post_data( $request ) {
       continue;
     }
     
-    // Get terms currently assigned to the post
-    $assigned_term_ids = wp_get_post_terms( $post_id, $taxonomy_slug, array( 'fields' => 'ids' ) );
-    
-    // Get ALL available terms for this taxonomy
-    $all_terms = get_terms( array(
-      'taxonomy' => $taxonomy_slug,
-      'hide_empty' => false,
+    // Only return terms currently assigned to the post. Full taxonomies are
+    // searched on demand via the search-terms endpoint so large term sets
+    // are not loaded into the duplication modal.
+    $assigned_terms = wp_get_post_terms( $post_id, $taxonomy_slug, array(
+      'update_term_meta_cache' => false,
     ) );
-    
+
+    $assigned_term_ids = array();
     $terms_data = array();
-    if ( ! is_wp_error( $all_terms ) ) {
-      foreach ( $all_terms as $term ) {
+    if ( ! is_wp_error( $assigned_terms ) ) {
+      foreach ( $assigned_terms as $term ) {
+        $assigned_term_ids[] = (int) $term->term_id;
         $terms_data[] = array(
-          'id' => $term->term_id,
+          'id' => (int) $term->term_id,
           'name' => $term->name,
           'slug' => $term->slug,
         );
       }
     }
-    
+
     $taxonomies_data[] = array(
       'slug' => $taxonomy_slug,
       'label' => $taxonomy->labels->name,
@@ -220,6 +248,74 @@ function get_post_data( $request ) {
     'taxonomies' => $taxonomies_data,
     'customMeta' => $custom_meta_data,
   ) );
+}
+
+/**
+ * Permission check for searching taxonomy terms
+ */
+function search_terms_permissions( $request ) {
+  if ( ! is_user_logged_in() ) {
+    return new \WP_Error( 'not_logged_in', esc_html__( 'You must be logged in to access this endpoint.', 'post-duplicator' ), array( 'status' => 401 ) );
+  }
+
+  if ( ! current_user_can( 'edit_posts' ) ) {
+    return new \WP_Error( 'no_permission', esc_html__( 'You do not have permission to access this endpoint.', 'post-duplicator' ), array( 'status' => 403 ) );
+  }
+
+  $taxonomy_slug = sanitize_key( $request->get_param( 'taxonomy' ) );
+  $taxonomy = get_taxonomy( $taxonomy_slug );
+  if ( ! $taxonomy ) {
+    return new \WP_Error( 'invalid_taxonomy', esc_html__( 'Invalid taxonomy.', 'post-duplicator' ), array( 'status' => 400 ) );
+  }
+
+  if ( ! current_user_can( $taxonomy->cap->assign_terms ) ) {
+    return new \WP_Error( 'no_permission', esc_html__( 'You do not have permission to assign terms in this taxonomy.', 'post-duplicator' ), array( 'status' => 403 ) );
+  }
+
+  return true;
+}
+
+/**
+ * Search taxonomy terms for the duplication modal
+ */
+function search_terms( $request ) {
+  $taxonomy_slug = sanitize_key( $request->get_param( 'taxonomy' ) );
+  $search = sanitize_text_field( $request->get_param( 'search' ) );
+  $number = absint( $request->get_param( 'number' ) );
+
+  if ( $number < 1 ) {
+    $number = 20;
+  } elseif ( $number > 50 ) {
+    $number = 50;
+  }
+
+  $args = array(
+    'taxonomy'               => $taxonomy_slug,
+    'hide_empty'             => false,
+    'number'                 => $number,
+    'orderby'                => 'name',
+    'order'                  => 'ASC',
+    'update_term_meta_cache' => false,
+  );
+
+  if ( '' !== $search ) {
+    $args['search'] = $search;
+  }
+
+  $terms = get_terms( $args );
+  $terms_data = array();
+
+  if ( ! is_wp_error( $terms ) ) {
+    foreach ( $terms as $term ) {
+      $terms_data[] = array(
+        'id' => (int) $term->term_id,
+        'name' => $term->name,
+        'slug' => $term->slug,
+      );
+    }
+  }
+
+  return rest_ensure_response( $terms_data );
 }
 
 /**
