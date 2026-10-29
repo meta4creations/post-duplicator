@@ -394,8 +394,9 @@ function get_parent_posts_permissions( $request ) {
     return new \WP_Error( 'not_logged_in', esc_html__( 'You must be logged in to access this endpoint.', 'post-duplicator' ), array( 'status' => 401 ) );
   }
   
-  // Check if user has edit capabilities
-  if ( ! current_user_can( 'edit_posts' ) ) {
+  // User must be able to edit posts of the requested post type
+  $post_type_object = get_post_type_object( get_parent_posts_post_type( $request ) );
+  if ( ! $post_type_object || ! current_user_can( $post_type_object->cap->edit_posts ) ) {
     return new \WP_Error( 'no_permission', esc_html__( 'You do not have permission to access this endpoint.', 'post-duplicator' ), array( 'status' => 403 ) );
   }
   
@@ -403,19 +404,22 @@ function get_parent_posts_permissions( $request ) {
 }
 
 /**
+ * Resolve the post type requested for parent posts, defaulting to 'page'
+ */
+function get_parent_posts_post_type( $request ) {
+  $post_type = sanitize_key( (string) $request->get_param( 'post_type' ) );
+  if ( ! $post_type || ! post_type_exists( $post_type ) ) {
+    return 'page';
+  }
+  return $post_type;
+}
+
+/**
  * Get available parent posts for a post type (hierarchical)
  */
 function get_parent_posts( $request ) {
-  $post_type = $request->get_param( 'post_type' );
+  $post_type = get_parent_posts_post_type( $request );
   $exclude_id = $request->get_param( 'exclude_id' );
-  
-  // Validate and sanitize post type
-  if ( ! $post_type || ! post_type_exists( $post_type ) ) {
-    // Default to 'page' if no valid post type specified
-    $post_type = 'page';
-  } else {
-    $post_type = sanitize_key( $post_type );
-  }
   
   // Validate and sanitize exclude_id
   if ( $exclude_id ) {
@@ -441,6 +445,10 @@ function get_parent_posts( $request ) {
   // Build a map of posts by ID
   $posts_map = array();
   foreach ( $posts as $post ) {
+    // Only expose posts the current user is allowed to read (e.g. hide other users' drafts and private posts)
+    if ( ! current_user_can( 'read_post', $post->ID ) ) {
+      continue;
+    }
     $posts_map[ $post->ID ] = array(
       'id' => $post->ID,
       'title' => $post->post_title,
@@ -738,7 +746,8 @@ function perform_duplication( $orig, $settings ) {
 				if (
 					$selected_parent_post &&
 					$selected_parent_post->post_type === $duplicate['post_type'] &&
-					is_post_type_hierarchical( $duplicate['post_type'] )
+					is_post_type_hierarchical( $duplicate['post_type'] ) &&
+					current_user_can( 'read_post', $selected_parent_id )
 				) {
 					$duplicate['post_parent'] = $selected_parent_id;
 				}
@@ -1055,13 +1064,18 @@ function get_users_permissions( $request ) {
  * not on every admin page load, so memory usage is acceptable even with full user objects.
  */
 function get_users( $request ) {
-  // Get users with edit_posts capability
-  // Use global namespace \get_users() to avoid conflict with this function name
-  $users = \get_users( [
-    'capability__in' => ['edit_posts'],
-    'orderby' => 'display_name',
-    'order' => 'ASC',
-  ] );
+  // Users who can't assign other authors only get themselves back
+  if ( ! current_user_can( 'edit_others_posts' ) ) {
+    $users = [ wp_get_current_user() ];
+  } else {
+    // Get users with edit_posts capability
+    // Use global namespace \get_users() to avoid conflict with this function name
+    $users = \get_users( [
+      'capability__in' => ['edit_posts'],
+      'orderby' => 'display_name',
+      'order' => 'ASC',
+    ] );
+  }
   
   $user_options = [];
   foreach ( $users as $user ) {

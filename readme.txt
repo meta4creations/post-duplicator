@@ -3,8 +3,8 @@ Contributors: metaphorcreations
 Tags: posts, post, duplicate, duplication
 Requires at least: 6.6
 Requires PHP: 7.4
-Tested up to: 7.1
-Stable tag: 3.0.16
+Tested up to: 7.1.4
+Stable tag: 3.0.17
 License: GPL2
 
 Creates functionality to duplicate any and all post types, including taxonomies & custom fields. Perfect for developers and content creators.
@@ -314,6 +314,10 @@ Please report any security bugs found in the source code of this project through
 
 == Changelog ==
 
+= 3.0.17 [2026-10-29] =
+* Security fix: the parent posts REST route now only returns posts the current user is allowed to read, preventing contributors from listing titles of other users' draft and private posts. Props Luka Zimonjic (reported via WPScan)
+* Security fix: the users REST route now only returns the current user unless they can edit others' posts, so usernames are no longer exposed to contributors
+
 = 3.0.16 [2026-08-22] =
 * Stop loading every taxonomy term when opening the duplication modal; search terms as needed instead
 
@@ -591,4 +595,4 @@ Must upgrade in order for the plugin to work. The file paths where initially wro
 
 == Upgrade Notice ==
 
-Stop loading every taxonomy term when opening the duplication modal; search terms as needed instead
+Security fixes

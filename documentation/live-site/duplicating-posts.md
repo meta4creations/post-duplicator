@@ -87,7 +87,7 @@ When you click to duplicate a post, a modal window opens with various options. H
 - **Featured Image**: Preview and option to change the featured image
 - **Post Type**: Choose the post type for the duplicate (defaults to same type)
 - **Post Status**: Choose the status (Draft, Published, Pending, or Same as original)
-- **Post Author**: Select who should be listed as the author
+- **Post Author**: Select who should be listed as the author (users who can't edit others' posts can only choose themselves)
 - **Post Date**: Set the publication date for the duplicate
 
 ### Advanced Options
